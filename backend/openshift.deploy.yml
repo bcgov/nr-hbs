@@ -1,245 +1,415 @@
+---
+# Backend deploy Template — consumed by `oc process` in reusable-deploy.yml.
+#
+# Parameters of note:
+#   NAME       Defaults to repo name (nr-hbs).
+#   ZONE       PR number for previews, 'test' for TEST, 'prod' for PROD.
+#              Suffixes every resource name so PR/test/prod resources coexist
+#              in the same namespace.
+#   IMAGE_TAG  GHCR tag. Per-PR builds use the PR number; merge.yml deploys
+#              the same tag to TEST and PROD, then aliases as ':prod'.
+#
+# The image reference uses the BCGov convention:
+#   ghcr.io/<owner>/<repo>/backend:<tag>
 apiVersion: template.openshift.io/v1
 kind: Template
+metadata:
+  name: nr-hbs-backend-deploy
 parameters:
   - name: NAME
-    description: Module name
-    required: true
-  - name: COMPONENT
-    description: Component name
-    value: backend
+    description: App name prefix
+    value: nr-hbs
   - name: ZONE
-    description: Deployment zone, e.g. pr-### or prod
+    description: PR number, 'test', or 'prod'
     required: true
   - name: IMAGE_TAG
-    description: Image tag to use
-    required: true
+    description: Container image tag (PR number, 'test', or 'prod')
+    value: latest
   - name: REGISTRY
-    description: Container registry to import from
-    value: ghcr.io
-  - name: ORG_NAME
-    description: Organization name
-    value: bcgov
-  - name: DOMAIN
-    value: apps.silver.devops.gov.bc.ca
+    description: Image registry path (no tag)
+    value: ghcr.io/bcgov/nr-hbs/backend
   - name: MIN_REPLICAS
-    description: The minimum amount of replicas for the horizontal pod autoscaler.
-    value: "2"
+    value: "1"
   - name: MAX_REPLICAS
-    description: The maximum amount of replicas for the horizontal pod autoscaler.
-    value: "5"
-  - name: CPU_REQUEST
-    value: "100m"
-  - name: MEMORY_REQUEST
-    value: "128Mi"
-  - name: MEMORY_LIMIT
-    description: Memory limit for the container (bounds the pod's working set).
-    value: "4Gi"
-  - name: LOG_LEVEL
-    description: Application log level (debug|info|warn|error)
-    value: "info"
+    value: "2"
+  - name: MIN_CPU
+    value: "200m"
+  # Memory request. Kept equal to MAX_MEM for Guaranteed QoS — see the
+  # resources block on the backend container for the quota arithmetic.
+  - name: MIN_MEM
+    value: "1Gi"
+  # Memory limit. The JVM derives its max heap from this value
+  # (-XX:MaxRAMPercentage=60), so raising it raises the heap. Bounded by the
+  # PROD namespace's 4Gi quota across 3 backend + 3 frontend replicas.
+  - name: MAX_MEM
+    value: "1Gi"
+  # Container timezone. Drives the JVM default zone, which both log patterns
+  # (%d in logging.pattern.console / .file) render against — OpenShift
+  # containers are UTC by default, which puts every log line 7-8 hours off the
+  # BC business day. A named zone resolves from the tzdb bundled in the JDK,
+  # so no OS tzdata package is required on the Alpine base image.
+  - name: TZ
+    value: America/Vancouver
+  - name: APP_LOG_LEVEL
+    value: INFO
+  - name: SPRING_SECURITY_LOG_LEVEL
+    value: INFO
+  - name: SPRING_WEB_LOG_LEVEL
+    value: INFO
+  - name: SPRING_BOOT_AUTOCONFIG_LOG_LEVEL
+    value: INFO
+  - name: SPRING_JPA_SHOW_SQL
+    value: "false"
+  # BC Gov SSO (Keycloak) standard realm, e.g.
+  # https://test.loginproxy.gov.bc.ca/auth/realms/standard (nr-fta / nr-rept).
+  - name: KEYCLOAK_ISSUER_URI
+    required: true
+  # The CSS integration's client id. Tokens must carry it as `azp` or the API
+  # would accept any token the shared realm signs, for any client.
+  - name: KEYCLOAK_CLIENT_ID
+    required: true
+  # nr-user-lookup-api (IDIR/BCeID lookups) — replaces the retired FAM
+  # identity-lookup. Not required so PR previews (which skip the Keycloak
+  # service-account step) deploy fine with these blank; the backend degrades
+  # gracefully when they're unset.
+  - name: USER_LOOKUP_BASE_URL
+    required: false
+    value: ""
+  - name: USER_LOOKUP_TOKEN_URL
+    required: false
+    value: ""
+  - name: USER_LOOKUP_CLIENT_ID
+    required: false
+    value: ""
+  - name: USER_LOOKUP_CLIENT_SECRET
+    required: false
+    value: ""
+  # nr-forest-client-api (client picker, org names): scheme + host, and
+  # HBS's API Services Portal key (kept in the backend Secret). Not required
+  # so a deploy without them still starts; client lookups then answer 503.
+  - name: FOREST_CLIENT_API_URL
+    required: false
+    value: ""
+  - name: FOREST_CLIENT_API_KEY
+    required: false
+    value: ""
+  # ClamAV virus scanning — clamd reached over raw TCP (INSTREAM). Plain
+  # container env (non-sensitive, like KEYCLOAK_ISSUER_URI); no Secret.
+  - name: CLAMAV_ENABLED
+    required: false
+    value: "true"
+  - name: CLAMAV_HOST
+    required: true
+  - name: CLAMAV_PORT
+    required: false
+    value: "3310"
+  # fail-open=true tolerates a scanner outage (allows the upload); false
+  # rejects it (fail-CLOSED). App default is fail-CLOSED (secure); ephemeral
+  # PR/dev envs that can't reach clamd set this "true" so uploads/e2e work.
+  - name: CLAMAV_FAIL_OPEN
+    required: false
+    value: "false"
+  # Master kill-switch for automatic outbound email. Non-sensitive plain
+  # env. ON by default — set "false" (via the EMAIL_SEND_ENABLED deploy var)
+  # to keep an environment silent while still rendering / logging emails.
+  - name: EMAIL_SEND_ENABLED
+    required: false
+    value: "true"
+  # Re-hosted legacy batch jobs (XML intake, anomaly audits, purges). OFF by
+  # default — the legacy AutoMate batch keeps running until cut-over and two
+  # schedulers must never process the same returns. See docs/batch-jobs.md.
+  - name: HBS_BATCH_ENABLED
+    required: false
+    value: "false"
+  # Size of the shared ReadWriteMany volume that replaces the legacy
+  # XMLinput / XMLarchive SMB shares (submitted scale data).
+  - name: XML_STORAGE_SIZE
+    required: false
+    value: "5Gi"
+  - name: DATABASE_HOST
+    required: true
+  - name: DATABASE_SERVICE_NAME
+    required: true
+  - name: DATABASE_USER
+    required: true
+  - name: DATABASE_PASSWORD
+    required: true
+  - name: KEYSTORE_SECRET
+    required: true
+
 objects:
+  # ── Deployment ────────────────────────────────────────────
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
+      name: ${NAME}-backend-${ZONE}
       labels:
-        app: ${NAME}-${ZONE}
-      name: ${NAME}-${ZONE}-${COMPONENT}
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/name: ${NAME}-backend
+        app.kubernetes.io/instance: ${ZONE}
     spec:
+      replicas: ${{MIN_REPLICAS}}
       selector:
         matchLabels:
-          deployment: ${NAME}-${ZONE}-${COMPONENT}
+          app: ${NAME}-backend-${ZONE}
+      # Recreate (not RollingUpdate) — matches BCGov template convention.
+      # The brief swap downtime is acceptable for ephemeral PR previews and
+      # avoids racing against the deployer action, which patches strategy
+      # mid-apply and creates a `rollingUpdate set while type=Recreate`
+      # validation error if the Template ships its own RollingUpdate config.
       strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: 1
-          maxSurge: 1
+        type: Recreate
       template:
         metadata:
           labels:
-            app: ${NAME}-${ZONE}
-            deployment: ${NAME}-${ZONE}-${COMPONENT}
+            app: ${NAME}-backend-${ZONE}
+            app.kubernetes.io/instance: ${ZONE}
+          annotations:
+            prometheus.io/path: /actuator/prometheus
+            prometheus.io/port: '8080'
+            prometheus.io/scrape: 'true'
         spec:
-          terminationGracePeriodSeconds: 30
-          affinity:
-            podAntiAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  podAffinityTerm:
-                    labelSelector:
-                      matchLabels:
-                        deployment: ${NAME}-${ZONE}-${COMPONENT}
-                    topologyKey: kubernetes.io/hostname
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
           initContainers:
-            - name: wait-for-db
-              image: ${REGISTRY}/${ORG_NAME}/${NAME}/migrations:${IMAGE_TAG}
-              command:
-                - /bin/sh
-                - -c
-                - |
-                  echo "Waiting for database to be reachable..."
-                  max_retries=30
-                  attempt=1
-                  until nc -z -v -w3 ${NAME}-${ZONE}-database 5432; do
-                    if [ "$attempt" -ge "$max_retries" ]; then
-                      echo "ERROR: Database ${NAME}-${ZONE}-database:5432 is not reachable after ${max_retries} attempts." >&2
-                      exit 1
-                    fi
-                    echo "Database not ready (attempt ${attempt}/${max_retries}), sleeping..."
-                    attempt=$((attempt + 1))
-                    sleep 2
-                  done
-                  echo "Database is UP!"
-              securityContext:
-                allowPrivilegeEscalation: false
-                runAsNonRoot: true
-                readOnlyRootFilesystem: true
-                capabilities:
-                  drop: ["ALL"]
-                seccompProfile:
-                  type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
-            - name: migrations
-              image: ${REGISTRY}/${ORG_NAME}/${NAME}/migrations:${IMAGE_TAG}
+            - name: ${NAME}-backend-init
+              image: ghcr.io/bcgov/nr-forest-client/common:prod
               imagePullPolicy: Always
               env:
-                - name: POSTGRES_DATABASE
+                - name: ORACLEDB_HOST
+                  value: ${DATABASE_HOST}
+                - name: ORACLEDB_SECRET
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-name
-                - name: FLYWAY_URL
-                  value: jdbc:postgresql://${NAME}-${ZONE}-database:5432/$(POSTGRES_DATABASE)
-                - name: FLYWAY_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-user
-                - name: FLYWAY_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-password
-                - name: FLYWAY_DEFAULT_SCHEMA
-                  value: "users"
-                - name: FLYWAY_BASELINE_ON_MIGRATE
-                  value: "true"
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: KEYSTORE_SECRET
+                - name: ORACLEDB_PORT
+                  value: "1543"
+              volumeMounts:
+                - name: api-cert
+                  mountPath: /cert
+                - name: init-tmp-storage
+                  mountPath: /tmp
               resources:
                 requests:
-                  cpu: 10m
-                  memory: 50Mi
+                  cpu: "200m"
+                  memory: "300Mi"
+                  ephemeral-storage: "50Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "500Mi"
+                  ephemeral-storage: "100Mi"
               securityContext:
                 allowPrivilegeEscalation: false
                 runAsNonRoot: true
                 readOnlyRootFilesystem: true
                 capabilities:
                   drop: ["ALL"]
-                seccompProfile:
-                  type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
           containers:
-            - name: ${NAME}
-              image: ${REGISTRY}/${ORG_NAME}/${NAME}/${COMPONENT}:${IMAGE_TAG}
+            - name: ${NAME}-backend
+              image: ${REGISTRY}:${IMAGE_TAG}
               imagePullPolicy: Always
               ports:
-                - name: http
-                  containerPort: 3000
+                - containerPort: 8080
+                  protocol: TCP
               env:
-                - name: LOG_LEVEL
-                  value: ${LOG_LEVEL}
-                - name: POSTGRES_HOST
-                  value: ${NAME}-${ZONE}-database
-                - name: POSTGRES_PORT
-                  value: "5432"
-                - name: POSTGRES_DATABASE
+                - name: TZ
+                  value: ${TZ}
+                - name: SPRING_PROFILES_ACTIVE
+                  value: oracle
+                - name: SERVER_PORT
+                  value: "8080"
+                - name: KEYCLOAK_ISSUER_URI
+                  value: ${KEYCLOAK_ISSUER_URI}
+                - name: KEYCLOAK_CLIENT_ID
+                  value: ${KEYCLOAK_CLIENT_ID}
+                - name: USER_LOOKUP_BASE_URL
+                  value: ${USER_LOOKUP_BASE_URL}
+                - name: USER_LOOKUP_TOKEN_URL
+                  value: ${USER_LOOKUP_TOKEN_URL}
+                - name: USER_LOOKUP_CLIENT_ID
+                  value: ${USER_LOOKUP_CLIENT_ID}
+                - name: USER_LOOKUP_CLIENT_SECRET
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-name
-                - name: POSTGRES_USER
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: USER_LOOKUP_CLIENT_SECRET
+                - name: FOREST_CLIENT_API_URL
+                  value: ${FOREST_CLIENT_API_URL}
+                - name: FOREST_CLIENT_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-user
-                - name: POSTGRES_PASSWORD
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: FOREST_CLIENT_API_KEY
+                - name: CLAMAV_ENABLED
+                  value: ${CLAMAV_ENABLED}
+                - name: CLAMAV_HOST
+                  value: ${CLAMAV_HOST}
+                - name: CLAMAV_PORT
+                  value: ${CLAMAV_PORT}
+                - name: CLAMAV_FAIL_OPEN
+                  value: ${CLAMAV_FAIL_OPEN}
+                - name: EMAIL_SEND_ENABLED
+                  value: ${EMAIL_SEND_ENABLED}
+                - name: HBS_BATCH_ENABLED
+                  value: ${HBS_BATCH_ENABLED}
+                - name: HBS_STORAGE_XML_ROOT
+                  value: /data/hbs/xml
+                - name: REPORTS_WORK_DIR
+                  value: /temp/hbs-reports
+                - name: DATABASE_HOST
+                  value: ${DATABASE_HOST}
+                - name: DATABASE_SERVICE_NAME
+                  value: ${DATABASE_SERVICE_NAME}
+                - name: DATABASE_USER
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-database
-                      key: database-password
-                - name: POSTGRES_SCHEMA
-                  value: "users"
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: DATABASE_USER
+                - name: DATABASE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: DATABASE_PASSWORD
+                - name: APP_LOG_LEVEL
+                  value: ${APP_LOG_LEVEL}
+                - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
+                  value: ${SPRING_SECURITY_LOG_LEVEL}
+                - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+                  value: ${SPRING_WEB_LOG_LEVEL}
+                - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_BOOT_AUTOCONFIGURE
+                  value: ${SPRING_BOOT_AUTOCONFIG_LOG_LEVEL}
+                - name: SPRING_JPA_SHOW_SQL
+                  value: ${SPRING_JPA_SHOW_SQL}
+                - name: KEYSTORE_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-backend-secret-${ZONE}
+                      key: KEYSTORE_SECRET
+              # The JVM sizes its heap as a percentage of the memory LIMIT
+              # (-XX:MaxRAMPercentage=60 in the Dockerfile), so changing the
+              # limit here changes the heap. The old 800Mi limit paired with a
+              # hardcoded -Xmx200m, which OOMed on attachment uploads (nr-fsp-new history) while
+              # ~500Mi of the pod sat unused. 1Gi ⇒ ~614MB heap, 3x the old
+              # ceiling.
+              #
+              # 1Gi is a quota ceiling, not a tuning choice. The PROD namespace
+              # caps at 4Gi total and merge.yml pins BOTH backend and frontend
+              # to 3 replicas there, so the budget is:
+              #   frontend 3 x 128Mi = 384Mi
+              #   backend  3 x   1Gi = 3072Mi
+              #   total              = 3456Mi, leaving 640Mi of namespace slack
+              # Anything above ~1237Mi per backend pod exceeds the quota and the
+              # 3rd replica will fail to schedule. Raise the namespace quota
+              # before raising this.
+              #
+              # requests == limits puts the pod in the Guaranteed QoS class, so
+              # it is the last thing evicted under node memory pressure. Since
+              # MIN_REPLICAS == MAX_REPLICAS in every zone (see reusable-deploy.yml)
+              # the footprint is fixed anyway — there is no burst headroom to
+              # reclaim by requesting less.
+              #
+              # ephemeral-storage must exceed the max heap size: the JVM writes
+              # a heap dump to /temp (emptyDir) on OOM, and an emptyDir counts
+              # against this limit — undersize it and the pod is evicted
+              # mid-dump, losing the diagnostic we added it for.
               resources:
                 requests:
-                  cpu: ${CPU_REQUEST}
-                  memory: ${MEMORY_REQUEST}
+                  cpu: ${MIN_CPU}
+                  memory: ${MIN_MEM}
+                  ephemeral-storage: "500Mi"
                 limits:
-                  memory: ${MEMORY_LIMIT}
+                  cpu: "1000m"
+                  memory: ${MAX_MEM}
+                  ephemeral-storage: "1Gi"
+              livenessProbe:
+                httpGet:
+                  path: /actuator/health
+                  port: 8080
+                initialDelaySeconds: 300
+                periodSeconds: 30
+                timeoutSeconds: 5
+                failureThreshold: 5
+                successThreshold: 1
+              readinessProbe:
+                tcpSocket:
+                  port: 8080
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 20
+                successThreshold: 1
+              volumeMounts:
+                - name: api-cert
+                  mountPath: /cert
+                - name: tls-certs
+                  mountPath: /etc/tls-certs
+                  readOnly: true
+                - name: log-storage
+                  mountPath: /logs
+                - name: app-storage
+                  mountPath: /temp
+                - name: xml-storage
+                  mountPath: /data/hbs/xml
+                - name: tmp-storage
+                  mountPath: /tmp
               securityContext:
                 allowPrivilegeEscalation: false
                 runAsNonRoot: true
                 readOnlyRootFilesystem: true
                 capabilities:
                   drop: ["ALL"]
-                seccompProfile:
-                  type: RuntimeDefault
-              volumeMounts:
-                - name: tmp
-                  mountPath: /tmp
-              startupProbe:
-                httpGet:
-                  path: /api/health
-                  port: http
-                periodSeconds: 5
-                failureThreshold: 30
-              readinessProbe:
-                httpGet:
-                  path: /api/health
-                  port: http
-                periodSeconds: 5
-                failureThreshold: 3
-              livenessProbe:
-                httpGet:
-                  path: /api
-                  port: http
-                periodSeconds: 10
-                failureThreshold: 3
-              lifecycle:
-                preStop:
-                  exec:
-                    # distroless/nodejs has no /bin/sleep; exec hooks skip image ENTRYPOINT
-                    command: ["/nodejs/bin/node", "-e", "setTimeout(() => {}, 10000)"]
           volumes:
-            - name: tmp
-              emptyDir:
-                medium: Memory
-                sizeLimit: 256Mi
+            - name: tls-certs
+              secret:
+                secretName: ${NAME}-backend-cert-${ZONE}
+            - name: log-storage
+              emptyDir: {}
+            - name: app-storage
+              emptyDir: {}
+            - name: tmp-storage
+              emptyDir: {}
+            - name: init-tmp-storage
+              emptyDir: {}
+            - name: api-cert
+              persistentVolumeClaim:
+                claimName: ${NAME}-backend-api-cert-${ZONE}
+            - name: xml-storage
+              persistentVolumeClaim:
+                claimName: ${NAME}-backend-xml-${ZONE}
+
+  # ── Service ───────────────────────────────────────────────
   - apiVersion: v1
     kind: Service
     metadata:
+      name: ${NAME}-backend-${ZONE}
       labels:
-        app: ${NAME}-${ZONE}
-      name: ${NAME}-${ZONE}-${COMPONENT}
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+      annotations:
+        service.alpha.openshift.io/serving-cert-secret-name: ${NAME}-backend-cert-${ZONE}
     spec:
-      ports:
-        - name: http
-          port: 80
-          targetPort: 3000
       selector:
-        deployment: ${NAME}-${ZONE}-${COMPONENT}
+        app: ${NAME}-backend-${ZONE}
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+
+  # ── HorizontalPodAutoscaler ───────────────────────────────
   - apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
     metadata:
+      name: ${NAME}-backend-${ZONE}-cpu
       labels:
-        app: ${NAME}-${ZONE}
-      name: ${NAME}-${ZONE}-${COMPONENT}
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
     spec:
       scaleTargetRef:
         apiVersion: apps/v1
         kind: Deployment
-        name: ${NAME}-${ZONE}-${COMPONENT}
+        name: ${NAME}-backend-${ZONE}
       minReplicas: ${{MIN_REPLICAS}}
       maxReplicas: ${{MAX_REPLICAS}}
       metrics:
@@ -248,30 +418,100 @@ objects:
             name: cpu
             target:
               type: Utilization
-              averageUtilization: 80
-      behavior:
-        scaleUp:
-          stabilizationWindowSeconds: 30
-          policies:
-            - type: Percent
-              value: 100
-              periodSeconds: 60
-          selectPolicy: Max
-        scaleDown:
-          stabilizationWindowSeconds: 300
-          policies:
-            - type: Percent
-              value: 50
-              periodSeconds: 60
-          selectPolicy: Max
-  - apiVersion: policy/v1
-    kind: PodDisruptionBudget
+              averageUtilization: 200
+
+  # ── PVC for Keystore (per-ZONE so PR previews get their own) ────
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
     metadata:
+      name: ${NAME}-backend-api-cert-${ZONE}
       labels:
-        app: ${NAME}-${ZONE}
-      name: ${NAME}-${ZONE}-${COMPONENT}
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
     spec:
-      maxUnavailable: 1
-      selector:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 50Mi
+      storageClassName: netapp-file-standard
+
+  # ── PVC for submitted scale-data XML (replaces the XMLinput / XMLarchive
+  # SMB shares). ReadWriteMany so the upload endpoint and the ShedLock'd
+  # intake job on any pod see the same files. Per-ZONE like the cert PVC.
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: ${NAME}-backend-xml-${ZONE}
+      labels:
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: ${XML_STORAGE_SIZE}
+      storageClassName: netapp-file-standard
+
+  # ── Secret ────────────────────────────────────────────────
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ${NAME}-backend-secret-${ZONE}
+      labels:
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+    type: Opaque
+    stringData:
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      KEYSTORE_SECRET: ${KEYSTORE_SECRET}
+      USER_LOOKUP_CLIENT_SECRET: ${USER_LOOKUP_CLIENT_SECRET}
+      FOREST_CLIENT_API_KEY: ${FOREST_CLIENT_API_KEY}
+
+  # ── NetworkPolicy: ingress from same-zone frontend + cluster monitoring ──
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: ${NAME}-backend-${ZONE}-ingress
+      labels:
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+    spec:
+      podSelector:
         matchLabels:
-          deployment: ${NAME}-${ZONE}-${COMPONENT}
+          app: ${NAME}-backend-${ZONE}
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app: ${NAME}-frontend-${ZONE}
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: monitoring
+      policyTypes:
+        - Ingress
+
+  # ── NetworkPolicy: egress — the backend must make outbound connections ──
+  # Oracle (external), Keycloak + user-lookup (external HTTPS), SMTP, and clamd
+  # (in-cluster, another namespace). Applied unconditionally: NetworkPolicy
+  # egress is all-or-nothing per pod, so a narrow allow-list would silently
+  # break DB / external access wherever the namespace baseline doesn't already
+  # default-deny egress. Permitting all egress can't reduce access below the
+  # current open baseline, and it guarantees the app side never blocks clamd.
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: ${NAME}-backend-${ZONE}-egress
+      labels:
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+    spec:
+      podSelector:
+        matchLabels:
+          app: ${NAME}-backend-${ZONE}
+      egress:
+        - {}
+      policyTypes:
+        - Egress

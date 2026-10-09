@@ -1,0 +1,1597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS3R888.rpt" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="766" leftMargin="13" rightMargin="13" topMargin="18" bottomMargin="18" uuid="5b587ff1-fa76-43c3-a103-94ef9b55e210">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="163"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS3R888.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="SP_SAMPLEPLANID" class="java.lang.String"/>
+	<parameter name="SP_JOBNO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS3R888.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS3R888(
+SP_CURSOR => $P{ORACLE_REF_CURSOR},
+SP_SAMPLEPLANID => $P{SP_SAMPLEPLANID},
+SP_JOBNO => $P{SP_JOBNO}
+)}]]>
+	</queryString>
+	<field name="POPULATION_NUMBER" class="java.lang.String"/>
+	<field name="SAMPLING_YEAR" class="java.math.BigDecimal"/>
+	<field name="PLAN_ABREVIATION" class="java.lang.String"/>
+	<field name="PLAN_NAME" class="java.lang.String"/>
+	<field name="SAMPLE_PLAN_STATUS_CODE" class="java.lang.String"/>
+	<field name="PRECISION_LIMIT" class="java.math.BigDecimal"/>
+	<field name="SAMPLE_FLOOR" class="java.math.BigDecimal"/>
+	<field name="CURRENT_CONSTRAINT_TYPE" class="java.lang.String"/>
+	<field name="CURRENT_ESTIMATE_TYPE" class="java.lang.String"/>
+	<field name="SAMPLING_PLAN_RATIO_TYPE_CODE" class="java.lang.String"/>
+	<field name="SAMPLING_PLAN_EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="SAMPLING_PLAN_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="SAMPLE_PLAN_CLIENT_NO" class="java.lang.String"/>
+	<field name="SAMPLE_PLAN_LOCN_CODE" class="java.lang.String"/>
+	<field name="CLIENT_NAME" class="java.lang.String"/>
+	<field name="DISTRICT" class="java.lang.String"/>
+	<field name="STRATUM_NUMBER" class="java.lang.String"/>
+	<field name="STRATUM_NAME" class="java.lang.String"/>
+	<field name="ESTIMATED_VOLUME" class="java.math.BigDecimal"/>
+	<field name="ESTIMATED_LOADS" class="java.math.BigDecimal"/>
+	<field name="ESTIMATED_LOAD_SIZE" class="java.math.BigDecimal"/>
+	<field name="ESTIMATED_STANDARD_DEVIATION" class="java.math.BigDecimal"/>
+	<field name="OPTIMUM_SAMPLE_CALC" class="java.math.BigDecimal"/>
+	<field name="OPTIMUM_PRECISION_CALC" class="java.math.BigDecimal"/>
+	<field name="OPTIMUM_FREQUENCY_CALC" class="java.math.BigDecimal"/>
+	<field name="SAMPLE_COUNT_CONSTRAINT" class="java.math.BigDecimal"/>
+	<field name="PRECISION_CONSTRAINT" class="java.math.BigDecimal"/>
+	<field name="TARGET_SAMPLE_CALC" class="java.math.BigDecimal"/>
+	<field name="TARGET_PRECISION_CALC" class="java.math.BigDecimal"/>
+	<field name="TARGET_FREQUENCY_CALC" class="java.math.BigDecimal"/>
+	<field name="STRATUM_PLAN_EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="STRATUM_PLAN_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="STRATUM_PLAN_CLIENT_NO" class="java.lang.String"/>
+	<field name="STRATUM_PLAN_CLIENT_LOCN_CODE" class="java.lang.String"/>
+	<field name="GRADE_SCHEDULE_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="ESTIMATED_TOTAL_VOLUME" class="java.math.BigDecimal"/>
+	<field name="ESTIMATED_TOTAL_LOADS" class="java.math.BigDecimal"/>
+	<field name="POP_ESTIMATED_LOAD_SIZE" class="java.math.BigDecimal"/>
+	<field name="SMP_OPTIMUM_PRECISION_CALC" class="java.math.BigDecimal"/>
+	<field name="SMP_TARGET_PRECISION_CALC" class="java.math.BigDecimal"/>
+	<variable name="Sum (HBS3R888.OPTIMUM_SAMPLE_CALC)" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OPTIMUM_SAMPLE_CALC}]]></variableExpression>
+	</variable>
+	<variable name="Sum (HBS3R888.TARGET_SAMPLE_CALC)" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TARGET_SAMPLE_CALC}]]></variableExpression>
+	</variable>
+	<variable name="CCF0_Tot_Opt_Freq" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//if {HBS3R888.OPTIMUM_SAMPLE_CALC} = 0 then 0
+//else TRUNCATE({HBS3R888.ESTIMATED_TOTAL_LOADS} / Sum ({HBS3R888.OPTIMUM_SAMPLE_CALC}));
+
+$F{OPTIMUM_SAMPLE_CALC}==null || $F{OPTIMUM_SAMPLE_CALC}.intValue() == 0
+? 0
+: $F{ESTIMATED_TOTAL_LOADS}.doubleValue() / $V{Sum (HBS3R888.OPTIMUM_SAMPLE_CALC)}.doubleValue()]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Tot_Target_Freq" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//if {HBS3R888.TARGET_SAMPLE_CALC} = 0 then 0
+//else TRUNCATE({HBS3R888.ESTIMATED_TOTAL_LOADS} / Sum ({HBS3R888.TARGET_SAMPLE_CALC}));
+
+$F{TARGET_SAMPLE_CALC} == null || $F{TARGET_SAMPLE_CALC}.intValue() == 0
+? 0
+: $F{ESTIMATED_TOTAL_LOADS}.doubleValue() / $V{Sum (HBS3R888.TARGET_SAMPLE_CALC)}.doubleValue()]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Constraint_Mode" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'D' THEN
+//    'N/A'
+//ELSE
+//    if {HBS3R888.CURRENT_CONSTRAINT_TYPE} = 'P' then
+//        'Constrain Precision'
+//    else if {HBS3R888.CURRENT_CONSTRAINT_TYPE} = 'S' then
+//        'Constrain Samples';
+
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null && $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+?  "N/A"
+:  $F{CURRENT_CONSTRAINT_TYPE}!=null
+   ?
+        ($F{CURRENT_CONSTRAINT_TYPE}.equalsIgnoreCase( "P" ) ? "Constrain Precision" :
+        ($F{CURRENT_CONSTRAINT_TYPE}.equalsIgnoreCase( "S" ) ? "Constrain Samples" : " "
+                ))
+   : " "]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Estimate_Mode" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//if {HBS3R888.CURRENT_ESTIMATE_TYPE} = 'LS' then
+//    'Loads and Size'
+//else if {HBS3R888.CURRENT_ESTIMATE_TYPE} = 'VL' then
+//    'Volume and Loads'
+//else if {HBS3R888.CURRENT_ESTIMATE_TYPE} = 'VS' then
+//    'Volume and Size';
+
+$F{CURRENT_ESTIMATE_TYPE}!=null
+?
+    ($F{CURRENT_ESTIMATE_TYPE}.equalsIgnoreCase( "LS" ) ? "Loads and Size" :
+    ($F{CURRENT_ESTIMATE_TYPE}.equalsIgnoreCase( "VL" ) ? "Volume and Loads" :
+    ($F{CURRENT_ESTIMATE_TYPE}.equalsIgnoreCase( "VS" ) ? "Volume and Size" : " "
+     )))
+: " "]]></variableExpression>
+	</variable>
+	<variable name="CCF4_Precision" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    CStr ({HBS3R888.PRECISION_LIMIT})+ '%'
+//ELSE
+//    'N/A';
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null && $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? String.format("%.2f", $F{PRECISION_LIMIT}) + "%"
+: "N/A"]]></variableExpression>
+	</variable>
+	<variable name="CCF5_Sample_floor" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    CStr ({HBS3R888.SAMPLE_FLOOR},"#")
+//ELSE
+//    'N/A';
+
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null && $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? $F{SAMPLE_FLOOR}.toString()
+: "N/A"]]></variableExpression>
+	</variable>
+	<variable name="CCF6_Sampling_year" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//cStr({HBS3R888.SAMPLING_YEAR},"#")
+
+$F{SAMPLING_YEAR}.toString()]]></variableExpression>
+	</variable>
+	<variable name="CCF7_Ratio_Type_code" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//if {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' then
+//    'Sample-based'
+//else if {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'D' then
+//    'Default'
+
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null
+?
+    ($F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" ) ? "Sample-based"  :
+    ($F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" ) ? "Default"  : " "
+     ))
+: " "]]></variableExpression>
+	</variable>
+	<variable name="CCF8_Client_No_Loc" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//{HBS3R888.STRATUM_PLAN_CLIENT_NO}+"-"+{HBS3R888.STRATUM_PLAN_CLIENT_LOCN_CODE}
+
+$F{STRATUM_PLAN_CLIENT_NO}!=null        ? $F{STRATUM_PLAN_CLIENT_NO}.toString()    +
+($F{STRATUM_PLAN_CLIENT_LOCN_CODE}!=null ? "-" + $F{STRATUM_PLAN_CLIENT_LOCN_CODE}.toString()     : "")
+ : ""]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="186">
+			<line>
+				<reportElement uuid="25d00c8d-668f-45c2-a655-bac1fc9b9e24" x="0" y="60" width="762" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<image>
+				<reportElement uuid="71a557b2-6431-437e-912d-e3fcb31b5e01" x="6" y="6" width="145" height="36"/>
+				<imageExpression><![CDATA[($P{SUBREPORT_DIR} + "hbs_logo1.jpg" )]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="c542dc6d-00d3-457d-ab63-6782acee3547" x="282" y="22" width="180" height="15" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Harvest Billing System]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e9cd7c60-950d-4ddc-8857-718d14fe4157" x="282" y="40" width="180" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Sample Plan Report]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="057c71cd-de12-4898-86ca-da270eb3e428" x="654" y="6" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Page:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fdebbffb-4fad-4c72-bdc3-9d2dd8cc4c88" x="654" y="32" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Report Id:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="71cb2342-988c-4dc8-95bb-bcf405b7b1ff" x="654" y="23" width="42" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Run Time:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d4572d24-173b-42c0-8e24-12ccf1cbd431" x="654" y="14" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Run Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9c0ef05e-0007-4759-9d02-9afa75110b0b" x="726" y="6" width="12" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[of]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4ffda12c-a2f7-4d23-85db-a2b6a0c38663" x="654" y="42" width="47" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Request No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="950ce573-fbdb-453f-b83b-2871ae606bd3" x="504" y="95" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Client/Loc:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="07abf3b1-afc3-44be-8dc9-50cc375b4c25" x="504" y="83" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Expiry Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="56c1a54f-3fc8-4512-8b4d-fa5211dca4f6" x="504" y="71" width="62" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Effective Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9cb5e275-ea20-4291-9521-dbb16018211e" x="6" y="107" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Plan Status:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c8f47d8f-a567-4eb3-bf4a-485a39df50a7" x="6" y="119" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Plan Name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6789540f-3d11-406e-9e54-dbcac19f5b91" x="6" y="95" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Plan Abbrev:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="746a2b93-8849-48be-b6a8-8374d5d5d4a3" x="6" y="83" width="62" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Sample Year:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="990283fc-bdfa-4416-808c-c7680e7e11f3" x="6" y="71" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Population:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d417bef-58c9-41a0-a1d7-747e195c01a9" x="252" y="71" width="66" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Precision Limit:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="20054207-6b4b-4212-9037-69529a74d420" x="252" y="83" width="66" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Sample Floor:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="361c07c4-5128-41b6-8dfe-771279f0bf2a" x="252" y="95" width="72" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Constraint Mode:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2f0ffda2-dbda-40da-8c2b-14f6b7f2e0c9" x="252" y="107" width="66" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Estimate Mode:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="09496ab2-36a4-46a5-9298-4df25694ca61" x="504" y="107" width="78" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Population Owner:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0fb90d1c-dc2b-4baa-9524-41ded71f8ffd" x="504" y="119" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[District:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0b9d3946-3d21-442f-b233-1351d31817da" x="252" y="119" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Ratio Type:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="02d874d6-e19c-43fd-a575-6efa202533d5" x="702" y="6" width="24" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement uuid="a7a1ca52-8561-4cf9-afb6-9f8ac20f8ad2" x="739" y="6" width="12" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="8f7665c5-0b04-4830-a241-d4b7032771d6" x="696" y="14" width="55" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="HH:mm.ss" isBlankWhenNull="true">
+				<reportElement uuid="6ba58648-d953-470b-bffa-e3f6409a585c" x="698" y="23" width="53" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a606f3bf-19e0-426a-87d0-a9abce81f5fe" x="696" y="32" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{p_report_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8c419f67-89f1-4b13-a867-c35d50c77d2a" x="702" y="42" width="48" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SP_JOBNO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="49c455e0-1f3b-463b-ad64-7164599968a8" x="72" y="71" width="27" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POPULATION_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="6916855a-1fe5-4ea0-afe2-d023c9075934" x="72" y="95" width="14" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PLAN_ABREVIATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ddf27275-b0d3-4e06-b0ee-b881d7561fae" x="72" y="119" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PLAN_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="e3ee6f4d-c11e-45d3-9495-ebf87ebeee2c" x="600" y="71" width="66" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLING_PLAN_EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="4cbfea08-f903-4d22-8501-4b39ec860545" x="600" y="83" width="66" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLING_PLAN_EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="1e4c3166-d3e4-43cd-b524-4e3e0197ebba" x="600" y="95" width="42" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLE_PLAN_CLIENT_NO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5312d94f-f6cd-4691-8ebc-d172e327b311" x="642" y="95" width="14" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLE_PLAN_LOCN_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b36a8782-9d67-4cdd-b050-8ee81aa30c51" x="600" y="107" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLIENT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="62f1b7e3-c67b-43e0-92e3-43d603017e2d" x="600" y="119" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DISTRICT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="636661eb-cde3-44ad-90e0-09cfdf5bae6f" x="72" y="107" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLE_PLAN_STATUS_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="860dbb13-83c4-4a68-974a-8820430ebd9b" x="336" y="95" width="128" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF2_Constraint_Mode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7cadd969-0faa-4edd-a54e-e00117e830ef" x="336" y="107" width="108" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF3_Estimate_Mode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7c0c9be7-f48c-4155-9800-3c3ed784f138" x="336" y="71" width="48" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF4_Precision}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="30267a05-1792-4fad-85f4-7a6514b9dfaf" x="336" y="83" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF5_Sample_floor}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="74f629c7-b343-40d7-93d7-5290acc17ba1" x="72" y="83" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF6_Sampling_year}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="756381cb-4ba8-4f97-b7dd-36d3fc2e0f1b" x="336" y="119" width="81" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF7_Ratio_Type_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="48b5d95c-aa3a-4ca0-9f52-7b91aa7517e5" x="6" y="138" width="72" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Stratum Details]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba17099b-01a8-44be-ae0f-0b2784a2aa46" x="6" y="156" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Stratum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f653fdc6-dc2d-4e9c-a24a-c2d73e69744d" x="156" y="156" width="150" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Estimates]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dcc34819-e149-408d-8402-926a431d70c4" x="312" y="156" width="96" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Optimums]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3d73f115-47b7-4378-8c36-75dcef685b37" x="414" y="156" width="66" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Constraints]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="88a47e24-4fd2-42d9-b41a-72e48d651499" x="486" y="156" width="96" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Targets]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba386e76-6d57-4b8f-a863-b62d2b811468" x="726" y="156" width="36" height="12" forecolor="#000000"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Schedule]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c52496b1-51f8-4f0f-9096-fcc4acf6562f" x="156" y="156" width="120" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    TRUE
+//ELSE
+//    FALSE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#808080"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Estimates]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e799dc82-93e7-40fa-9f43-bfc6d15583cf" x="12" y="174" width="18" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="321c3eec-2add-43c6-a9bd-d9223d9a70b3" x="36" y="174" width="30" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="653b960a-ef36-46bf-90c9-193085f0f159" x="156" y="174" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0669e601-42c3-4f74-9ab1-f01339fb0a72" x="204" y="174" width="30" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Loads]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="27cce929-95c9-4ae8-a600-0611805aea10" x="246" y="174" width="24" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6aa01772-712d-46b4-9cb0-933d327fdedd" x="276" y="174" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[StDev]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="454989bc-8f04-4231-a220-10d5650a25be" x="310" y="174" width="36" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Samples]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9ca61f41-2eaf-45c1-8060-f0628b4f79e9" x="354" y="174" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Prec]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="94a6f4d4-2644-44c1-95f4-17069bebcb2b" x="384" y="174" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Freq]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4dc966ce-7c06-460d-ae56-1e5bd6b190f6" x="414" y="174" width="36" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Samples]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5c234477-b83d-4ea3-a71f-5ea912122835" x="456" y="174" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Prec]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="15374149-22e0-4474-8264-59dfe77cf634" x="486" y="174" width="36" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Samples]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="502e1b93-2b97-443e-a7ef-2a014d750768" x="528" y="174" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Prec]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f9f3a1e3-d580-4cd7-a422-dd37ae406f5e" x="557" y="174" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Freq]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f59b75fe-5161-4ed4-bec0-310f38ecfd3d" x="588" y="174" width="36" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Eff.Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1f7811de-7725-40dc-88f9-2c6e4ac3de08" x="630" y="174" width="36" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Exp.Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="071bc901-ac4a-4b9c-8ac6-3c131745ca51" x="678" y="174" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Client/ Loc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f7b88c89-6b9d-42c8-9e9f-fbf708f4799b" x="726" y="174" width="18" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[GSC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7cc8e48d-4a09-4dcd-891e-ad51b69c9b7e" x="744" y="174" width="24" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[PSC]]></text>
+			</staticText>
+			<subreport>
+				<reportElement uuid="a526b0e1-f07b-44ff-bbb5-0496c4229d18" x="202" y="6" width="333" height="14"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HBS_HEADER" + $P{SUBREPORT_EXT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="b5e4d5ef-8b37-44ee-a4f5-beb9bc7e2845" x="378" y="0" width="6" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2e6e90fe-43d5-44ea-949a-6fb85af2f9cc" x="480" y="0" width="6" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0945b298-d35a-4731-b6ac-571bf8cafa94" x="552" y="0" width="6" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5ee00abf-e76f-4223-89ee-b6871fbccfff" x="12" y="0" width="18" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STRATUM_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4e7649cb-d7f1-4322-9652-0391e5dc7882" x="36" y="0" width="90" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STRATUM_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="0b5daf24-30df-4450-8e68-f7136d9b7f51" x="114" y="0" width="84" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="b317d417-9094-4544-9fe8-788b3760f146" x="198" y="0" width="40" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_LOADS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="048f878f-79a7-4793-8cc0-abe30fea73b0" x="240" y="0" width="36" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_LOAD_SIZE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="e59f9707-44fe-47e3-bd14-2273d762ca68" x="276" y="0" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_STANDARD_DEVIATION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="081abb15-a0d1-4be9-a952-4be51aa4a16c" x="318" y="0" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPTIMUM_SAMPLE_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="85d8ba0b-cd5d-4489-bd29-07f15f68cba1" x="354" y="0" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPTIMUM_PRECISION_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="596ff936-6749-42d9-85d5-b13f829cddf9" x="384" y="0" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPTIMUM_FREQUENCY_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="d06e9044-418e-468d-8e42-f2d826ae76ca" x="420" y="0" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SAMPLE_COUNT_CONSTRAINT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="d84d2334-2e2b-4321-b007-fadd94b7312c" x="456" y="0" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRECISION_CONSTRAINT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="17fa0a05-e8a2-4f96-8518-611f16ccab74" x="492" y="0" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TARGET_SAMPLE_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="52dbbe8f-c4f7-44d3-aa30-2053edf45df1" x="528" y="0" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TARGET_PRECISION_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="e1f2ed3d-9f8c-4052-afa4-074120e7bcd1" x="555" y="0" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TARGET_FREQUENCY_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="037fb09e-6455-4d5d-97af-eea75710b042" x="581" y="0" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STRATUM_PLAN_EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="22c08da3-a40d-4886-8964-6d9dd34c33f3" x="628" y="0" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{STRATUM_PLAN_EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="04e57cc6-4ea3-4327-a3cc-d09d066cc5e2" x="732" y="0" width="6" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GRADE_SCHEDULE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="11ec88df-1dd5-4723-84b3-9507d6b9b318" x="747" y="0" width="18" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCALE_PRODUCT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3f2eb342-b68e-4829-a3d3-dd7b93a2a3ab" x="678" y="0" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF8_Client_No_Loc}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="56" splitType="Prevent">
+			<line>
+				<reportElement uuid="299c0558-7bee-4c01-88bd-31b94aaa2d93" x="0" y="0" width="762" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="6e2ce1be-b16b-4baa-a224-486b6b880e58" mode="Opaque" x="0" y="48" width="766" height="8" forecolor="#000000" backcolor="#EAEAEA"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="6" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Note:  While every effort has been made to ensure that the information presented on this report is accurate and complete, it cannot be guaranteed.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="85299fb6-29e4-439f-b357-2448299f3208" x="6" y="6" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Legend:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="74df649f-13d0-4f4c-bee5-84e3208b1744" x="372" y="18" width="24" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[GSC:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="075e887e-a246-4252-8c47-978e11be6f98" x="372" y="30" width="24" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[PSC:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2fc3411-204c-4dfc-b86b-ae4cadf04036" x="132" y="18" width="66" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Prec:  Precision]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1aab09dc-f044-48e0-8b5c-fecb28b6ead1" x="132" y="30" width="66" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Freq:  Frequency]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bad45aaa-6f9a-4b5d-a8fb-63624034e27e" x="240" y="18" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Eff.Date:  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e20c65dc-0320-45a3-89d0-61f8b5158396" x="240" y="30" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Exp.Date:  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8fbf2744-1d97-47e3-ba36-7182f5d04cc8" x="6" y="18" width="102" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[StDev:  Standard Deviation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bf23d70d-806f-4412-9f2a-ebae477b03e3" x="282" y="18" width="60" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Effective Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f3273553-ca6e-4fab-892a-1b563a4a8123" x="282" y="30" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Expiry Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a6ae908-75df-4bde-b229-d1f135f14f7c" x="402" y="18" width="180" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Grade Schedule Code (C=Coastal;  I=Interior)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cae5fb73-dd75-40a7-9205-db573f7ff312" x="402" y="30" width="96" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Product Schedule Code]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="33">
+			<line>
+				<reportElement uuid="b471bddf-e1c2-4011-920c-7bcc2992d6c9" x="240" y="16" width="37" height="1">
+					<printWhenExpression><![CDATA[$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null && $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" ) || $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" ) ? true : false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="1cf46eb0-1278-4927-bca7-733b080a884b" x="312" y="2" width="36" height="1">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="f756e101-629a-40cb-87c3-8b0e6dbc0c08" x="353" y="15" width="56" height="1">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="776ebc72-33be-4200-b595-1d2b3c368463" x="490" y="2" width="33" height="1">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="6be67af4-58cf-4009-bed1-c562532ebe0b" x="525" y="16" width="58" height="1">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="9989c429-436e-4f13-85d9-edd9fa35b343" x="128" y="2" width="113" height="1">
+					<printWhenExpression><![CDATA[$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null && $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" ) || $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" ) ? true : false]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="7f91b372-dcd0-4333-ad5a-b3e91e0be52c" x="6" y="6" width="78" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" ) || $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Population Totals:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a55c9ccf-f6f4-4f2d-8749-49745172245d" x="6" y="18" width="78" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" ) || $F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Population Stats:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="75ed81d5-4b4c-4418-b992-6b4a47417670" x="378" y="18" width="6" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="18802aa6-1a47-4c1a-b468-f74b42b6adac" x="552" y="18" width="6" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="dbf550b2-6574-4225-b8d1-b3f30e2fe0d3" x="132" y="6" width="66" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_TOTAL_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="9472af08-2adc-409a-b46b-46c7ebc87517" x="202" y="6" width="36" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_TOTAL_LOADS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="28e5153a-68c5-4363-9b81-4291d7e38b58" x="324" y="6" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Sum (HBS3R888.OPTIMUM_SAMPLE_CALC)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(-#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="763acd07-b885-43fc-b540-35bac4a933ab" x="384" y="18" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Tot_Opt_Freq}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="e9a41c2e-7609-41f0-bab9-a3560c5149db" x="492" y="6" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Sum (HBS3R888.TARGET_SAMPLE_CALC)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="85a6d40c-3170-4563-8379-dec7da1c0944" x="558" y="18" width="24" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_Tot_Target_Freq}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="68ebf0bc-4284-4a37-a617-659366d8a3f1" x="348" y="18" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SMP_OPTIMUM_PRECISION_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="f7aed0d0-0789-42fb-9c2f-42d93ce63703" x="522" y="18" width="30" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SMP_TARGET_PRECISION_CALC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="3b7482ba-2abf-4ca3-a6f3-9d9e6b085af1" x="229" y="18" width="48" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'S' THEN
+//    FALSE
+//ELSE
+//    TRUE;]@
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "S" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POP_ESTIMATED_LOAD_SIZE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="0bd6f35b-68c1-49aa-a7b4-d3e56b3e2f96" x="132" y="6" width="66" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'D' THEN
+//    FALSE
+//ELSE
+//    TRUE;
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_TOTAL_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;(#,##0)" isBlankWhenNull="true">
+				<reportElement uuid="f90f9615-50b8-4340-afdd-bba60efe0527" x="202" y="6" width="36" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'D' THEN
+//    FALSE
+//ELSE
+//    TRUE;
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ESTIMATED_TOTAL_LOADS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
+				<reportElement uuid="90e8fafa-88c0-4663-b586-8ed6c67dc2b2" x="229" y="18" width="48" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//IF {HBS3R888.SAMPLING_PLAN_RATIO_TYPE_CODE} = 'D' THEN
+//    FALSE
+//ELSE
+//    TRUE;
+
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}!=null &&
+$F{SAMPLING_PLAN_RATIO_TYPE_CODE}.equalsIgnoreCase( "D" )
+? true
+: false]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POP_ESTIMATED_LOAD_SIZE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

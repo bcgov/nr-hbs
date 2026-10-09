@@ -1,0 +1,15 @@
+/* The loader fills the space the content will take — down to the bottom of
+   the viewport, as the detail pages' grey tab pane does (styles/_detail.scss)
+   — with Carbon's large spinner centred in it. */
+.async-boundary__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-block-size: max(16rem, calc(100dvh - 21rem));
+}
+
+.async-boundary__loading-text {
+  color: var(--cds-text-secondary);
+}

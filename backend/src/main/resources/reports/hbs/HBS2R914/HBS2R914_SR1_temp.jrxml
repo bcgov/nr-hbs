@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp.rpt - 01" pageWidth="684" pageHeight="504" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="684" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="94939e65-357a-404b-a1fd-30ed8231d53e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ORG_NO" class="java.lang.String"/>
+	<parameter name="ORG_NO_as_num" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{ORG_NO} != null && !($P{ORG_NO}.isEmpty()) && $P{ORG_NO}.matches("[0-9]+")
+?
+Integer.parseInt($P{ORG_NO})
+: 0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp.rpt - 01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ORG_UNIT_NAME
+FROM ORG_UNIT
+
+WHERE ORG_UNIT_NO = $P{ORG_NO_as_num}]]>
+	</queryString>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<variable name="CCF0_show_orgunit_name" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//'In '+{Command.ORG_UNIT_NAME}
+
+$F{ORG_UNIT_NAME}!=null
+? "In " + $F{ORG_UNIT_NAME}
+: "In "]]></variableExpression>
+	</variable>
+	<title>
+		<band/>
+	</title>
+	<detail>
+		<band splitType="Prevent">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+		</band>
+	</detail>
+	<summary>
+		<band height="12">
+			<staticText>
+				<reportElement uuid="1600e2b4-2a6b-4bdd-8a30-6eaa2a395ce1" x="6" y="0" width="72" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Sites:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="99d291dd-a0a2-4d73-b61d-c595024830bd" x="138" y="0" width="288" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_show_orgunit_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

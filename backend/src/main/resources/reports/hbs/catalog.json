@@ -1,0 +1,2079 @@
+[
+  {
+    "id": "HBS2R027",
+    "title": "2R027 List of Received Batches of Detail Scale Data",
+    "procedure": "HBS2R027",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_RETURN_TYPE_CODE",
+      "RB_TRADING_PARTNER",
+      "RB_REGDIST",
+      "RB_SCALE_SITE",
+      "RB_SEARCH_BY_SITES",
+      "RB_SEARCH_BY_MARKS",
+      "RB_USER_ID",
+      "RB_AFTER_DATE",
+      "RB_BEFORE_DATE",
+      "RB_TRANSMISSION_ID",
+      "RB_BATCH_TYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R027_SR1_temp",
+      "HBS2R027_SR2_HBS2R027b"
+    ]
+  },
+  {
+    "id": "HBS2R032",
+    "title": "2R032 Transmission Detail Active Version Status",
+    "procedure": "HBS2R032",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_TRANSMISSION_ID",
+      "RB_BATCH_ID",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R032_SR10_HBS2R032e",
+      "HBS2R032_SR11_HBS2R032f",
+      "HBS2R032_SR1_HBS2R032a",
+      "HBS2R032_SR2_HBS2R032a1",
+      "HBS2R032_SR3_HBS2R032a2",
+      "HBS2R032_SR4_HBS2R032a3",
+      "HBS2R032_SR5_HBS2R032a4",
+      "HBS2R032_SR6_HBS2R032a5",
+      "HBS2R032_SR7_HBS2R032b",
+      "HBS2R032_SR8_HBS2R032c",
+      "HBS2R032_SR9_HBS2R032d"
+    ]
+  },
+  {
+    "id": "HBS2R033",
+    "title": "2R033 Transmission Detail Content Listing",
+    "procedure": "HBS2R033",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_TRANSMISSION_ID",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R033_SR10_HBS2R033e",
+      "HBS2R033_SR11_HBS2R033f",
+      "HBS2R033_SR1_HBS2R033a",
+      "HBS2R033_SR2_HBS2R033a1",
+      "HBS2R033_SR3_HBS2R033a2",
+      "HBS2R033_SR4_HBS2R033a3",
+      "HBS2R033_SR5_HBS2R033a4",
+      "HBS2R033_SR6_HBS2R033a5",
+      "HBS2R033_SR7_HBS2R033b",
+      "HBS2R033_SR8_HBS2R033c",
+      "HBS2R033_SR9_HBS2R033d"
+    ]
+  },
+  {
+    "id": "HBS2R051",
+    "title": "2R051 - List of Piece Scale Summary Returns",
+    "procedure": "HBS2R051",
+    "parameters": [
+      "PSR_SELECTCOUNT",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_RETURNCATEGORYCODE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_SCALEDATEFROM",
+      "PSR_SCALEDATETO",
+      "PSR_TIMBERMARK",
+      "PSR_SCALESITE",
+      "PSR_DISTRICTSCALED",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_CLIENTTYPE",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_LICENCENUMBER",
+      "PSR_RETURNNUMBER",
+      "PSR_INVOICENUMBER",
+      "PSR_OVERRIDERATINGRULEID",
+      "PSR_BILLINGDATEFROM",
+      "PSR_BILLINGDATETO",
+      "PSR_ACTIVEVERSIONFLAG",
+      "PSR_FIELDSCALEDECKID",
+      "PSR_PSSMRY",
+      "PSR_GENERATEDFLAG",
+      "PSR_VISIBILITYINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R051_SR1_temp1",
+      "HBS2R051_SR2_temp1",
+      "HBS2R051_SR3_HBS2R051c",
+      "HBS2R051_SR4_HBS2R051h",
+      "HBS2R051_SR5_HBS2R051g"
+    ]
+  },
+  {
+    "id": "HBS2R052",
+    "title": "2R052 - Return Volume Estimate Report",
+    "procedure": "HBS2R052",
+    "parameters": [
+      "PSRETURN_DOCUMENTNUMBER",
+      "PSRETURN_VERSIONNUMBER",
+      "PSRETURN_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R052_SR1_HBS2R052D",
+      "HBS2R052_SR2_HBS2R052a",
+      "HBS2R052_SR3_HBS2R052b",
+      "HBS2R052_SR4_HBS2R052c"
+    ]
+  },
+  {
+    "id": "HBS2R101",
+    "title": "HBS2R101 - List of Weight Scale",
+    "procedure": "HBS2R101",
+    "parameters": [
+      "PSR_ACTIVEVERSIONFLAG",
+      "PSR_BILLINGDATEFROM",
+      "PSR_BILLINGDATETO",
+      "PSR_CLIENTLOC",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTTYPE",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_DISTRICTSCALED",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_FIELDSCALEDECKID",
+      "PSR_GENERATEDFLAG",
+      "PSR_INVOICENUMBER",
+      "PSR_JOBNO",
+      "PSR_ORDERBY",
+      "PSR_OVERRIDERATINGRULEID",
+      "PSR_POPULATION",
+      "PSR_RETURNCATEGORYCODE",
+      "PSR_SAMPLINGYEAR",
+      "PSR_SCALEDATEFROM",
+      "PSR_SCALEDATETO",
+      "PSR_SCALESITE",
+      "PSR_SEARCHBYMARKS",
+      "PSR_SEARCHBYSITES",
+      "PSR_SELECTCOUNT",
+      "PSR_STRATUM",
+      "PSR_TIMBERMARK",
+      "PSR_USERID",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_VISIBILITYINDICATOR"
+    ],
+    "subreports": [
+      "HBS2R101_SR1_temp1",
+      "HBS2R101_SR2_temp1",
+      "HBS2R101_SR3_HBS2R101c",
+      "HBS2R101_SR4_HBS2R101d",
+      "HBS2R101_SR5_HBS2R101h",
+      "HBS2R101_SR6_HBS2R101g"
+    ]
+  },
+  {
+    "id": "HBS2R102",
+    "title": "2R102 Weight Scale Return Report",
+    "procedure": "HBS2R102",
+    "parameters": [
+      "WSRETURN_DOCUMENTNUMBER",
+      "WSRETURN_VERSIONNUMBER",
+      "WSRETURN_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R102_SR1_HBS2R102D",
+      "HBS2R102_SR2_HBS2R102b",
+      "HBS2R102_SR3_HBS2R102c"
+    ]
+  },
+  {
+    "id": "HBS2R151",
+    "title": "2R151 - List of Sample Scale Summary Returns",
+    "procedure": "HBS2R151",
+    "parameters": [
+      "PSR_SELECTCOUNT",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_STATEMENTNUMBER",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_RETURNCATEGORYCODE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_SCALEDATEFROM",
+      "PSR_SCALEDATETO",
+      "PSR_TIMBERMARK",
+      "PSR_SCALESITE",
+      "PSR_DISTRICTSCALED",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_CLIENTTYPE",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_LICENCENUMBER",
+      "PSR_RETURNNUMBER",
+      "PSR_POPULATION",
+      "PSR_STRATUM",
+      "PSR_SAMPLINGYEAR",
+      "PSR_COMPILEDDATEFROM",
+      "PSR_COMPILEDDATETO",
+      "PSR_ACTIVEVERSIONFLAG",
+      "PSR_GENERATEDFLAG",
+      "PSR_VISIBILITYINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R151_SR1_temp1",
+      "HBS2R151_SR2_temp1",
+      "HBS2R151_SR3_HBS2R151d",
+      "HBS2R151_SR4_HBS2R151h",
+      "HBS2R151_SR5_HBS2R151c",
+      "HBS2R151_SR6_HBS2R151g"
+    ]
+  },
+  {
+    "id": "HBS2R152",
+    "title": "2R152 - Sample Scale Return Report",
+    "procedure": "HBS2R152",
+    "parameters": [
+      "SSRETURN_DOCUMENTNUMBER",
+      "SSRETURN_VERSIONNUMBER",
+      "SSRETURN_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R152_SR1_HBS2R152D",
+      "HBS2R152_SR2_HBS2R152a",
+      "HBS2R152_SR3_HBS2R152b",
+      "HBS2R152_SR4_HBS2R152c"
+    ]
+  },
+  {
+    "id": "HBS2R201",
+    "title": "HBS2R201.rpt",
+    "procedure": "HBS2R201",
+    "parameters": [
+      "OVRRULES_TIMBER_MARK",
+      "OVRRULES_FIELD_SCALE_DECKID",
+      "OVRRULES_RULE_STATUS",
+      "OVRRULES_SCALEAFTER_DATE",
+      "OVRRULES_SCALEBEFORE_DATE",
+      "OVRRULES_PROCESSAFTER_DATE",
+      "OVRRULES_PROCESSBEFORE_DATE",
+      "OVRRULES_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS2R321",
+    "title": "HBS2R321.rpt",
+    "procedure": "HBS2R321",
+    "parameters": [
+      "RB_JOBNO",
+      "RB_SCALE_SITE_ID_NMBR",
+      "RB_CLIENT_LOCN_CODE",
+      "RB_CLIENT_NUMBER",
+      "RB_SELECTCOUNT"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS2R401GroupDistScale",
+    "title": "HBS2R401GroupDistScale.rpt",
+    "procedure": "HBS2R401",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_JOBNO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "hbs2R401GroupDistScale_SR1_HBS2R401a",
+      "hbs2R401GroupDistScale_SR2_HBS2R401b",
+      "hbs2R401GroupDistScale_SR3_HBS2R401c"
+    ]
+  },
+  {
+    "id": "HBS2R401GroupScaleTM",
+    "title": "HBS2R401GroupScaleTM.rpt",
+    "procedure": "HBS2R401",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_JOBNO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "hbs2R401GroupScaleTM_SR1_HBS2R401a",
+      "hbs2R401GroupScaleTM_SR2_HBS2R401b",
+      "hbs2R401GroupScaleTM_SR3_HBS2R401c"
+    ]
+  },
+  {
+    "id": "HBS2R402GroupDistScale",
+    "title": "2R402 - Site Summary Report (Weight Scale Summaries) Grouped By District Scaled and Scale Site",
+    "procedure": "HBS2R402",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOBNO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "HBS2R402GroupDistScale_SR1_HBS2R402a",
+      "HBS2R402GroupDistScale_SR2_HBS2R402b",
+      "HBS2R402GroupDistScale_SR3_HBS2R402c"
+    ]
+  },
+  {
+    "id": "HBS2R402GroupScalePop",
+    "title": "2R402 - Site Summary Report (Weight Scale Summaries) Grouped By Scale Site and Population",
+    "procedure": "HBS2R402",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOBNO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "HBS2R402GroupScalePop_SR1_HBS2R402a",
+      "HBS2R402GroupScalePop_SR2_HBS2R402b",
+      "HBS2R402GroupScalePop_SR3_HBS2R402c"
+    ]
+  },
+  {
+    "id": "HBS2R402GroupScaleTM",
+    "title": "HBS2R402GroupScaleTM.rpt",
+    "procedure": "HBS2R402",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOBNO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "hbs2R402GroupScaleTM_SR1_HBS2R402a",
+      "hbs2R402GroupScaleTM_SR2_HBS2R402b",
+      "hbs2R402GroupScaleTM_SR3_HBS2R402c"
+    ]
+  },
+  {
+    "id": "HBS2R403GroupDistScale",
+    "title": "HBS2R403GroupDistScale.rpt",
+    "procedure": "HBS2R403",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOB_NO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "HBS2R403GroupDistScale_SR1_HBS2R403b",
+      "HBS2R403GroupDistScale_SR2_HBS2R403a",
+      "HBS2R403GroupDistScale_SR3_HBS2R403c"
+    ]
+  },
+  {
+    "id": "HBS2R403GroupScalePop",
+    "title": "HBS2R403GroupScalePop.rpt",
+    "procedure": "HBS2R403",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOB_NO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "HBS2R403GroupScalePop_SR1_HBS2R403a",
+      "HBS2R403GroupScalePop_SR2_HBS2R403b",
+      "HBS2R403GroupScalePop_SR3_HBS2R403c"
+    ]
+  },
+  {
+    "id": "HBS2R403GroupScaleTM",
+    "title": "HBS2R403GroupScaleTM.rpt",
+    "procedure": "HBS2R403",
+    "parameters": [
+      "RB_DISTRICT_SCALED",
+      "RB_DISTRICT_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION",
+      "RB_VERSION_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_SCALER_LICENSE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLING_YEAR",
+      "RB_JOB_NO",
+      "RB_GROUP_BY"
+    ],
+    "subreports": [
+      "HBS2R403GroupScaleTM_SR1_HBS2R403a",
+      "HBS2R403GroupScaleTM_SR2_HBS2R403b",
+      "HBS2R403GroupScaleTM_SR3_HBS2R403c"
+    ]
+  },
+  {
+    "id": "HBS2R411",
+    "title": "HBS2R411.rpt",
+    "procedure": "HBS2R411",
+    "parameters": [
+      "Avg_Rate_Coast",
+      "Avg_Rate_NInterior",
+      "Avg_Rate_SInterior",
+      "PSAGED_SCALED_PRIORTO",
+      "PSAGED_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS2R412",
+    "title": "HBS2R412.rpt",
+    "procedure": "HBS2R412",
+    "parameters": [
+      "Avg_Rate_Coast",
+      "Avg_Rate_NInterior",
+      "Avg_Rate_SInterior",
+      "WSAGED_SCALED_PRIORTO",
+      "WSAGED_JOB"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS2R551",
+    "title": "HBS2R551.rpt",
+    "procedure": "HBS2R551",
+    "parameters": [
+      "IS_COUNT",
+      "PSR_DOCTYPE",
+      "PSR_DISTRICTSCALED",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_TIMBERMARK",
+      "PSR_FIELDSCALEDECKID",
+      "PSR_FIELDSCALEIND",
+      "PSR_OTHERIND",
+      "PSR_CHKSCALEIND",
+      "PSR_SCALESITE",
+      "PSR_LICENCENUMBER",
+      "PSR_CLIENTTYPE",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_SCALEDDATEFROM",
+      "PSR_SCALEDDATETO",
+      "PSR_SUMMARIZEDDATEFROM",
+      "PSR_SUMMARIZEDDATETO",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_EVENTTYPE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_BATCHID",
+      "PSR_INPUTBATCHDATEFROM",
+      "PSR_INPUTBATCHDATETO",
+      "PSR_RETURNNUMBER",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_SUMMARYDOCUMENTNUMBER",
+      "PSR_ACTIVEVERSIONINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_INPUTUSERID",
+      "PSR_CROIND",
+      "PSR_ORIGSCALERLICNUMBER",
+      "PSR_ORIGRETURNNUMBER",
+      "PSR_ERRORRESPONSIBILITY",
+      "PSR_LIMITYEARIND",
+      "PSR_RECEIVEDDATEFROM",
+      "PSR_RECEIVEDDATETO",
+      "PSR_CUTBLOCK",
+      "PSR_NUMBERRANGEFROM",
+      "PSR_NUMBERRANGETO",
+      "PSR_SEARCHBYRANGE",
+      "PSR_TRANSPORTID",
+      "PSR_LDSNUMBER",
+      "PSR_CLIENTSCALERLICENCE",
+      "PSR_TIMBERMARKFILTER",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R551_SR1_temp1",
+      "HBS2R551_SR2_temp1",
+      "HBS2R551_SR3_HBS2R551e"
+    ]
+  },
+  {
+    "id": "HBS2R552",
+    "title": "HBS2R552.rpt",
+    "procedure": "HBS2R552",
+    "parameters": [
+      "PSRETURN_DETAILDOCUMENTNUMBER",
+      "PSRETURN_VERSIONNUMBER",
+      "PSRETURN_JOBNO",
+      "PSRETURN_USERTYPE",
+      "PSVERSIONSTATUSCODE",
+      "PSERRORCATEGORY",
+      "PSEVENTTYPE",
+      "PSSCALEDDATEFROM",
+      "PSSCALEDDATETO",
+      "PSTIMBERMARK",
+      "PS_FIELDSCALEDECKID",
+      "PS_FIELDSCALEIND",
+      "PS_CHKSCALEIND",
+      "PSSCALESITE",
+      "PSLICENCENUMBER",
+      "PSDISTRICTSCALED",
+      "PSDISTRICTHARVESTED",
+      "PSCLIENTTYPE",
+      "PSCLIENTNO",
+      "PSCLIENTLOC",
+      "PSACTIVEVERSIONINDICATOR",
+      "PSORDERBY",
+      "PSMINREC",
+      "PSMAXREC"
+    ],
+    "subreports": [
+      "HBS2R552_SR1_HBS2R552c",
+      "HBS2R552_SR2_HBS2R552a",
+      "HBS2R552_SR3_HBS2R552b"
+    ]
+  },
+  {
+    "id": "HBS2R552docd",
+    "title": "HBS2R552docd.rpt",
+    "procedure": "HBS2R552",
+    "parameters": [
+      "PSRETURN_DETAILDOCUMENTNUMBER",
+      "PSRETURN_VERSIONNUMBER",
+      "PSRETURN_JOBNO",
+      "PSRETURN_USERTYPE",
+      "PSVERSIONSTATUSCODE",
+      "PSERRORCATEGORY",
+      "PSEVENTTYPE",
+      "PSSCALEDDATEFROM",
+      "PSSCALEDDATETO",
+      "PSTIMBERMARK",
+      "PS_FIELDSCALEDECKID",
+      "PS_FIELDSCALEIND",
+      "PS_CHKSCALEIND",
+      "PSSCALESITE",
+      "PSLICENCENUMBER",
+      "PSDISTRICTSCALED",
+      "PSDISTRICTHARVESTED",
+      "PSCLIENTTYPE",
+      "PSCLIENTNO",
+      "PSCLIENTLOC",
+      "PSACTIVEVERSIONINDICATOR",
+      "PSORDERBY",
+      "PSMINREC",
+      "PSMAXREC"
+    ],
+    "subreports": [
+      "HBS2R552docd_SR1_HBS2R552a",
+      "HBS2R552docd_SR2_HBS2R552b"
+    ]
+  },
+  {
+    "id": "HBS2R601",
+    "title": "2R601 - List of Weigh Slips",
+    "procedure": "HBS2R601",
+    "parameters": [
+      "IS_COUNT",
+      "PSR_DISTRICTSCALED",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_TIMBERMARK",
+      "PSR_FIELDSCALEDECKID",
+      "PSR_FIELDSCALEIND",
+      "PSR_OTHERIND",
+      "PSR_SCALESITE",
+      "PSR_LICENCENUMBER",
+      "PSR_CLIENTTYPE",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_POPULATION",
+      "PSR_STRATUM",
+      "PSR_SAMPLINGYEAR",
+      "PSR_SCALEDDATEFROM",
+      "PSR_SCALEDDATETO",
+      "PSR_SUMMARIZEDDATEFROM",
+      "PSR_SUMMARIZEDDATETO",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_EVENTTYPE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_BATCHID",
+      "PSR_INPUTBATCHDATEFROM",
+      "PSR_INPUTBATCHDATETO",
+      "PSR_WEIGHSLIP",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_SUMMARYDOCUMENTNUMBER",
+      "PSR_ACTIVEVERSIONINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_INPUTUSERID",
+      "PSR_ERRORRESPONSIBILITY",
+      "PSR_LIMITYEARIND",
+      "PSR_RECEIVEDDATEFROM",
+      "PSR_RECEIVEDDATETO",
+      "PSR_CUTBLOCK",
+      "PSR_NUMBERRANGEFROM",
+      "PSR_NUMBERRANGETO",
+      "PSR_SEARCHBYRANGE",
+      "PSR_TRANSPORTID",
+      "PSR_LDSNUMBER",
+      "PSR_CLIENTSCALERLICENCE",
+      "PSR_TIMBERMARKFILTER",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R601_SR1_temp1",
+      "HBS2R601_SR2_temp1",
+      "HBS2R601_SR3_HBS2R601e"
+    ]
+  },
+  {
+    "id": "HBS2R602",
+    "title": "HBS2R602.rpt",
+    "procedure": "HBS2R602",
+    "parameters": [
+      "WSRETURN_VERSIONNUMBER",
+      "WSRETURN_DETAILDOCUMENTNUMBER",
+      "WSRETURN_JOBNO",
+      "WSRETURN_USERTYPE",
+      "WSRETURN_DISTRICTSCALED",
+      "WSRETURN_DISTRICTHARVESTED",
+      "WSRETURN_TIMBERMARK",
+      "WSRETURN_FIELDSCALEDECKID",
+      "WSRETURN_FIELDSCALEIND",
+      "WSRETURN_SCALESITE",
+      "WSRETURN_LICENCENUMBER",
+      "WSRETURN_CLIENTTYPE",
+      "WSRETURN_CLIENTNO",
+      "WSRETURN_CLIENTLOC",
+      "WSRETURN_POPULATION",
+      "WSRETURN_STRATUM",
+      "WSRETURN_SAMPLINGYEAR",
+      "WSRETURN_SCALEDDATEFROM",
+      "WSRETURN_SCALEDDATETO",
+      "WSRETURN_VERSIONSTATUSCODE",
+      "WSRETURN_EVENTTYPE",
+      "WSRETURN_ERRORCATEGORY",
+      "WSRETURN_ACTIVEVERSIONIND",
+      "WSRETURN_ORDERBY",
+      "WSRETURN_MINREC",
+      "WSRETURN_MAXREC"
+    ],
+    "subreports": [
+      "HBS2R602_SR1_HBS2R602b",
+      "HBS2R602_SR2_HBS2R602a"
+    ]
+  },
+  {
+    "id": "HBS2R602docd",
+    "title": "2R602 - Scale Data Document Delivery",
+    "procedure": "HBS2R602",
+    "parameters": [
+      "WSRETURN_DETAILDOCUMENTNUMBER",
+      "WSRETURN_VERSIONNUMBER",
+      "WSRETURN_JOBNO",
+      "WSRETURN_USERTYPE",
+      "WSRETURN_DISTRICTSCALED",
+      "WSRETURN_DISTRICTHARVESTED",
+      "WSRETURN_TIMBERMARK",
+      "WSRETURN_FIELDSCALEDECKID",
+      "WSRETURN_FIELDSCALEIND",
+      "WSRETURN_SCALESITE",
+      "WSRETURN_LICENCENUMBER",
+      "WSRETURN_CLIENTTYPE",
+      "WSRETURN_CLIENTNO",
+      "WSRETURN_CLIENTLOC",
+      "WSRETURN_POPULATION",
+      "WSRETURN_STRATUM",
+      "WSRETURN_SAMPLINGYEAR",
+      "WSRETURN_SCALEDDATEFROM",
+      "WSRETURN_SCALEDDATETO",
+      "WSRETURN_VERSIONSTATUSCODE",
+      "WSRETURN_EVENTTYPE",
+      "WSRETURN_ERRORCATEGORY",
+      "WSRETURN_ACTIVEVERSIONIND",
+      "WSRETURN_ORDERBY",
+      "WSRETURN_MINREC",
+      "WSRETURN_MAXREC"
+    ],
+    "subreports": [
+      "HBS2R602docd_SR1_HBS2R602a"
+    ]
+  },
+  {
+    "id": "HBS2R651",
+    "title": "HBS2R651.rpt",
+    "procedure": "HBS2R651",
+    "parameters": [
+      "PSR_DISTRICTSCALED",
+      "IS_COUNT",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_TIMBERMARK",
+      "PSR_FIELDSCALEDECKID",
+      "PSR_CHKSCALEIND",
+      "PSR_SCALESITE",
+      "PSR_LICENCENUMBER",
+      "PSR_CLIENTTYPE",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_POPULATION",
+      "PSR_STRATUM",
+      "PSR_SAMPLINGYEAR",
+      "PSR_SCALEDDATEFROM",
+      "PSR_SCALEDDATETO",
+      "PSR_SUMMARIZEDDATEFROM",
+      "PSR_SUMMARIZEDDATETO",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_EVENTTYPE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_BATCHID",
+      "PSR_INPUTBATCHDATEFROM",
+      "PSR_INPUTBATCHDATETO",
+      "PSR_RETURNNUMBER",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_SUMMARYDOCUMENTNUMBER",
+      "PSR_ACTIVEVERSIONINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_INPUTUSERID",
+      "PSR_CROIND",
+      "PSR_ORIGSCALERLICNUMBER",
+      "PSR_ORIGRETURNNUMBER",
+      "PSR_ERRORRESPONSIBILITY",
+      "PSR_LIMITYEARIND",
+      "PSR_RECEIVEDDATEFROM",
+      "PSR_RECEIVEDDATETO",
+      "PSR_NUMBERRANGEFROM",
+      "PSR_NUMBERRANGETO",
+      "PSR_SEARCHBYRANGE",
+      "PSR_TRANSPORTID",
+      "PSR_LDSNUMBER",
+      "PSR_CLIENTSCALERLICENCE",
+      "PSR_TIMBERMARKFILTER",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R651_SR1_temp1",
+      "HBS2R651_SR2_temp1",
+      "HBS2R651_SR3_HBS2R651e"
+    ]
+  },
+  {
+    "id": "HBS2R652",
+    "title": "HBS2R652.rpt",
+    "procedure": "HBS2R652",
+    "parameters": [
+      "SSRETURN_DETAILDOCUMENTNUMBER",
+      "SSRETURN_VERSIONNUMBER",
+      "SSRETURN_JOBNO",
+      "SSRETURN_USERTYPE",
+      "SSRETURN_DISTRICTSCALED",
+      "SSRETURN_DISTRICTHARVESTED",
+      "SSRETURN_TIMBERMARK",
+      "SSRETURN_FIELDSCALEDECKID",
+      "SSRETURN_CHKSCALEIND",
+      "SSRETURN_SCALESITE",
+      "SSRETURN_LICENCENUMBER",
+      "SSRETURN_CLIENTTYPE",
+      "SSRETURN_CLIENTNO",
+      "SSRETURN_CLIENTLOC",
+      "SSRETURN_POPULATION",
+      "SSRETURN_STRATUM",
+      "SSRETURN_SAMPLINGYEAR",
+      "SSRETURN_SCALEDDATEFROM",
+      "SSRETURN_SCALEDDATETO",
+      "SSRETURN_VERSIONSTATUSCODE",
+      "SSRETURN_EVENTTYPE",
+      "SSRETURN_ERRORCATEGORY",
+      "SSRETURN_ACTIVEVERSIONIND",
+      "SSRETURN_ORDERBY",
+      "SSRETURN_MINREC",
+      "SSRETURN_MAXREC"
+    ],
+    "subreports": [
+      "HBS2R652_SR1_HBS2R652c",
+      "HBS2R652_SR2_HBS2R652a",
+      "HBS2R652_SR3_HBS2R652b"
+    ]
+  },
+  {
+    "id": "HBS2R652docd",
+    "title": "HBS2R652docd.rpt",
+    "procedure": "HBS2R652",
+    "parameters": [
+      "SSRETURN_DETAILDOCUMENTNUMBER",
+      "SSRETURN_VERSIONNUMBER",
+      "SSRETURN_JOBNO",
+      "SSRETURN_USERTYPE",
+      "SSRETURN_DISTRICTSCALED",
+      "SSRETURN_DISTRICTHARVESTED",
+      "SSRETURN_DISTRICTHARVESTED",
+      "SSRETURN_TIMBERMARK",
+      "SSRETURN_FIELDSCALEDECKID",
+      "SSRETURN_CHKSCALEIND",
+      "SSRETURN_SCALESITE",
+      "SSRETURN_LICENCENUMBER",
+      "SSRETURN_CLIENTTYPE",
+      "SSRETURN_CLIENTNO",
+      "SSRETURN_CLIENTLOC",
+      "SSRETURN_POPULATION",
+      "SSRETURN_STRATUM",
+      "SSRETURN_SAMPLINGYEAR",
+      "SSRETURN_SCALEDDATEFROM",
+      "SSRETURN_SCALEDDATETO",
+      "SSRETURN_VERSIONSTATUSCODE",
+      "SSRETURN_EVENTTYPE",
+      "SSRETURN_ERRORCATEGORY",
+      "SSRETURN_ACTIVEVERSIONIND",
+      "SSRETURN_ORDERBY",
+      "SSRETURN_MINREC",
+      "SSRETURN_MAXREC"
+    ],
+    "subreports": [
+      "HBS2R652docd_SR1_HBS2R652a",
+      "HBS2R652docd_SR2_HBS2R652b"
+    ]
+  },
+  {
+    "id": "HBS2R701",
+    "title": "2R701 - List of Ledger Entries",
+    "procedure": "HBS2R701",
+    "parameters": [
+      "IS_COUNT",
+      "PSR_DISTRICTSCALED",
+      "PSR_DISTRICTHARVESTED",
+      "PSR_TIMBERMARK",
+      "PSR_SCALESITE",
+      "PSR_PRIMARYSCALER",
+      "PSR_CLIENTASSN",
+      "PSR_CLIENTNO",
+      "PSR_CLIENTLOC",
+      "PSR_SCALEDFROMDATE",
+      "PSR_SCALEDTODATE",
+      "PSR_VERSIONSTATUSCODE",
+      "PSR_BATCHID",
+      "PSR_RECEIVEDFROMDATE",
+      "PSR_RECEIVEDTODATE",
+      "PSR_EVENTTYPE",
+      "PSR_ERRORCODE",
+      "PSR_EXCLUDEERROR",
+      "PSR_RETURNNUMBER",
+      "PSR_DOCUMENTCONTROLNUMBER",
+      "PSR_LEDGERTYPE",
+      "PSR_ACTIVEVERSIONINDICATOR",
+      "PSR_SEARCHBYSITES",
+      "PSR_SEARCHBYMARKS",
+      "PSR_USERID",
+      "PSR_INPUTUSERID",
+      "PSR_ERRORRESPONSIBILITY",
+      "PSR_LIMITYEARIND",
+      "PSR_RECEIVEDDATEFROM",
+      "PSR_RECEIVEDDATETO",
+      "PSR_CUTBLOCK",
+      "PSR_NUMBERRANGEFROM",
+      "PSR_NUMBERRANGETO",
+      "PSR_SEARCHBYRANGE",
+      "PSR_TRANSPORTID",
+      "PSR_LDSNUMBER",
+      "PSR_CLIENTSCALERLICENCE",
+      "PSR_TIMBERMARKFILTER",
+      "PSR_ORDERBY",
+      "PSR_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R701_SR1_temp1",
+      "HBS2R701_SR2_temp1",
+      "HBS2R701_SR3_temp2"
+    ]
+  },
+  {
+    "id": "HBS2R702",
+    "title": "HBS2R702.rpt",
+    "procedure": "HBS2R702",
+    "parameters": [
+      "LEDGERDTL_DOCUMENTNUMBER",
+      "LEDGERDTL_VERSIONNUMBER",
+      "LEDGERDTL_LEDGERTYPE",
+      "LEDGERDTL_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS2R912",
+    "title": "HBS2R912.rpt",
+    "procedure": "HBS2R912",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO",
+      "RB_ANOMALY_TYPE"
+    ],
+    "subreports": [
+      "HBS2R912_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R914",
+    "title": "HBS2R914.rpt",
+    "procedure": "HBS2R914",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO",
+      "RB_ANOMALY_TYPE"
+    ],
+    "subreports": [
+      "HBS2R914_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R922",
+    "title": "HBS2R922.rpt",
+    "procedure": "HBS2R922",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO",
+      "RB_ANOMALY_TYPE"
+    ],
+    "subreports": [
+      "HBS2R922_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R932",
+    "title": "HBS2R932.rpt",
+    "procedure": "HBS2R932",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R932_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R933",
+    "title": "HBS2R933.rpt",
+    "procedure": "HBS2R933",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R933_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R942",
+    "title": "HBS2R942.rpt",
+    "procedure": "HBS2R942",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R942_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R952",
+    "title": "HBS2R952.rpt",
+    "procedure": "HBS2R952",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R952_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R953",
+    "title": "HBS2R953.rpt",
+    "procedure": "HBS2R953",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_ANOMALY_STATUS",
+      "RB_SCALED_FROM",
+      "RB_SCALED_TO",
+      "RB_ASSESSED_FROM",
+      "RB_ASSESSED_TO",
+      "RB_SEARCH_BY",
+      "RB_PRIMARY_LICENSE",
+      "RB_USER_ID",
+      "RB_SCALE_SITE",
+      "RB_DISTRICT_SCALED",
+      "RB_ASSESSMENT_STATUS",
+      "RB_LAST_ASSESSMENT",
+      "RB_WINDOW_START",
+      "RB_WINDOW_END",
+      "RB_FROM_ASSESSMENT",
+      "RB_TO_ASSESSMENT",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS2R953_SR1_temp"
+    ]
+  },
+  {
+    "id": "HBS2R962",
+    "title": "HBS2R962.rpt",
+    "procedure": "HBS2R962",
+    "parameters": [
+      "AUDITLOG_CHANGED_FIELD",
+      "AUDITLOG_CHANGEDFROMDATE",
+      "AUDITLOG_CHANGEDTODATE",
+      "AUDITLOG_JOBNO",
+      "AUDITLOG_RETURN_DOCNUMBER",
+      "AUDITLOG_RETURN_FORMAT",
+      "AUDITLOG_RETURN_VERSION",
+      "AUDITLOG_SELECTCOUNT",
+      "AUDITLOG_USERID"
+    ],
+    "subreports": [
+      "HBS2R962_SR1_HBS2R962a"
+    ]
+  },
+  {
+    "id": "HBS3R211",
+    "title": "HBS3R211.rpt",
+    "procedure": "HBS3R211",
+    "parameters": [
+      "PDDR_SELECTCOUNT",
+      "PDDR_DISTRICT",
+      "PDDR_METHOD",
+      "PDDR_START_DATE",
+      "PDDR_END_DATE",
+      "PDDR_DDR_JOBNO",
+      "PDDR_ORDER_BY"
+    ],
+    "subreports": [
+      "HBS3R211_SR1_HBS3R211a"
+    ]
+  },
+  {
+    "id": "HBS3R221",
+    "title": "HBS3R221.rpt",
+    "procedure": "HBS3R221",
+    "parameters": [
+      "PWRR_CUTBLOCK",
+      "PWRR_DDR_JOBNO",
+      "PWRR_EFFECTIVEONAFTER",
+      "PWRR_EFFECTIVEONBEFORE",
+      "PWRR_TIMBERMARK"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R331",
+    "title": "HBS3R331.rpt",
+    "procedure": "HBS3R331",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCN_CODE",
+      "RB_POPULATION_NMBR",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R341",
+    "title": "HBS3R341.rpt",
+    "procedure": "HBS3R341",
+    "parameters": [
+      "RB_CLIENT_LOCN_CODE",
+      "RB_CLIENT_NUMBER",
+      "RB_JOBNO",
+      "RB_SELECTCOUNT",
+      "RB_TIMBER_MARK"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R371",
+    "title": "HBS3R371.rpt",
+    "procedure": "HBS3R371",
+    "parameters": [
+      "RB_CLIENT_LOCN_CODE",
+      "RB_CLIENT_NUMBER",
+      "RB_JOBNO",
+      "RB_SELECTCOUNT"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R416",
+    "title": "3R416 - Stumpage Invoice and Scale Summary",
+    "procedure": "HBS00002",
+    "parameters": [
+      "WSINVOICE_USERTYPE",
+      "WSINVOICE_USERCLILOC",
+      "WSINVOICE_LIST01",
+      "WSINVOICE_LIST02",
+      "WSINVOICE_LIST03",
+      "WSINVOICE_LIST04",
+      "WSINVOICE_LIST05",
+      "WSINVOICE_LIST06",
+      "WSINVOICE_LIST07",
+      "WSINVOICE_LIST08",
+      "WSINVOICE_LIST09",
+      "WSINVOICE_LIST10"
+    ],
+    "subreports": [
+      "HBS3R416_SR1_HBS00002a",
+      "HBS3R416_SR2_HBS00002d"
+    ]
+  },
+  {
+    "id": "HBS3R417",
+    "title": "HBS3R417.rpt",
+    "procedure": "HBS00004",
+    "parameters": [
+      "INVOICE_LIST01",
+      "INVOICE_LIST02",
+      "INVOICE_LIST03",
+      "INVOICE_LIST04",
+      "INVOICE_LIST05",
+      "INVOICE_LIST06",
+      "INVOICE_LIST07",
+      "INVOICE_LIST08",
+      "INVOICE_LIST09",
+      "INVOICE_LIST10",
+      "INVLIST_SCALETYPE",
+      "INVLIST_BILLFORM",
+      "INVLIST_BILLTO",
+      "INVLIST_SCALEFROM",
+      "INVLIST_SCALETO",
+      "INVLIST_REGDIST",
+      "INVLIST_INVCLI",
+      "INVLIST_INVLOC",
+      "INVLIST_COPYCLI",
+      "INVLIST_COPYLOC",
+      "INVLIST_MARKLICTYPE",
+      "INVLIST_LICMARK01",
+      "INVLIST_LICMARK02",
+      "INVLIST_LICMARK03",
+      "INVLIST_LICMARK04",
+      "INVLIST_LICMARK05",
+      "INVLIST_LICMARK06",
+      "INVLIST_LICMARK07",
+      "INVLIST_LICMARK08",
+      "INVLIST_LICMARK09",
+      "INVLIST_LICMARK10",
+      "INVLIST_SCALE1",
+      "INVLIST_SCALE2",
+      "INVLIST_SCALE3",
+      "INVLIST_SCALE4",
+      "INVLIST_SCALE5",
+      "INVLIST_POP",
+      "INVLIST_STRAT",
+      "INVLIST_YEAR",
+      "INVLIST_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R421",
+    "title": "HBS3R421.rpt",
+    "procedure": "HBS3R421",
+    "parameters": [
+      "RB_JOBNO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_REGION_HARVESTED",
+      "RB_FILE_TYPE1",
+      "RB_FILE_TYPE2",
+      "RB_FILE_TYPE3",
+      "RB_MGMT_UNIT_TYPE_CODE",
+      "RB_MGMT_UNIT_NUMBER",
+      "RB_LICENCE",
+      "RB_TIMBER_MARK",
+      "RB_REGION_SCALED",
+      "RB_SCALE_SITE",
+      "RB_RETURN_CATEGORY",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE"
+    ],
+    "subreports": [
+      "HBS3R421_SR1_HBS3R421a",
+      "HBS3R421_SR2_HBS3R421b",
+      "HBS3R421_SR3_HBS3R421c"
+    ]
+  },
+  {
+    "id": "HBS3R422",
+    "title": "HBS3R422.rpt",
+    "procedure": "HBS3R422",
+    "parameters": [
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_CLIENT_NUMBER",
+      "RB_FILE_TYPE1",
+      "RB_FILE_TYPE2",
+      "RB_FILE_TYPE3",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_JOBNO",
+      "RB_LICENCE",
+      "RB_MGMT_UNIT_NUMBER",
+      "RB_MGMT_UNIT_TYPE_CODE",
+      "RB_POPULATION",
+      "RB_REGION_HARVESTED",
+      "RB_REGION_SCALED",
+      "RB_RETURN_CATEGORY",
+      "RB_SAMPLINGYEAR",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_SCALE_SITE",
+      "RB_STRATUM",
+      "RB_TIMBER_MARK"
+    ],
+    "subreports": [
+      "HBS3R422_SR1_HBS3R422a",
+      "HBS3R422_SR2_HBS3R422b",
+      "HBS3R422_SR3_HBS3R422c"
+    ]
+  },
+  {
+    "id": "HBS3R431",
+    "title": "3R431 - Mark Monthly Billing History Report",
+    "procedure": "HBS00001R",
+    "parameters": [
+      "INVSMRY_FROM",
+      "INVSMRY_TO",
+      "INVSMRY_REGDIST",
+      "INVSMRY_CLIENTNO",
+      "INVSMRY_CLIENTLOC",
+      "INVSMRY_LICMARK01",
+      "INVSMRY_LICMARK02",
+      "INVSMRY_LICMARK03",
+      "INVSMRY_LICMARK04",
+      "INVSMRY_LICMARK05",
+      "INVSMRY_LICMARK06",
+      "INVSMRY_LICMARK07",
+      "INVSMRY_LICMARK08",
+      "INVSMRY_LICMARK09",
+      "INVSMRY_LICMARK10",
+      "INVSMRY_FILETYPE1",
+      "INVSMRY_FILETYPE2",
+      "INVSMRY_FILETYPE3",
+      "INVSMRY_LICMARKTYPE",
+      "INVSMRY_SPECIES",
+      "INVSMRY_PRODUCT",
+      "INVSMRY_GRADE",
+      "INVSMRY_BILLINGTYPE",
+      "INVSMRY_GRPTYPE",
+      "INVSMRY_DISPSPG",
+      "INVSMRY_DISPDTLS",
+      "INVSMRY_USERTYPECD",
+      "INVSMRY_USERCLILOC",
+      "INVSMRY_JOBNO",
+      "INVSMRY_REGDISTDESC",
+      "INVSMRY_MGMTUNITTYPECODE",
+      "INVSMRY_MGMTUNITNO"
+    ],
+    "subreports": [
+      "HBS3R431_SR1_HBS0001_sub_a",
+      "HBS3R431_SR2_HBS0001_sub_b"
+    ]
+  },
+  {
+    "id": "HBS3R441",
+    "title": "3R441 Mark Monthly Scale History Report",
+    "procedure": "HBS3R441R",
+    "parameters": [
+      "INVSMRY_FROM",
+      "INVSMRY_TO",
+      "INVSMRY_REGDIST",
+      "INVSMRY_CLIENTNO",
+      "INVSMRY_CLIENTLOC",
+      "INVSMRY_LICMARK01",
+      "INVSMRY_LICMARK02",
+      "INVSMRY_LICMARK03",
+      "INVSMRY_LICMARK04",
+      "INVSMRY_LICMARK05",
+      "INVSMRY_LICMARK06",
+      "INVSMRY_LICMARK07",
+      "INVSMRY_LICMARK08",
+      "INVSMRY_LICMARK09",
+      "INVSMRY_LICMARK10",
+      "INVSMRY_FILETYPE1",
+      "INVSMRY_FILETYPE2",
+      "INVSMRY_FILETYPE3",
+      "INVSMRY_LICMARKTYPE",
+      "INVSMRY_SPECIES",
+      "INVSMRY_PRODUCT",
+      "INVSMRY_GRADE",
+      "INVSMRY_BILLINGTYPE",
+      "INVSMRY_GRPTYPE",
+      "INVSMRY_DISPSPG",
+      "INVSMRY_DISPDTLS",
+      "INVSMRY_USERTYPECD",
+      "INVSMRY_USERCLILOC",
+      "INVSMRY_JOBNO",
+      "INVSMRY_REGDISTDESC",
+      "INVSMRY_REGDISTSCALED",
+      "INVSMRY_REGDISTSCALEDDESC",
+      "INVSMRY_SCALESITE",
+      "INVSMRY_MGMTUNITTYPECODE",
+      "INVSMRY_MGMTUNITNO"
+    ],
+    "subreports": [
+      "HBS3R441_Subreport1",
+      "HBS3R441_Subreport2"
+    ]
+  },
+  {
+    "id": "HBS3R451",
+    "title": "3R451 - Piece Scale Invoice/Volume Statement Register",
+    "procedure": "HBS3R451",
+    "parameters": [
+      "RB_TYPE",
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS3R451_SR1_HBS3R451a",
+      "HBS3R451_SR2_HBS3R451b"
+    ]
+  },
+  {
+    "id": "HBS3R453",
+    "title": "HBS3R453.rpt",
+    "procedure": "HBS3R036",
+    "parameters": [
+      "RB_CLI_LOC_OPTION",
+      "RB_CLIENT_LOC_CODE",
+      "RB_CLIENT_NAME",
+      "RB_CLIENT_NUMBER",
+      "RB_FROM_DATE",
+      "RB_RECIPIENT_TYPE",
+      "RB_TO_DATE",
+      "RB_USERID",
+      "Text"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R461",
+    "title": "HBS3R461.rpt",
+    "procedure": "HBS3R461",
+    "parameters": [
+      "RB_TYPE",
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS3R461_SR1_HBS3R461a",
+      "HBS3R461_SR2_HBS3R461b"
+    ]
+  },
+  {
+    "id": "HBS3R471",
+    "title": "3R471- Compiled Sample Statement Register",
+    "procedure": "HBS3R471",
+    "parameters": [
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS3R471_SR1_HBS3R471a",
+      "HBS3R471_SR2_HBS3R471b"
+    ]
+  },
+  {
+    "id": "HBS3R476",
+    "title": "3R476 - Ratio Computation Statement Register",
+    "procedure": "HBS3R476",
+    "parameters": [
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R490",
+    "title": "HBS3R490.rpt",
+    "procedure": "HBS3R490",
+    "parameters": [
+      "PTIMBERMARK",
+      "PLICENSE",
+      "PCLIENTNUM",
+      "PCLIENTLOC",
+      "PEXPDATE",
+      "PJOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R755",
+    "title": "3R755 - Special Forest Product Detail Return Report",
+    "procedure": "HBS3R755",
+    "parameters": [
+      "PSRETURN_DETAILDOCUMENTNUMBER",
+      "PSRETURN_VERSIONNUMBER",
+      "PSRETURN_JOBNO",
+      "PSRETURN_USERTYPE"
+    ],
+    "subreports": [
+      "HBS3R755_SR1_HBS3R755c",
+      "HBS3R755_SR2_HBS3R755b"
+    ]
+  },
+  {
+    "id": "HBS3R829",
+    "title": "HBS3R829.rpt",
+    "procedure": "HBS3R829",
+    "parameters": [
+      "FB_BILLS_COMPLETED_FLAG",
+      "FB_CLIENT_LOCN_CODE",
+      "FB_CLIENT_NUMBER",
+      "FB_EXPIRING_BEFORE",
+      "FB_JOBNO",
+      "FB_NO_ELIGIBLE_BILLS_FLAG",
+      "FB_ORG_UNIT_NO",
+      "FB_POPULATION_NMBR",
+      "FB_RADIO_SELECTED",
+      "FB_SAMPLING_YEAR",
+      "FB_SELECTCOUNT",
+      "FB_STRATUM_FLAG",
+      "FB_USERID",
+      "FB_YEAR_IN_PROGRESS_FLAG"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R832",
+    "title": "HBS3R832.rpt",
+    "procedure": "HBS3R832",
+    "parameters": [
+      "PARAM_SELECTCOUNT",
+      "PARAM_TIMBERMARK",
+      "PARAM_POPULATION",
+      "PARAM_STRATUM",
+      "PARAM_VERSIONSTATUS",
+      "PARAM_SAMPLINGYEAR",
+      "PARAM_TMOWNEDBYCLINUM",
+      "PARAM_TMOWNEDBYCLILOC",
+      "PARAM_POPOWNEDBYCLINUM",
+      "PARAM_POPOWNEDBYCLILOC",
+      "PARAM_JOBNUM"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R834",
+    "title": "HBS3R834.rpt",
+    "procedure": "HBS3R834",
+    "parameters": [
+      "RB_JOBNO",
+      "RB_POP_CLIENT_NUMBER",
+      "RB_POP_LOC_CODE",
+      "RB_POPULATION",
+      "RB_SAMPLINGYEAR",
+      "RB_TIMBERMARK",
+      "RB_TMK_CLIENT_NUMBER",
+      "RB_TMK_LOC_CODE"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R852",
+    "title": "HBS3R852.rpt",
+    "procedure": "HBS3R852",
+    "parameters": [
+      "PARAMCLIENTLOC",
+      "PARAMCLIENTNO",
+      "PARAMJOBNO",
+      "PARAMPOPULATION",
+      "PARAMSELECTCOUNT",
+      "PARAMYEAR"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R860",
+    "title": "HBS3R860.rpt",
+    "procedure": "HBS3R860",
+    "parameters": [
+      "PARAMPOPULATION",
+      "PARAMSELECTCOUNT",
+      "PARAMYEAR",
+      "PSRETURN_JOBNO"
+    ],
+    "subreports": [
+      "HBS3R860_SR1_HBS3R860a"
+    ]
+  },
+  {
+    "id": "HBS3R888",
+    "title": "HBS3R888.rpt",
+    "procedure": "HBS3R888",
+    "parameters": [
+      "SP_JOBNO",
+      "SP_SAMPLEPLANID"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R889",
+    "title": "HBS3R889.rpt",
+    "procedure": "HBS3R889",
+    "parameters": [
+      "SP_JOBNO",
+      "SP_STRATUMNO",
+      "SP_SAMPLEPLANID"
+    ],
+    "subreports": [
+      "HBS3R889_SR1_HBS3R889A",
+      "HBS3R889_SR2_HBS3R889B"
+    ]
+  },
+  {
+    "id": "HBS3R902",
+    "title": "HBS3R902.rpt",
+    "procedure": "HBS3R902",
+    "parameters": [
+      "PLLS_SELECTCOUNT",
+      "PLLS_SCALESITE",
+      "PLLS_SCALEDONAFTER",
+      "PLLS_SCALEDONBEFORE",
+      "PLLS_RECEIVEDONAFTER",
+      "PLLS_RECEIVEDONBEFORE",
+      "PLLS_RADRETURNTYPE",
+      "PLLS_DAYSLATELIMIT",
+      "PLLS_SEARCHBYSITES",
+      "PLLS_DISTRICTSCALED",
+      "PLLS_USERID",
+      "PLLS_DDR_JOBNO"
+    ],
+    "subreports": [
+      "HBS3R902_SR1_OrgUnitName"
+    ]
+  },
+  {
+    "id": "HBS3R972",
+    "title": "HBS3R972.rpt",
+    "procedure": "HBS3R972",
+    "parameters": [
+      "RB_JOBNO",
+      "RB_LDS_NUMBER",
+      "RB_TRANSPORT_ID",
+      "RB_TO_WEIGH_SLIP_NUMBER",
+      "RB_FROM_WEIGH_SLIP_NUMBER",
+      "RB_TO_LOAD_NUMBER",
+      "RB_FROM_LOAD_NUMBER",
+      "RB_TO_DATE",
+      "RB_FROM_DATE",
+      "RB_SCALE_SITE",
+      "RB_CUT_BLOCK_ID",
+      "RB_TIMBER_MARK",
+      "RB_COUNT"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R973",
+    "title": "HBS3R973.rpt",
+    "procedure": "HBS3R973",
+    "parameters": [
+      "RB_JOBNO",
+      "RB_LDS_NUMBER",
+      "RB_TRANSPORT_ID",
+      "RB_TO_WEIGH_SLIP_NUMBER",
+      "RB_FROM_WEIGH_SLIP_NUMBER",
+      "RB_TO_LOAD_NUMBER",
+      "RB_FROM_LOAD_NUMBER",
+      "RB_TO_DATE",
+      "RB_FROM_DATE",
+      "RB_ORIGINATING_SITE",
+      "RB_SCALE_SITE",
+      "RB_CUT_BLOCK_ID",
+      "RB_TIMBER_MARK",
+      "RB_COUNT"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R974",
+    "title": "HBS3R974.rpt",
+    "procedure": "HBS3R974",
+    "parameters": [
+      "RB_COUNT",
+      "RB_TIMBER_MARK",
+      "RB_CUT_BLOCK_ID",
+      "RB_SCALE_SITE",
+      "RB_DESTINATION_SITE",
+      "RB_FROM_DATE",
+      "RB_TO_DATE",
+      "RB_FROM_LOAD_NUMBER",
+      "RB_TO_LOAD_NUMBER",
+      "RB_FROM_WEIGH_SLIP_NUMBER",
+      "RB_TO_WEIGH_SLIP_NUMBER",
+      "RB_TRANSPORT_ID",
+      "RB_LDS_NUMBER",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R976",
+    "title": "HBS3R976.rpt",
+    "procedure": "HBS3R976",
+    "parameters": [
+      "RB_SELECT_COUNT",
+      "RB_CUT_BLOCK",
+      "RB_LICENSE",
+      "RB_DISTRICT",
+      "RB_JOBNO",
+      "RB_CLIENT",
+      "RB_TIMBER_MARK"
+    ],
+    "subreports": [
+      "HBS3R976_SR1_HBS3R976a"
+    ]
+  },
+  {
+    "id": "HBS3R979",
+    "title": "HBS3R979.rpt",
+    "procedure": "HBS3R979",
+    "parameters": [
+      "RB_COUNT",
+      "RB_TIMBER_MARK",
+      "RB_CUT_BLOCK_ID",
+      "RB_SCALE_SITE",
+      "RB_FROM_DATE",
+      "RB_TO_DATE",
+      "RB_FROM_LOAD_NUMBER",
+      "RB_TO_LOAD_NUMBER",
+      "RB_FROM_WEIGH_SLIP_NUMBER",
+      "RB_TO_WEIGH_SLIP_NUMBER",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R982",
+    "title": "HBS3R982.rpt",
+    "procedure": "HBS3R982",
+    "parameters": [
+      "PARAM_CUTBLOCK",
+      "PARAM_JOBNUM",
+      "PARAM_RECEIVEDONAFTER",
+      "PARAM_RECEIVEDONBEFORE",
+      "PARAM_SELECTCOUNT",
+      "PARAM_TIMBERMARK"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R992",
+    "title": "HBS3R992.rpt",
+    "procedure": "HBS3R992",
+    "parameters": [
+      "P_AFTER_DATE",
+      "P_BEFORE_DATE",
+      "P_JOBNO",
+      "P_SCALESITE",
+      "P_SELECTCOUNT",
+      "P_SOFTWAREPRODUCT",
+      "P_SOFTWAREREVISION",
+      "P_SOFTWAREVENDOR",
+      "P_SOFTWAREVERSION"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS3R993",
+    "title": "HBS3R993.rpt",
+    "procedure": "HBS3R993",
+    "parameters": [
+      "RB_SELECTCOUNT",
+      "RB_SCALE_SITE",
+      "RB_SOFTWAREPRODUCT",
+      "RB_SOFTWAREVERSION",
+      "RB_SOFTWAREREVISION",
+      "RB_AFTER_DATE",
+      "RB_BEFORE_DATE",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  },
+  {
+    "id": "HBS4R452",
+    "title": "HBS4R452.rpt",
+    "procedure": "HBS3R451",
+    "parameters": [
+      "RB_TYPE",
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS4R452_SR1_HBS3R451a",
+      "HBS4R452_SR2_HBS3R451b"
+    ]
+  },
+  {
+    "id": "HBS4R462",
+    "title": "HBS4R462.rpt",
+    "procedure": "HBS3R461",
+    "parameters": [
+      "RB_TYPE",
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS4R462_SR1_HBS3R461a",
+      "HBS4R462_SR2_HBS3R461b"
+    ]
+  },
+  {
+    "id": "HBS4R472",
+    "title": "4R472 - Compiled Sample Statement List",
+    "procedure": "HBS3R471",
+    "parameters": [
+      "RB_DOC_NUMBER",
+      "RB_SCALE_DATE_FROM",
+      "RB_SCALE_DATE_TO",
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_TIMBER_MARK",
+      "RB_SCALE_SITE",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_REGION_SCALED",
+      "RB_REGION_HARVESTED",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": [
+      "HBS4R472_SR1_HBS3R471a",
+      "HBS4R472_SR2_HBS3R471b"
+    ]
+  },
+  {
+    "id": "HBS4R477",
+    "title": "HBS4R477.rpt",
+    "procedure": "HBS3R476",
+    "parameters": [
+      "RB_ISSUE_DATE_FROM",
+      "RB_ISSUE_DATE_TO",
+      "RB_POPULATION",
+      "RB_STRATUM",
+      "RB_SAMPLINGYEAR",
+      "RB_CLIENT_ASSOCIATION",
+      "RB_CLIENT_NUMBER",
+      "RB_CLIENT_LOCATION_CODE",
+      "RB_TRANSMISSION_ID",
+      "RB_ORDER_BY",
+      "RB_REPORTTYPE",
+      "RB_JOBNO"
+    ],
+    "subreports": []
+  }
+]

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS3R421a" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0e213118-4865-428f-af8e-3af1807efe68">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="temp_DistHarv" class="java.lang.String"/>
+	<parameter name="DistHarv_as_num" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{temp_DistHarv} != null && !($P{temp_DistHarv}.isEmpty()) && $P{temp_DistHarv}.matches("[0-9]+")
+?
+Integer.parseInt($P{temp_DistHarv})
+: 0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS3R421a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from ORG_UNIT
+WHERE  ORG_UNIT_NO = $P{DistHarv_as_num}]]>
+	</queryString>
+	<field name="ORG_UNIT_NO" class="java.math.BigDecimal"/>
+	<field name="ORG_UNIT_CODE" class="java.lang.String"/>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="AREA_CODE" class="java.lang.String"/>
+	<field name="TELEPHONE_NO" class="java.lang.String"/>
+	<field name="ORG_LEVEL_CODE" class="java.lang.String"/>
+	<field name="OFFICE_NAME_CODE" class="java.lang.String"/>
+	<field name="ROLLUP_REGION_NO" class="java.math.BigDecimal"/>
+	<field name="ROLLUP_REGION_CODE" class="java.lang.String"/>
+	<field name="ROLLUP_DIST_NO" class="java.math.BigDecimal"/>
+	<field name="ROLLUP_DIST_CODE" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="bf55bfa5-bada-4ae0-b5b2-39e680c4babd" x="1" y="0" width="229" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_UNIT_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

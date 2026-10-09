@@ -1,0 +1,1935 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by C MacArthur (Sierra Systems Group) -->
+<xs:schema targetNamespace="gov.bc.ca/forests/hbs/statement/v1" xmlns="gov.bc.ca/forests/hbs/statement/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="hbs-transmission">
+		<xs:annotation>
+			<xs:documentation>Root Element for a transmission.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="hbs-batch" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>A single instance of a batch. Can contain a collection of any one type of statement.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="piece-scale-invoices">
+								<xs:annotation>
+									<xs:documentation>A collection of piece scale invoices</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="piece-scale-invoice" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a piece scale invoice</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="piece-scale-header">
+														<xs:annotation>
+															<xs:documentation>The header information for the invoice</xs:documentation>
+														</xs:annotation>
+													</xs:element>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="piece-scale-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="piece-scale-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="detail-documents" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="detail-document" type="piece-scale-detail-document-type" maxOccurs="unbounded"/>
+																<xs:element name="detail-totals" type="piece-scale-detail-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="notations" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="notation" type="notation-type" maxOccurs="unbounded"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="piece-scale-volume-statements">
+								<xs:annotation>
+									<xs:documentation>A collection of piece scale volume statements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="piece-scale-volume-statement" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a piece scale volume statement</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="piece-scale-header"/>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="piece-scale-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="piece-scale-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="detail-documents" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="detail-document" type="piece-scale-detail-document-type" maxOccurs="unbounded"/>
+																<xs:element name="detail-totals" type="piece-scale-detail-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="notations" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="notation" type="notation-type" maxOccurs="unbounded"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="weight-scale-invoices">
+								<xs:annotation>
+									<xs:documentation>A collection of weight scale invoices</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="weight-scale-invoice" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a weight scale invoice</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="weight-scale-header"/>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="weight-scale-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="weight-scale-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="detail-documents" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="detail-document" type="weight-scale-detail-document-type" maxOccurs="unbounded"/>
+																<xs:element name="detail-totals" type="weight-scale-detail-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="notations" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="notation" type="notation-type" maxOccurs="unbounded"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="weight-scale-volume-statements">
+								<xs:annotation>
+									<xs:documentation>A collection of weight scale volume statements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="weight-scale-volume-statement" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a weight scale volume statement</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="weight-scale-header"/>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="weight-scale-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="weight-scale-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="detail-documents" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="detail-document" type="weight-scale-detail-document-type" maxOccurs="unbounded"/>
+																<xs:element name="detail-totals" type="weight-scale-detail-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="notations" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="notation" type="notation-type" maxOccurs="unbounded"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="compiled-sample-statements">
+								<xs:annotation>
+									<xs:documentation>A collection of compiled sample statements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="compiled-sample-statement" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a compiled sample statement</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="compiled-sample-header-type"/>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="compiled-sample-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="compiled-sample-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="detail-document" type="compiled-sample-detail-document-type" minOccurs="0"/>
+													<xs:element name="notations" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="notation" type="notation-type" maxOccurs="unbounded"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="ratio-statements">
+								<xs:annotation>
+									<xs:documentation>A collection of ratio statements</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ratio-statement" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>A single instance of a ratio statement</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="header" type="ratio-statement-header-type"/>
+													<xs:element name="segregation-details">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="segregation-detail" type="ratio-statement-segregation-detail-type" maxOccurs="unbounded"/>
+																<xs:element name="segregation-totals" type="ratio-statement-segregation-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="compiled-samples" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="compiled-sample" maxOccurs="unbounded">
+																	<xs:complexType>
+																		<xs:complexContent>
+																			<xs:extension base="ratio-statement-compiled-sample-type"/>
+																		</xs:complexContent>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="sample-totals" type="ratio-statement-sample-totals-type"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element ref="fine-print"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+						<xs:attribute name="batch-type-code" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="3"/>
+									<xs:enumeration value="PSI"/>
+									<xs:enumeration value="PSV"/>
+									<xs:enumeration value="WSI"/>
+									<xs:enumeration value="WSV"/>
+									<xs:enumeration value="CSS"/>
+									<xs:enumeration value="RS"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="document-count" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:positiveInteger">
+									<xs:minInclusive value="1"/>
+									<xs:maxInclusive value="99999"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="transmission-id" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="date-created" type="xs:date" use="required"/>
+			<xs:attribute name="time-created" type="xs:time" use="required"/>
+			<xs:attribute name="batch-count" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="9999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="client-number" use="optional">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="client-location-code" use="optional">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="recipient-type" use="optional">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="7"/>
+						<xs:enumeration value="SEND_TO"/>
+						<xs:enumeration value="COPY_TO"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="header-type">
+		<xs:annotation>
+			<xs:documentation>Super Type that has the common elements that occur in document</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="statement-number">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="issue-date" type="xs:date"/>
+			<xs:element name="debit-credit-indicator" type="debit-credit-indicator-type"/>
+			<xs:element name="scale-method">
+				<xs:simpleType>
+					<xs:restriction base="scale-method-type">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="transaction-type">
+				<xs:simpleType>
+					<xs:restriction base="transaction-type-type">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="invoice-to" type="client-location-type"/>
+			<xs:element name="copy-to" type="client-location-type" minOccurs="0"/>
+			<xs:element name="timber-mark">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="license" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cutting-permit" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+						<xs:minLength value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="region-harvested" type="org-unit-type"/>
+			<xs:element name="region-scaled" type="org-unit-type" minOccurs="0"/>
+			<xs:element name="district-harvested" type="org-unit-type"/>
+			<xs:element name="district-scaled" type="org-unit-type" minOccurs="0"/>
+			<xs:element name="scale-period">
+				<xs:complexType>
+					<xs:attribute name="start" type="xs:date" use="optional"/>
+					<xs:attribute name="end" type="xs:date" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="scale-site" type="scale-site-type" minOccurs="0"/>
+			<xs:element name="summary-doc-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:totalDigits value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="summary-type">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Generated"/>
+						<xs:enumeration value="Submitted"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="return-category" type="return-catagory-type"/>
+			<xs:element name="kind-of-charge">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+						<xs:minLength value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="statement-cycle">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value=" "/>
+						<xs:enumeration value="1"/>
+						<xs:enumeration value="2"/>
+						<xs:enumeration value="3"/>
+						<xs:enumeration value="4"/>
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="deck-id" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cut-block" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="prev-statement-number" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="scaler" type="scaler-type" minOccurs="0"/>
+			<xs:element name="related-statement-number" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="scale-method-type">
+		<xs:annotation>
+			<xs:documentation>Enumeration for the types of scale methods</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="P"/>
+			<xs:enumeration value="W"/>
+			<xs:enumeration value="S"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transaction-type-type">
+		<xs:annotation>
+			<xs:documentation>Enumeration for the types of transactions</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ORG"/>
+			<xs:enumeration value="CAN"/>
+			<xs:enumeration value="RWC"/>
+			<xs:enumeration value="RWN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="debit-credit-indicator-type">
+		<xs:annotation>
+			<xs:documentation>Enumeration for the debit or credit indicator</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+			<xs:enumeration value="DR"/>
+			<xs:enumeration value="CR"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="client-location-type">
+		<xs:annotation>
+			<xs:documentation>A type to encapsulate a client location</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="client-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="client-code">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="name">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="location-name" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="address1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="address2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="address3" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="city">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="province">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="5"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="country" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="postal-code">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="scaler-type">
+		<xs:annotation>
+			<xs:documentation>A type to encapsulate a scaler</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" use="required">
+			<xs:annotation>
+				<xs:documentation>Both last and first name</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="60"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="license" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="notation-type" mixed="true">
+		<xs:annotation>
+			<xs:documentation>A type to encapsulate a notation</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="99"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="org-unit-type">
+		<xs:annotation>
+			<xs:documentation>A type to encapsulate an org unit</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="org-unit-code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="org-unit-name" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="100"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="piece-scale-header">
+		<xs:annotation>
+			<xs:documentation>All the elements that are in a piece scale header.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="header-type">
+				<xs:sequence>
+					<xs:element name="invoice-amount" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:decimal">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="total-volume" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:decimal">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="return-number" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="piece-scale-segregation-detail-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a piece scale segregation detail</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="species-group"/>
+		<xs:attributeGroup ref="product-group"/>
+		<xs:attributeGroup ref="grade-group"/>
+		<xs:attribute name="stumpage-rate" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="piece-scale-method" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="L"/>
+					<xs:enumeration value="K"/>
+					<xs:enumeration value="C"/>
+					<xs:enumeration value="P"/>
+					<xs:enumeration value="G"/>
+					<xs:enumeration value="N"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="piece-scale-method-description" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="pieces" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="net-volume" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="9"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="beachcomb-mark" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="no-mark-visible-indicator" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="avoidable-indicator" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="scaled-before-indicator" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="bonus-bid-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="dev-levy-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="silviculture-levy-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="reserve-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="piece-scale-detail-document-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a detail document</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="detail-doc-type"/>
+		<xs:attribute name="scale-date" type="xs:date" use="required"/>
+		<xs:attribute name="scaler-license" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="return-number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="load-arrival-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="LDS-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="log-count" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="piece-scale-segregation-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the segregation details</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="pieces" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="piece-scale-detail-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the detail document</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="log-count" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="weight-scale-header">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a weight scale header.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="header-type">
+				<xs:sequence>
+					<xs:element name="total-weight">
+						<xs:simpleType>
+							<xs:restriction base="xs:integer">
+								<xs:totalDigits value="9"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="total-loads">
+						<xs:simpleType>
+							<xs:restriction base="xs:integer">
+								<xs:totalDigits value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="population-number">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="stratum-number">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="sampling-year">
+						<xs:simpleType>
+							<xs:restriction base="xs:positiveInteger">
+								<xs:totalDigits value="5" fixed="true"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ytd-weight">
+						<xs:simpleType>
+							<xs:restriction base="xs:integer">
+								<xs:totalDigits value="14"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="total-volume">
+						<xs:simpleType>
+							<xs:restriction base="xs:decimal">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="3"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="invoice-amount" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:decimal">
+								<xs:totalDigits value="15"/>
+								<xs:fractionDigits value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="weight-scale-segregation-detail-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a weight scale segregation detail</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="species-group"/>
+		<xs:attributeGroup ref="grade-group"/>
+		<xs:attribute name="segregation-ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="stumpage-rate" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:fractionDigits value="2"/>
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-weight-times-rate" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-bonus-bid-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-dev-levy-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-silviculture-levy-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-reserve-amount" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="weight-scale-segregation-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the segregation details</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="segregation-ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="weight-scale-detail-document-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a detail document</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="detail-doc-type"/>
+		<xs:attribute name="scale-date" type="xs:date" use="required"/>
+		<xs:attribute name="scaler-license" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="weigh-slip-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="LDS-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="net-weight" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="weight-scale-detail-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the detail document</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="net-weight" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="9"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="additional-value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="compiled-sample-header-type">
+		<xs:annotation>
+			<xs:documentation>The elements that are in a compiled sample header</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="statement-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="issue-date" type="xs:date"/>
+			<xs:element name="transaction-type">
+				<xs:simpleType>
+					<xs:restriction base="transaction-type-type">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="population-owner" type="client-location-type"/>
+			<xs:element name="stratum-owner" type="client-location-type" minOccurs="0"/>
+			<xs:element name="timber-mark">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="license">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cutting-permit" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="region-harvested" type="org-unit-type"/>
+			<xs:element name="region-scaled" type="org-unit-type"/>
+			<xs:element name="district-harvested" type="org-unit-type"/>
+			<xs:element name="district-scaled" type="org-unit-type"/>
+			<xs:element name="scale-date" type="xs:date"/>
+			<xs:element name="scale-site" type="scale-site-type" minOccurs="0"/>
+			<xs:element name="summary-doc-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:totalDigits value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="summary-type">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Generated"/>
+						<xs:enumeration value="Submitted"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="return-category" type="return-catagory-type"/>
+			<xs:element name="prev-statement-number" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="scaler" type="scaler-type"/>
+			<xs:element name="return-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sample-weight">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sample-volume">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:totalDigits value="15"/>
+						<xs:fractionDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="weigh-slip" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="population-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="stratum-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sampling-year">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="related-statement-number" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="compiled-sample-segregation-detail-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a compiled sample segregation detail</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="species-group"/>
+		<xs:attributeGroup ref="product-group"/>
+		<xs:attributeGroup ref="grade-group"/>
+		<xs:attribute name="pieces" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="fraction" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="5"/>
+					<xs:fractionDigits value="2"/>
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="100"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="compiled-sample-segregation-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the segregation details</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="pieces" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="compiled-sample-detail-document-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a compiled sample detail document</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="detail-doc-type"/>
+		<xs:attribute name="scale-date" type="xs:date" use="required"/>
+		<xs:attribute name="scaler-license" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="return-number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="load-arrival-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="LDS-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="weigh-slip-number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="log-count" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="gross-weight" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="grapple-weight" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="tare-weight" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="original-DDN" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="13"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="original-scale-site" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="original-scaler-license" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="original-scaler-name" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="60"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="original-return-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ratio-statement-header-type">
+		<xs:annotation>
+			<xs:documentation>The elements that are in a compiled sample header</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="statement-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="issue-date" type="xs:date"/>
+			<xs:element name="population-owner" type="client-location-type"/>
+			<xs:element name="stratum-owner" type="client-location-type" minOccurs="0"/>
+			<xs:element name="population-region" type="org-unit-type"/>
+			<xs:element name="population-district" type="org-unit-type"/>
+			<xs:element name="population-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="stratum-number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="stratum-name">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sampling-year">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:totalDigits value="5" fixed="true"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="effective-date" type="xs:string"/>
+			<xs:element name="from-date" type="xs:date"/>
+			<xs:element name="to-date" type="xs:string"/>
+			<xs:element name="ytd-sample-count">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ytd-sample-volume">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:totalDigits value="16"/>
+						<xs:fractionDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ytd-sample-weight">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:totalDigits value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ytd-sample-ratio">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:totalDigits value="6"/>
+						<xs:fractionDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="prev-statement-number" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="ratio-statement-segregation-detail-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a ratio statement segregation detail</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup ref="species-group"/>
+		<xs:attributeGroup ref="product-group"/>
+		<xs:attributeGroup ref="grade-group"/>
+		<xs:attribute name="period-sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-sample-ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ratio-statement-segregation-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are are totaled from the segregation details</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="period-sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="16"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ytd-sample-ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ratio-statement-compiled-sample-type">
+		<xs:annotation>
+			<xs:documentation>All the items that are in a compiled sample</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="statement-number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="7"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="scale-site" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="scale-date" type="xs:date" use="required"/>
+		<xs:attribute name="scaler-license" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="scaler-name" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="60"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="return-number" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="transaction-type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="3"/>
+					<xs:enumeration value="ORG"/>
+					<xs:enumeration value="CAN"/>
+					<xs:enumeration value="RWC"/>
+					<xs:enumeration value="RWN"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="return-category" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="return-category-code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="weigh-slip-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="LDS-number" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="10"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="timber-mark" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="sample-weight" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="9"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="sample-ratio" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="5"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ratio-statement-sample-totals-type">
+		<xs:annotation>
+			<xs:documentation>All the items totaled from a compiled sample</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="sample-volume" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:totalDigits value="15"/>
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="sample-weight" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="14"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="scale-site-type">
+		<xs:annotation>
+			<xs:documentation>Type to encapsulate a scale site</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="4"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="name" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="30"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="return-catagory-type">
+		<xs:attribute name="code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="description" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:element name="fine-print">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="2048"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:attributeGroup name="product-group">
+		<xs:annotation>
+			<xs:documentation>Group for product name and code</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="product" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="30"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="product-code" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="species-group">
+		<xs:annotation>
+			<xs:documentation>Group for species name and code</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="species" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="30"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="species-code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="grade-group">
+		<xs:annotation>
+			<xs:documentation>Group for grade name and code</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="grade" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="30"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="grade-code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="detail-doc-type">
+		<xs:annotation>
+			<xs:documentation>Type to hold DDN DV event-seq</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="DDN" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="13"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="DV" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="transaction-sequence" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,15 @@
+// FSP global styles. Font loading + the BCGov Carbon overrides come from the
+// BCGov theme package wired up inside ./styles/_overrides.scss:
+//   • @bcgov-nr/nr-theme/design-tokens/type-family.scss registers @font-face
+//     for "BC Sans" (with a space) and exports the BCGov $type-family /
+//     $font-weights maps.
+//   • _overrides.scss configures @carbon/type/scss/font-family with those
+//     maps, so every Carbon type-style mixin uses BC Sans automatically.
+//
+// We deliberately do NOT register our own @font-face blocks or apply a
+// blanket `* { font-family: !important }` rule. Doing so makes FSP render
+// font-weight 300 (Light) using a real Light file, while REPT's `light`
+// keyword in nr-theme silently falls back to Regular — the result is FSP
+// looking lighter than REPT for the same Carbon type-style tokens.
+// Matching REPT's behaviour means letting nr-theme alone do font loading.
+@use './styles';

@@ -1,0 +1,1662 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (http://www.altova.com) by CGI Montréal CANADA (CGI Montréal CANADA) -->
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by C MacArthur (Sierra Systems Group) -->
+<!-- edited with XMLSPY v5 rel. 2 U (http://www.xmlspy.com) by C MacArthur (SSG) -->
+<!-- Harvest Billing System: Scale Data Submission Schema - Version 1.0 (Appendix B Version 3.1f) March March 4, 2003 -->
+<!--Copyright (c) 2002, B.C. Ministry of Forests All rights reserved-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="gov.bc.ca/forests/hbs/v3" xmlns:altova="http://www.altova.com/xml-schema-extensions" targetNamespace="gov.bc.ca/forests/hbs/v3" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:element name="HBS">
+		<xs:annotation>
+			<xs:documentation>HBS Scale Data Submission Schema - Version 6.1b</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="hbs-request-header" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="request-id" type="xs:integer"/>
+							<xs:element name="date-created" type="xs:date"/>
+							<xs:element name="time-created" type="xs:time"/>
+							<xs:element name="requestor-email" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="128"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="request-parameters" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="2000"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="requestor-relationship" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="Public"/>
+										<xs:enumeration value="MOF"/>
+										<xs:enumeration value="Industry"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="requestor-client" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="8"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="requestor-client-location" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="2"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="fine-print" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="2048"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="transmission">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BatchCount" type="xs:integer"/>
+							<xs:element name="Type">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="P"/>
+										<xs:enumeration value="T"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Creator">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="10"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element ref="Software"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="WSB" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="WSBDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="PS"/>
+													<xs:enumeration value="SS"/>
+													<xs:enumeration value="RS"/>
+													<xs:enumeration value="PD"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="WSCommon"/>
+										<xs:element ref="WSWeights"/>
+										<xs:element ref="WSSource"/>
+										<xs:element name="FieldScaleFlag">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+													<xs:enumeration value="Y"/>
+													<xs:enumeration value="N"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleDeckID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="PSY">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="8"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OutgoingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Destination" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="SampleType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+													<xs:enumeration value="C"/>
+													<xs:enumeration value="N"/>
+													<xs:enumeration value="F"/>
+													<xs:enumeration value="S"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!-- xs:assert test="count(SampleDeduction)=1 and EventType = ('SS') or count(SampleDeduction)=0 and EventType = ('PS','SS','RS','PD')  " xpathDefaultNamespace="##targetNamespace"/> 
+									<xs:assert test="count(FieldScaleDeckID)=1 and FieldScaleFlag = ('Y') or count(FieldScaleDeckID)=0 and FieldScaleFlag = ('N')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(OutgoingLDSNumber)=1 and EventType = ('RS','PD') or count(OutgoingLDSNumber)=0 and EventType = (('PS','SS'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(Destination)=1 and EventType = ('RS','PD') or count(Destination)=0 and EventType = (('PS','SS'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="SampleType=('N','C') and EventType = ('PS','PD') or SampleType=('F','S')  and EventType = ('SS','RS')  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!--<xs:assert test="count(WSBDocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>
+						<xs:assert test="sum(WSBDocument/WSWeights/Gross)= BatchHeader/BatchControlTotal" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="WSR" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="WSRDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="RT"/>
+													<xs:enumeration value="RR"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="WSCommon"/>
+										<xs:element ref="WSWeights"/>
+										<xs:element ref="WSSource"/>
+										<xs:element name="FieldScaleFlag">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+													<xs:enumeration value="Y"/>
+													<xs:enumeration value="N"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleDeckID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="PSY">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="8"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OutgoingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Destination" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!--<xs:assert test="count(FieldScaleDeckID)=1 and FieldScaleFlag = ('Y') or count(FieldScaleDeckID)=0 and FieldScaleFlag = ('N')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(OutgoingLDSNumber)=1 and EventType = ('RR') or count(OutgoingLDSNumber)=0 and EventType = (('RT'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(Destination)=1 and EventType = ('RR') or count(Destination)=0 and EventType = (('RT'))  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!--<xs:assert test="count(WSRDocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>
+						<xs:assert test="sum(WSRDocument/WSWeights/Gross)= BatchHeader/BatchControlTotal" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="WSO" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="WSODocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="4R"/>
+													<xs:enumeration value="DP"/>
+													<xs:enumeration value="CU"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="WSCommon"/>
+										<xs:element name="PSY" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="8"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OutgoingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="IncomingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Destination" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="TransportIdentifier" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Source" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!--<xs:assert test="count(IncomingLDSNumber)=1 and EventType = ('4R') or count(IncomingLDSNumber)=0 and EventType = (('DP','CU'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(TransportIdentifier)=1 and EventType = ('4R','DP') or count(TransportIdentifier)=0 and EventType = (('CU'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(Source)=1 and EventType = ('4R') or count(Source)=0 and EventType = (('DP','CU'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(PSY)=1 and EventType = ('4R','DP') or count(PSY)=0 and EventType = (('CU'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(OutgoingLDSNumber)=1 and EventType = ('DP') or count(OutgoingLDSNumber)=0 and EventType = (('4R','CU'))  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(Destination)=1 and EventType = ('DP') or count(Destination)=0 and EventType = (('4R','CU'))  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!-- <xs:assert test="count(WSODocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PPS" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="PPSDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="PS"/>
+													<xs:enumeration value="FD"/>
+													<xs:enumeration value="RT"/>
+													<xs:enumeration value="RR"/>
+													<xs:enumeration value="CS"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="PSCommon"/>
+										<xs:element name="LoadArrivalNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="IncomingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="TransportIdentifier" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Source">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="CutblockID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleFlag">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="1"/>
+													<xs:minLength value="1"/>
+													<xs:enumeration value="Y"/>
+													<xs:enumeration value="N"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleDeckID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="WeighSlipNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OriginatingScaleSiteNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="SplitLoad" minOccurs="0"/>
+										<xs:element name="Beachcomb" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="1"/>
+													<xs:enumeration value="N"/>
+													<xs:enumeration value="Y"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="CheckScale" minOccurs="0"/>
+										<xs:element ref="PSMeasure"/>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!--<xs:assert test="count(LoadArrivalNumber)=1 and EventType = ('FD','PS','RR') or count(LoadArrivalNumber)=0 and EventType = ('RT','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(IncomingLDSNumber)=1 and EventType = ('PS','RR') or count(IncomingLDSNumber)=0 and EventType = ('FD','RT','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(TransportIdentifier)=1 and EventType = ('PS','RR') or count(TransportIdentifier)=0 and EventType = ('FD','RT','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(CutblockID)=1 and EventType = ('PS','RR','RT','CS') or count(CutblockID)=0 and EventType = ('FD')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(FieldScaleDeckID)=1 and FieldScaleFlag = ('Y') or count(FieldScaleDeckID)=0 and FieldScaleFlag = ('N')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(WeighSlipNumber)=1 and EventType = ('RR','RT') or count(WeighSlipNumber)=0 and EventType = ('PS','FD','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(OriginatingScaleSiteNumber)=1 and EventType = ('RR') or count(OriginatingScaleSiteNumber)=0 and EventType = ('PS','FD','RT','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(SplitLoad)=0 and EventType = ('PS','FD','RT','RR','CS') or count(SplitLoad)=1 and EventType = ('PS','RT','RR')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(CheckScale)=0 and EventType = ('PS','FD','RT','RR') or count(CheckScale)=1 and EventType = ('CS')  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!--<xs:assert test="count(PPSDocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>
+						<xs:assert test="sum(PPSDocument/PSMeasure/LogCount)= BatchHeader/BatchControlTotal" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PSS" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="PSSDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="CS"/>
+													<xs:enumeration value="SS"/>
+													<xs:enumeration value="RS"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="PSCommon"/>
+										<xs:element name="LoadArrivalNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="IncomingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="TransportIdentifier" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Source">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="PSY">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="8"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="WeighSlipNumber">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="SampleWeight">
+											<xs:simpleType>
+												<xs:restriction base="xs:integer">
+													<xs:minInclusive value="1"/>
+													<xs:maxInclusive value="999999"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OriginatingScaleSiteNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="CheckScale" minOccurs="0"/>
+										<xs:element ref="PSMeasure"/>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!--<xs:assert test="count(LoadArrivalNumber)=1 and EventType = ('RS') or count(LoadArrivalNumber)=0 and EventType = ('SS','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count((IncomingLDSNumber))=1 and EventType = ('RS') or count((IncomingLDSNumber))=0 and EventType = ('SS','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(TransportIdentifier)=1 and EventType = ('RS') or count(TransportIdentifier)=0 and EventType = ('SS','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(OriginatingScaleSiteNumber)=1 and EventType = ('RS') or count(OriginatingScaleSiteNumber)=0 and EventType = ('SS','CS')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(CheckScale)=1 and EventType = ('CS') or count(CheckScale)=0 and EventType = ('SS','RS')  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!--<xs:assert test="count(PSSDocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>
+						<xs:assert test="sum(PSSDocument/PSMeasure/LogCount)= BatchHeader/BatchControlTotal" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="POT" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="POTDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="4R"/>
+													<xs:enumeration value="CU"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="PSCommon"/>
+										<xs:element name="LoadArrivalNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="IncomingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="TransportIdentifier" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Source" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="SplitLoad" minOccurs="0"/>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+									<!--<xs:assert test="count(LoadArrivalNumber)=1 and EventType = ('4R') or count(LoadArrivalNumber)=0 and EventType = ('CU')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count((IncomingLDSNumber))=1 and EventType = ('4R') or count((IncomingLDSNumber))=0 and EventType = ('CU')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(TransportIdentifier)=1 and EventType = ('4R') or count(TransportIdentifier)=0 and EventType = ('CU')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(Source)=1 and EventType = ('4R') or count(Source)=0 and EventType = ('CU')  " xpathDefaultNamespace="##targetNamespace"/>
+									<xs:assert test="count(SplitLoad)=1 and EventType = ('4R') or count(SplitLoad)=0 and EventType = ('4R','CU')  " xpathDefaultNamespace="##targetNamespace"/>-->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<!--<xs:assert test="count(POTDocument) = BatchHeader/DocumentCount" xpathDefaultNamespace="##targetNamespace"/>-->
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ARL" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="ARLEntry" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Arrival" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="ArrivalDate">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="8"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="LoadArrivalNumber">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="10"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="IncomingLDSNumber">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="10"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="TransportIdentifier">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="16"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="Source">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Scale" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="ScaleDate">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="8"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="PrimaryScalerLicence">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="4"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="PrimaryScalerReturnNumber">
+														<xs:simpleType>
+															<xs:restriction base="xs:integer">
+																<xs:minInclusive value="0"/>
+																<xs:maxInclusive value="9999"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element ref="SplitLoad" minOccurs="0"/>
+													<xs:element name="LoadArrivalNumber" minOccurs="0">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:minLength value="1"/>
+																<xs:maxLength value="10"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="FieldScaleFlag" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+													<xs:enumeration value="N"/>
+													<xs:enumeration value="Y"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleDeckID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="CutblockID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="WeighSlipNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OriginatingScaleSiteNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="PS"/>
+													<xs:enumeration value="B4"/>
+													<xs:enumeration value="4R"/>
+													<xs:enumeration value="TD"/>
+													<xs:enumeration value="FD"/>
+													<xs:enumeration value="RR"/>
+													<xs:enumeration value="RS"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="ScaleSite">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DPL" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="DPLEntry" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="DepartureDate">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="8"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OutgoingLDSNumber">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Destination">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="DepartureNumber">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="OutgoingTransportIdentifier">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="DP"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="ScaleSite">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="4"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="SFP" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="BatchHeader"/>
+							<xs:element name="SFPDocument" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="EventType">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="2"/>
+													<xs:enumeration value="PS"/>
+													<xs:enumeration value="CS"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="PSCommon"/>
+										<xs:element name="LoadArrivalNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="IncomingLDSNumber" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="TransportIdentifier" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="16"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Source">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="7"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="CutblockID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="10"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleFlag">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="1"/>
+													<xs:minLength value="1"/>
+													<xs:enumeration value="Y"/>
+													<xs:enumeration value="N"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FieldScaleDeckID" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:length value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element ref="CheckScale" minOccurs="0"/>
+										<xs:element ref="SplitLoad" minOccurs="0"/>
+										<xs:element name="SFPMeasure">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="ScaleMethod">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:length value="1"/>
+																<xs:enumeration value="P"/>
+																<xs:enumeration value="C"/>
+																<xs:enumeration value="K"/>
+																<xs:enumeration value="L"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="DetailRecordCount">
+														<xs:simpleType>
+															<xs:restriction base="xs:integer">
+																<xs:minInclusive value="0"/>
+																<xs:maxInclusive value="9999"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:choice>
+														<xs:element name="Stack" minOccurs="0" maxOccurs="unbounded">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="PR">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:length value="2"/>
+																				<xs:enumeration value="SS"/>
+																				<xs:enumeration value="LB"/>
+																				<xs:enumeration value="SK"/>
+																				<xs:enumeration value="SB"/>
+																				<xs:enumeration value="GS"/>
+																				<xs:enumeration value="FW"/>
+																				<xs:enumeration value="RS"/>
+																				<xs:enumeration value="RR"/>
+																				<xs:enumeration value="PS"/>
+																				<xs:enumeration value="PR"/>
+																				<xs:enumeration value="CS"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="StackNumber">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="9999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="SP">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:minLength value="1"/>
+																				<xs:maxLength value="2"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="LT">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="9999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="WD" default="1">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="HT" default="1">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="CnvFactor">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="SolidVol">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:unsignedInt">
+																				<xs:minInclusive value="0"/>
+																				<xs:maxInclusive value="999999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="Bundle" minOccurs="0" maxOccurs="unbounded">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="PR">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:length value="2"/>
+																				<xs:enumeration value="XM"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="BundleNumber">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="9999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="PieceCount">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="9999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="SP">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:minLength value="1"/>
+																				<xs:maxLength value="2"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="GR">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:maxLength value="1"/>
+																				<xs:enumeration value="3"/>
+																				<xs:enumeration value="2"/>
+																				<xs:enumeration value="1"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="SFPLogMeasure" minOccurs="0">
+															<xs:complexType>
+																<xs:sequence minOccurs="0">
+																	<xs:element name="ProratedPieceCount" minOccurs="0">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:integer">
+																				<xs:minInclusive value="1"/>
+																				<xs:maxInclusive value="9999"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:element>
+																	<xs:element name="Log" maxOccurs="unbounded">
+																		<xs:complexType>
+																			<xs:sequence>
+																				<xs:element name="PR">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:string">
+																							<xs:length value="2"/>
+																							<xs:enumeration value="SS"/>
+																							<xs:enumeration value="MT"/>
+																							<xs:enumeration value="GS"/>
+																							<xs:enumeration value="RR"/>
+																							<xs:enumeration value="PR"/>
+																							<xs:enumeration value="CA"/>
+																							<xs:enumeration value="CS"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="LogNumber">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:integer">
+																							<xs:minInclusive value="1"/>
+																							<xs:maxInclusive value="9999"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="SP">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:string">
+																							<xs:minLength value="1"/>
+																							<xs:maxLength value="2"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="LT">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:integer">
+																							<xs:minInclusive value="1"/>
+																							<xs:maxInclusive value="999"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="TP">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:integer">
+																							<xs:minInclusive value="1"/>
+																							<xs:maxInclusive value="999"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="BT">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:integer">
+																							<xs:minInclusive value="1"/>
+																							<xs:maxInclusive value="999"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																				<xs:element name="NetVolume">
+																					<xs:simpleType>
+																						<xs:restriction base="xs:unsignedInt">
+																							<xs:minInclusive value="0"/>
+																							<xs:maxInclusive value="999999"/>
+																						</xs:restriction>
+																					</xs:simpleType>
+																				</xs:element>
+																			</xs:sequence>
+																		</xs:complexType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:choice>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attributeGroup ref="DocID"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<!--<xs:assert test="transmission/BatchCount = (count(WSB)+count(WSR)+count(WSO)+count(PPS)+count(PSS)+count(POT)+count(ARL)+count(DPL) )" xpathDefaultNamespace="##targetNamespace"/>-->
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WSCommon">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ScaleSite">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ScaleDate" type="xs:date"/>
+				<xs:element name="ScaleTime" type="xs:time"/>
+				<xs:element name="WeighSlipNumber" type="xs:unsignedLong"/>
+				<xs:element name="PrimaryScalerLicence">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SecondaryScalerLicence" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="Comment" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="200"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element ref="Software"/>
+				<xs:element ref="EC_Digest"/>
+				<xs:element ref="EC_Signature" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WSWeights">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Gross">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="1"/>
+							<xs:maxInclusive value="999999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="Tare">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="999999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SampleDeduction" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="999999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WSSource">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Source">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="7"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="IncomingLDSNumber">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="10"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="TransportIdentifier">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="16"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="CutblockID">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="10"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PSCommon">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ScaleSite">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ScaleDate" type="xs:date"/>
+				<xs:element name="PrimaryScalerLicence">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="PrimaryScalerReturnNumber">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="9999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SecondaryScalerLicence" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element ref="Software"/>
+				<xs:element ref="EC_Digest"/>
+				<xs:element ref="EC_Signature" minOccurs="0"/>
+				<xs:element name="Comment" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="200"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SplitLoad">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ParcelID">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="9"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ParcelCount">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="9"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PSMeasure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Log" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="LogNumber">
+								<xs:simpleType>
+									<xs:restriction base="xs:integer">
+										<xs:minInclusive value="1"/>
+										<xs:maxInclusive value="9999"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="6"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="1"/>
+										<xs:enumeration value="N"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SP">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:minLength value="1"/>
+										<xs:maxLength value="2"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="GR">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LT">
+								<xs:simpleType>
+									<xs:restriction base="xs:integer">
+										<xs:minInclusive value="1"/>
+										<xs:maxInclusive value="999"/>
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TP">
+								<xs:simpleType>
+									<xs:restriction base="xs:integer">
+										<xs:minInclusive value="1"/>
+										<xs:maxInclusive value="999"/>
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="BT">
+								<xs:simpleType>
+									<xs:restriction base="xs:integer">
+										<xs:minInclusive value="1"/>
+										<xs:maxInclusive value="999"/>
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NetVolume">
+								<xs:simpleType>
+									<xs:restriction base="xs:unsignedInt">
+										<xs:minInclusive value="0"/>
+										<xs:maxInclusive value="999999"/>
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DefectCount">
+								<xs:simpleType>
+									<xs:restriction base="xs:unsignedInt">
+										<xs:minInclusive value="0"/>
+										<xs:maxInclusive value="9"/>
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Defect" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="DefectNumber">
+											<xs:simpleType>
+												<xs:restriction base="xs:integer">
+													<xs:maxInclusive value="9"/>
+													<xs:minInclusive value="1"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="DefectCode">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:whiteSpace value="preserve"/>
+													<xs:minLength value="1"/>
+													<xs:maxLength value="2"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="DefectVolume">
+											<xs:simpleType>
+												<xs:restriction base="xs:integer">
+													<xs:minInclusive value="0"/>
+													<xs:maxInclusive value="999999"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="DefectFmtDesc">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="40"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="LogCount">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="9999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ScaleMethod">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="1"/>
+							<xs:enumeration value="G"/>
+							<xs:enumeration value="N"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+			<!-- <xs:assert test="count(Log) = LogCount" xpathDefaultNamespace="##targetNamespace"/>-->
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CheckScale">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="OriginalScalerLicence">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="OriginalScalerReturnNumber">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="9999"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="CheckReplacesOriginal">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="1"/>
+							<xs:enumeration value="Y"/>
+							<xs:enumeration value="N"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:attributeGroup name="DocID">
+		<xs:attribute name="DDN" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="([A-Z0-9]){13}"/>
+					<!-- Start of chage  (Elena) 23.11.2010 BT12716 -->
+					<!-- End of chage 23.11.2010 BT12716 -->
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="DV" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="2"/>
+					<xs:minInclusive value="1"/>
+					<xs:maxInclusive value="99"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:element name="BatchHeader">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ScaleSite">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="FromScaleDate" type="xs:date"/>
+				<xs:element name="ToScaleDate" type="xs:date"/>
+				<xs:element name="SubmitterBatchID" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="10"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="DocumentCount" type="xs:integer"/>
+				<xs:element name="BatchControlTotal" type="xs:integer"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Software">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SoftwareProduct">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SoftwareVersion">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SoftwareRevision">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EC_Digest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Method">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="SHA256"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="EC_HTX64" type="Hex64Dig"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EC_Signature">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SigningScalerLicence" type="ScalerType"/>
+				<xs:element name="SigningDate" type="DateType"/>
+				<xs:element name="SigningTime" type="xs:time"/>
+				<xs:element name="EC_ENCR_SIG" type="xs:hexBinary"/>
+				<xs:element name="Method">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="RSA_15"/>
+							<xs:enumeration value="RSA_OAEP"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="Identifier" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="DateType">
+		<xs:restriction base="xs:date">
+			<xs:minInclusive value="2015-01-01"/>
+			<xs:maxInclusive value="2035-12-31"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ScalerType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z0-9]{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Hex64Dig">
+		<xs:restriction base="xs:hexBinary">
+			<xs:length value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

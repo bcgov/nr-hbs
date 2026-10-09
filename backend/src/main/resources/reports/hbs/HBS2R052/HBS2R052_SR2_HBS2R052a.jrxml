@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R052a" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0b97e805-7796-400b-af79-aea3c98a13dc">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R052.DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<parameter name="Pm-HBS2R052.VERSION" class="java.math.BigDecimal"/>
+	<parameter name="Pm-HBS2R052.SCL_RTN_CATEGORY_CODE" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R052a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       PSS.SEGREGATION_ID
+     , PSS.PSSEG_TYPE
+     , PSS.DOCUMENT_CONTROL_NUMBER
+     , PSS.VERSION
+     , PSS.SCALE_SPECIES_CODE
+     , PSS.SCALE_PRODUCT_CODE
+     , PSS.SCALE_GRADE_CODE
+     , PSS.NUMBER_OF_PIECES
+     , PSS.VOLUME
+     , PSS.TIMBER_MARK
+     , PSS.INPUT_SPECIES
+     , PSS.INPUT_PRODUCT
+     , PSS.INPUT_GRADE
+     , PSS.INPUT_BCOMB_TIMBER_MARK
+     , PSS.INPUT_OTHER_DESC
+     , PSS.ARCHIVE_TIMBER_MARK
+     , PSS.SB4_IND
+     , PSS.NMV_IND
+     , PSS.AVOIDABLE_IND
+     , PSS.OTHER_DESCRIPTION_TYPE_CODE
+     , SSC.DESCRIPTION  AS SCALE_SPECIES_DESC
+     , SPC.DESCRIPTION  AS SCALE_PRODUCT_DESC
+     , SGC.DESCRIPTION  AS SCALE_GRADE_DESC
+     , PSTS.TXN_SEG_ID
+     , PSTS.TRX_ID
+     , PSTS.VALUE
+     , PSTS.RATE
+     , PSTS.OVERRIDE_RATE_ID
+     , PSTS.WSTRT_ID
+     , PSTS.RATE_SOURCE
+     , PSTS.RESERVE_STMPG_RATE_COMPONENT
+     , PSTS.BONUS_BID_RATE_COMPONENT
+     , PSTS.DEV_LEVY_RATE_COMPONENT
+     , PSTS.SILV_LEVY_RATE_COMPONENT
+     , PSTS.RESERVE_STMPG_AMOUNT_COMPONENT
+     , PSTS.BONUS_BID_AMOUNT_COMPONENT
+     , PSTS.DEV_LEVY_AMOUNT_COMPONENT
+     , PSTS.SILV_LEVY_AMOUNT_COMPONENT
+FROM      PIECE_SCL_SEGREGATION       PSS
+LEFT JOIN SCALE_SPECIES_CODE          SSC  ON SSC.SCALE_SPECIES_CODE           = PSS.SCALE_SPECIES_CODE
+LEFT JOIN SCALE_PRODUCT_CODE          SPC  ON SPC.SCALE_PRODUCT_CODE           = PSS.SCALE_PRODUCT_CODE
+LEFT JOIN PIECE_SCL_TXN_SEGREGATION   PSTS ON PSTS.SEGREGATION_ID              = PSS.SEGREGATION_ID
+     JOIN SCALE_GRADE_CODE            SGC  ON SGC.SCALE_GRADE_CODE             = PSS.SCALE_GRADE_CODE
+WHERE  PSS.DOCUMENT_CONTROL_NUMBER = $P{Pm-HBS2R052.DOCUMENT_CONTROL_NUMBER}
+AND    PSS.VERSION                 = $P{Pm-HBS2R052.VERSION}
+ ORDER BY
+       PSS.TIMBER_MARK
+     , SSC.DESCRIPTION
+     , SPC.DESCRIPTION
+     , SGC.DESCRIPTION
+     , PSS.NMV_IND]]>
+	</queryString>
+	<field name="SEGREGATION_ID" class="java.math.BigDecimal"/>
+	<field name="PSSEG_TYPE" class="java.lang.String"/>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="SCALE_GRADE_CODE" class="java.lang.String"/>
+	<field name="NUMBER_OF_PIECES" class="java.math.BigDecimal"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="INPUT_SPECIES" class="java.lang.String"/>
+	<field name="INPUT_PRODUCT" class="java.lang.String"/>
+	<field name="INPUT_GRADE" class="java.lang.String"/>
+	<field name="INPUT_BCOMB_TIMBER_MARK" class="java.lang.String"/>
+	<field name="INPUT_OTHER_DESC" class="java.lang.String"/>
+	<field name="ARCHIVE_TIMBER_MARK" class="java.lang.String"/>
+	<field name="SB4_IND" class="java.lang.String"/>
+	<field name="NMV_IND" class="java.lang.String"/>
+	<field name="AVOIDABLE_IND" class="java.lang.String"/>
+	<field name="OTHER_DESCRIPTION_TYPE_CODE" class="java.lang.String"/>
+	<field name="SCALE_SPECIES_DESC" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_DESC" class="java.lang.String"/>
+	<field name="SCALE_GRADE_DESC" class="java.lang.String"/>
+	<field name="TXN_SEG_ID" class="java.math.BigDecimal"/>
+	<field name="TRX_ID" class="java.math.BigDecimal"/>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<field name="RATE" class="java.math.BigDecimal"/>
+	<field name="OVERRIDE_RATE_ID" class="java.math.BigDecimal"/>
+	<field name="WSTRT_ID" class="java.math.BigDecimal"/>
+	<field name="RATE_SOURCE" class="java.lang.String"/>
+	<field name="RESERVE_STMPG_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="BONUS_BID_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="DEV_LEVY_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="SILV_LEVY_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="RESERVE_STMPG_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="BONUS_BID_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="DEV_LEVY_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="SILV_LEVY_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<sortField name="TIMBER_MARK"/>
+	<sortField name="NMV_IND"/>
+	<variable name="CCF1_Show_Species" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{SCALE_SPECIES_CODE} == null || $F{SCALE_SPECIES_CODE}.isEmpty()
+? ( $F{INPUT_SPECIES} == null || $F{INPUT_SPECIES}.isEmpty() ? "" : "* " + $F{INPUT_SPECIES} )
+: $F{SCALE_SPECIES_DESC}]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Show_Grade" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{SCALE_GRADE_CODE} == null || $F{SCALE_GRADE_CODE}.isEmpty()
+? ( !($F{INPUT_GRADE}.equalsIgnoreCase( " " ))
+  ? ( $F{SCALE_GRADE_DESC} == null || $F{SCALE_GRADE_DESC}.isEmpty() ? "" : "* " + $F{SCALE_GRADE_DESC} )
+  : "  "
+  )
+: ( $F{SCALE_GRADE_DESC} == null || $F{SCALE_GRADE_DESC}.isEmpty() ? "" : $F{SCALE_GRADE_DESC} )]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Show_Product" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{SCALE_PRODUCT_CODE} == null || $F{SCALE_PRODUCT_CODE}.isEmpty()
+? ( !($F{INPUT_PRODUCT}.equalsIgnoreCase( " " ))
+  ? ( $F{INPUT_PRODUCT} == null || $F{INPUT_PRODUCT}.isEmpty() ? "" : "* " + $F{INPUT_PRODUCT} )
+  : "  "
+  )
+: ( $F{SCALE_PRODUCT_DESC} == null || $F{SCALE_PRODUCT_DESC}.isEmpty() ? "" : $F{SCALE_PRODUCT_DESC} )]]></variableExpression>
+	</variable>
+	<variable name="CCF4_Show_Timbermark" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{TIMBER_MARK} == null || $F{TIMBER_MARK}.isEmpty()
+? ( $F{INPUT_BCOMB_TIMBER_MARK} == null || $F{INPUT_BCOMB_TIMBER_MARK}.isEmpty() ? "" : "* " + $F{INPUT_BCOMB_TIMBER_MARK} )
+: $F{TIMBER_MARK}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="30" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="a0241d90-b023-4809-8b37-33a4ffe06bc2" x="1" y="5" width="73" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Segregations]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="87078a3b-8f4a-4b98-afea-0f72713418cc" x="2" y="18" width="45" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "BC" )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Input Mark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="59eaaee2-aed5-4e65-af2d-013055dda7bb" x="47" y="18" width="47" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "BC" )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Billed Mark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f816951d-1bc1-4e17-8081-67de7f41f3da" x="95" y="18" width="60" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Species]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="af13f7ab-a9f0-4ab5-8783-1ed4bf32de88" x="157" y="18" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Product]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d4ec6d9c-207e-450c-95ae-223d492044bb" x="233" y="18" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Grade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="72d334e4-1ae6-49ef-b7ab-5fde3ba1549b" x="282" y="18" width="42" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "WA" )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Avoidable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a44cddfb-e1c1-443f-b438-abde127793a9" x="324" y="18" width="53" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rate Source]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9c5bde9d-3fe8-447e-96e8-5f8092991dc6" x="432" y="18" width="23" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[SB4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b44f768d-efd5-46ad-bb46-b3e062829b9e" x="457" y="18" width="27" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[NMV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb1c200d-2356-4931-a505-0fe08cc72a46" x="490" y="18" width="31" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Pieces]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="77ada6ec-878a-4cf4-b1e7-64b81734de0f" x="538" y="18" width="39" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4a37adef-13c0-4e9a-83a5-0940aabb47d6" x="591" y="18" width="27" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8bc84cf8-c920-449d-a3ed-9a91032b8243" x="672" y="18" width="31" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Value]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="13" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="26ee8a32-9e87-4e08-b7de-f8a355c6ffd4" x="2" y="0" width="44" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "BC" )]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_BCOMB_TIMBER_MARK}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="213364e6-4f05-477e-9f78-38d11abcf35f" x="47" y="0" width="44" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "BC" )]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIMBER_MARK}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d8c1fb35-33df-4358-9662-ec7f61738362" x="95" y="0" width="59" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_Show_Species}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="31991883-7305-4be8-aaf0-1a365c7245b3" x="157" y="0" width="74" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF3_Show_Product}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d6b8c0eb-7ed3-453a-b8fc-911d5d95898c" x="233" y="0" width="49" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF2_Show_Grade}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="0dd9789d-f3ad-42e8-afbd-44c3a07960b4" x="282" y="0" width="42" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[$P{Pm-HBS2R052.SCL_RTN_CATEGORY_CODE}.equalsIgnoreCase( "WA" )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AVOIDABLE_IND}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4676025e-290d-4db9-a5d7-77befa8c4fb5" x="324" y="0" width="102" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RATE_SOURCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4c18b601-91d0-458a-b9fa-797d18061ce0" x="438" y="0" width="6" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SB4_IND}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="62418d3b-7a55-43e4-81e2-bcefb9a7898c" x="463" y="0" width="6" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NMV_IND}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="e08913d8-ae31-43ee-9113-4ec5f95d8427" x="484" y="0" width="34" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_OF_PIECES}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.000;-###0.000" isBlankWhenNull="true">
+				<reportElement uuid="51491e47-2002-4982-8485-cf09bf4d78cf" x="521" y="0" width="55" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="160a265a-2fa5-433b-b7af-450486552bae" x="579" y="0" width="39" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="d7159d3b-0a8b-44f2-aa29-38436b012c9a" x="618" y="0" width="85" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

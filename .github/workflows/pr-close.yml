@@ -22,5 +22,47 @@ jobs:
       oc_token: ${{ secrets.oc_token }}
     with:
       cleanup: label
-      packages: backend frontend migrations
+      packages: backend frontend
+      # The helper's default cleanup label is `app=<repo-name>-<target>`
+      # (i.e. `app=nr-hbs-<PR#>`), but every object in our templates is
+      # labelled `app=nr-hbs-{backend,frontend}-<PR#>` — those labels are
+      # also the matchLabels/selector for the Deployment, Service, and
+      # NetworkPolicy podSelector, so they can't be flattened to a single
+      # PR-wide value without colliding backend and frontend Pods.
+      # `cleanup_name` is the helper's escape hatch: a space-separated list
+      # of label values it iterates over, calling
+      #   oc delete all,cm,pvc,secret -l app=<value>
+      # for each. Listing both sub-app labels here makes PR close actually
+      # remove the deployed objects.
+      #
+      # NetworkPolicies are NOT covered by `oc delete all` — the
+      # cleanup-networkpolicies job below handles them explicitly.
+      cleanup_name: nr-hbs-backend-${{ github.event.number }} nr-hbs-frontend-${{ github.event.number }}
 
+  # `oc delete all` (used by the helper above) expands to pods, services,
+  # routes, deployments, replicasets, configmaps, etc. — but NOT
+  # networkpolicy. Both openshift.deploy.yml templates create per-PR
+  # NetworkPolicies (frontend ingress + backend ingress-from-frontend), so
+  # without this step they accumulate forever in the namespace. Match by
+  # the same `app=` label values the helper uses.
+  cleanup-networkpolicies:
+    name: Cleanup PR NetworkPolicies
+    needs: cleanup
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Delete per-PR NetworkPolicies
+        uses: bcgov/action-oc-runner@111868d1fc50db0a40417ba321d865ef5c931bbd # v1.7.0
+        with:
+          oc_namespace: ${{ secrets.oc_namespace }}
+          oc_token: ${{ secrets.oc_token }}
+          oc_server: ${{ vars.oc_server }}
+          commands: |
+            set -eu
+            for label in \
+              "nr-hbs-backend-${{ github.event.number }}" \
+              "nr-hbs-frontend-${{ github.event.number }}"
+            do
+              echo "Deleting networkpolicies matching app=${label}"
+              oc delete networkpolicy -l "app=${label}" --ignore-not-found
+            done

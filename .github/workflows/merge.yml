@@ -5,9 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - '*.md'
-      - '.github/**'
       - '.github/graphics/**'
-      - '!.github/workflows/**'
   workflow_dispatch:
 
 concurrency:
@@ -26,46 +24,82 @@ jobs:
       pr: ${{ steps.pr.outputs.pr }}
     runs-on: ubuntu-24.04
     steps:
-      # Get PR number for squash merges to main
+      # Find the PR number associated with this squash-merged commit on main,
+      # so we can deploy the same image tag that the PR was running.
       - id: pr
         uses: bcgov/action-get-pr@28b0adf8e4d40720d41f9c87356ce24b0a4bd6af # v0.3.1
+
   deploy-test:
     name: TEST Deploys (${{ needs.init.outputs.pr }})
     needs: [init]
+    # contents:read here so the nested reusable-deploy jobs can checkout.
+    # Workflow-level `permissions: {}` above sets all scopes to none; the
+    # called workflow can't grant itself more than the caller has.
+    permissions:
+      contents: read
     uses: ./.github/workflows/reusable-deploy.yml
     secrets:
-      db_password: ${{ secrets.db_password }}
       oc_namespace: ${{ secrets.oc_namespace }}
       oc_token: ${{ secrets.oc_token }}
+      database_user: ${{ secrets.database_user }}
+      database_password: ${{ secrets.database_password }}
+      database_host: ${{ secrets.database_host }}
+      database_service_name: ${{ secrets.database_service_name }}
+      keystore_secret: ${{ secrets.keystore_secret }}
+      keycloak_sa_client_id: ${{ secrets.KEYCLOAK_SA_CLIENT_ID }}
+      keycloak_sa_client_secret: ${{ secrets.KEYCLOAK_SA_CLIENT_SECRET }}
+      user_lookup_base_url: ${{ secrets.USER_LOOKUP_BASE_URL }}
+      forest_client_api_url: ${{ secrets.FOREST_CLIENT_API_URL }}
+      forest_client_api_key: ${{ secrets.FOREST_CLIENT_API_KEY }}
+      clamav_host: ${{ secrets.CLAMAV_HOST }}
     with:
       environment: test
       target: test
       tag: ${{ needs.init.outputs.pr }}
+      backend_replicas: "2"
+      frontend_replicas: "2"
 
   tests:
     name: Tests
     needs: [deploy-test]
+    permissions:
+      contents: read
     uses: ./.github/workflows/reusable-tests.yml
+    secrets:
+      e2e_idir_user: ${{ secrets.E2E_IDIR_USER }}
+      e2e_idir_password: ${{ secrets.E2E_IDIR_PASSWORD }}
     with:
       target: test
 
   deploy-prod:
     name: PROD Deploys (${{ needs.init.outputs.pr }})
     needs: [tests, init]
+    permissions:
+      contents: read
     uses: ./.github/workflows/reusable-deploy.yml
     secrets:
-      db_password: ${{ secrets.db_password }}
       oc_namespace: ${{ secrets.oc_namespace }}
       oc_token: ${{ secrets.oc_token }}
+      database_user: ${{ secrets.database_user }}
+      database_password: ${{ secrets.database_password }}
+      database_host: ${{ secrets.database_host }}
+      database_service_name: ${{ secrets.database_service_name }}
+      keystore_secret: ${{ secrets.keystore_secret }}
+      keycloak_sa_client_id: ${{ secrets.KEYCLOAK_SA_CLIENT_ID }}
+      keycloak_sa_client_secret: ${{ secrets.KEYCLOAK_SA_CLIENT_SECRET }}
+      user_lookup_base_url: ${{ secrets.USER_LOOKUP_BASE_URL }}
+      forest_client_api_url: ${{ secrets.FOREST_CLIENT_API_URL }}
+      forest_client_api_key: ${{ secrets.FOREST_CLIENT_API_KEY }}
+      clamav_host: ${{ secrets.CLAMAV_HOST }}
     with:
       environment: prod
       target: prod
       tag: ${{ needs.init.outputs.pr }}
+      backend_replicas: "3"
+      frontend_replicas: "3"
 
   # Sync Sysdig email alerts for PROD. No-ops cleanly if SYSDIG_API_TOKEN is
-  # unset or monitoring/alerts/ is empty — adoption is gradual. Alert
-  # templates live in monitoring/alerts/ in this repo; add or remove files
-  # there to customize the alert set.
+  # unset — adoption is gradual. Alert templates live in monitoring/alerts/.
   monitor-prod:
     name: Sysdig Monitor (PROD)
     needs: [deploy-prod]
@@ -76,14 +110,18 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
-      # 0.0.3 is the first version with __APP__ template substitution, which
-      # monitoring/alerts/*.json depend on — don't downgrade this pin.
+      # v0.5.0 is the first release carrying sysdig-monitor, and it
+      # keeps the __APP__ template substitution that monitoring/alerts/*.json
+      # depend on — don't downgrade this pin.
       - uses: bcgov/actions/sysdig-monitor@4026bfd276b8a5839029106099b13edfb594b2c3 # v0.8.0
         with:
           sysdig_api_token: ${{ secrets.SYSDIG_API_TOKEN }}
           oc_namespace: ${{ secrets.oc_namespace }}
-          app: ${{ github.event.repository.name }}
+          app: nr-hbs
 
+  # After PROD is up, alias the PR image as :prod in GHCR. Creates a durable
+  # record of "this is the image running in production right now" and a
+  # rollback target.
   promote:
     name: Promote Images
     needs: [deploy-prod, init]
@@ -92,7 +130,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [migrations, backend, frontend]
+        package: [backend, frontend]
     timeout-minutes: 1
     steps:
       - uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5

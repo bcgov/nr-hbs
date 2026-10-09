@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp2.rpt" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7aa21037-c8b6-4c04-afbb-79375129194d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R701.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="Pm-?PSR_ERRORCODE" class="java.lang.String"/>
+	<parameter name="Pm-?PSR_EXCLUDEERROR" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp2.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from HBS_EDIT_ERR_MESSAGE_CODE
+ WHERE HBS_EDIT_ERR_MESSAGE_CODE = $P{Pm-?PSR_ERRORCODE}]]>
+	</queryString>
+	<field name="HBS_EDIT_ERR_MESSAGE_CODE" class="java.lang.String"/>
+	<field name="HBS_EDIT_ERR_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="HBS_EDIT_ERR_RESPONSIBLTY_CODE" class="java.lang.String"/>
+	<variable name="CCF0_Show_Description" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( !($P{Pm-?PSR_ERRORCODE}.isEmpty())
+? ( $P{Pm-?PSR_EXCLUDEERROR}.equalsIgnoreCase( "Y" )
+  ? ( $F{HBS_EDIT_ERR_MESSAGE_CODE} == null || $F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty() ? "" : $F{HBS_EDIT_ERR_MESSAGE_CODE} ) + " - Inverted Selection"
+  : ( $F{HBS_EDIT_ERR_MESSAGE_CODE} == null || $F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty() ? "" : $F{HBS_EDIT_ERR_MESSAGE_CODE} )
+  )
+: ""
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF1_show_errorDescription" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( !($P{Pm-?PSR_ERRORCODE}.isEmpty())
+? ( $P{Pm-?PSR_EXCLUDEERROR}.equalsIgnoreCase( "Y" )
+  ? "(i.e. everything but " + ( $F{HBS_EDIT_ERR_MESSAGE_CODE} == null || $F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty() ? "" : $F{HBS_EDIT_ERR_MESSAGE_CODE} ) + ")"
+  : ""
+  )
+: ""
+)]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="26" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9fe5bd81-65e4-4bc2-a5b4-cbb87e70906a" x="0" y="0" width="101" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_Description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5cd4e810-c4f3-4c8b-9b93-4a93c28655e2" x="0" y="12" width="101" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_show_errorDescription}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

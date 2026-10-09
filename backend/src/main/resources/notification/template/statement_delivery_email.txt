@@ -1,0 +1,10 @@
+Harvest Billing System statements are available for {{clientName}} ({{clientNumber}}).
+
+{{statementCount}} statement(s) issued on {{issueDate}} can be viewed and
+downloaded from the HBS application:
+
+{{appUrl}}/queries/transmissions
+
+For billing enquiries contact {{helpDeskEmail}} or {{helpDeskPhone}}.
+
+Please do not reply to this automated message.

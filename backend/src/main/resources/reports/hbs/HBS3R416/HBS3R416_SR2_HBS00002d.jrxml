@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS00002d" pageWidth="588" pageHeight="768" whenNoDataType="AllSectionsNoDetail" columnWidth="588" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="395bf308-d229-4385-b673-08e450601488">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS00002.INVOICE_NUMBER" class="java.lang.String"/>
+	<parameter name="Pm-HBS00002.CANCELLATION_IND" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS00002d"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       WID.INVOICE_NUMBER
+     , WID.CANCELLATION_IND
+     , WID.HDBS_TREE_SPECIES
+     , WID.LOG_GRADE
+     , WID.WEIGHT_REF_NUMBER
+     , WID.PERIOD_REF_NUMBER
+     , WID.NEGATION_IND
+     , WID.WEIGHT_X_RATE_YTD
+     , WID.SEGREGATION_RATIO
+     , WID.RATE_IN_DOLLARS
+     , WID.YTD_VOLUME
+     , WID.ADDITIONAL_VOLUME
+     , WID.YTD_AMOUNT
+     , WID.ADDITIONAL_AMOUNT
+     , WID.BONUS_AMOUNT
+     , WID.DEV_LEVY_AMOUNT
+     , WID.SILV_LEVY_AMOUNT
+     , WID.ENTRY_TIMESTAMP
+     , WID.ENTRY_USERID
+     , WID.UPDATE_TIMESTAMP
+     , WID.UPDATE_USERID
+     , SSC.SCALE_SPECIES_CODE
+     , SSC.DESCRIPTION
+     , SSC.EFFECTIVE_DATE
+     , SSC.EXPIRY_DATE
+FROM   WS_INVOICE_DTL WID
+JOIN   SCALE_SPECIES_CODE SSC ON SSC.SCALE_SPECIES_CODE = WID.HDBS_TREE_SPECIES
+WHERE  WID.INVOICE_NUMBER = $P{Pm-HBS00002.INVOICE_NUMBER}
+AND    WID.CANCELLATION_IND = $P{Pm-HBS00002.CANCELLATION_IND}
+ORDER BY WID.INVOICE_NUMBER]]>
+	</queryString>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="CANCELLATION_IND" class="java.lang.String"/>
+	<field name="HDBS_TREE_SPECIES" class="java.lang.String"/>
+	<field name="LOG_GRADE" class="java.lang.String"/>
+	<field name="WEIGHT_REF_NUMBER" class="java.math.BigDecimal"/>
+	<field name="PERIOD_REF_NUMBER" class="java.math.BigDecimal"/>
+	<field name="NEGATION_IND" class="java.lang.String"/>
+	<field name="WEIGHT_X_RATE_YTD" class="java.math.BigDecimal"/>
+	<field name="SEGREGATION_RATIO" class="java.math.BigDecimal"/>
+	<field name="RATE_IN_DOLLARS" class="java.math.BigDecimal"/>
+	<field name="YTD_VOLUME" class="java.math.BigDecimal"/>
+	<field name="ADDITIONAL_VOLUME" class="java.math.BigDecimal"/>
+	<field name="YTD_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ADDITIONAL_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="BONUS_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="DEV_LEVY_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="SILV_LEVY_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<sortField name="INVOICE_NUMBER"/>
+	<sortField name="CCF1_dtl_sort_order" type="Variable"/>
+	<sortField name="DESCRIPTION"/>
+	<sortField name="LOG_GRADE"/>
+	<sortField name="WEIGHT_REF_NUMBER"/>
+	<variable name="CCF0_dtl_Scale_Species_Desc" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[($F{DESCRIPTION}.toUpperCase()).trim()]]></variableExpression>
+	</variable>
+	<variable name="CCF1_dtl_sort_order" class="java.lang.Integer" resetType="None">
+		<variableExpression><![CDATA[//select {WS_INVOICE_DTL.HDBS_TREE_SPECIES}
+//case    'OT': 3
+//case    'ZZ': 2
+//case    'R' : 2
+//default:      1
+
+( $F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ) ? 3 :
+( $F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "ZZ" ) ? 2 :
+( $F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "R"  ) ? 2 : 1 )))]]></variableExpression>
+	</variable>
+	<variable name="v_highest_group0_WEIGHT_REF_NUMBER" class="java.lang.Integer" resetType="Group" resetGroup="Group 0" calculation="Highest">
+		<variableExpression><![CDATA[$F{WEIGHT_REF_NUMBER} == null ? 0 : $F{WEIGHT_REF_NUMBER}.intValue()]]></variableExpression>
+	</variable>
+	<variable name="CCF2_RTCondition1" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[$F{WEIGHT_REF_NUMBER} != null && $F{WEIGHT_REF_NUMBER}.intValue() == 1]]></variableExpression>
+	</variable>
+	<variable name="CCF3_RTCondition2" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[//{WS_INVOICE_DTL.WEIGHT_REF_NUMBER}  = Maximum ({WS_INVOICE_DTL.WEIGHT_REF_NUMBER},{WS_INVOICE_DTL.INVOICE_NUMBER} )
+
+$F{WEIGHT_REF_NUMBER} != null && $V{v_highest_group0_WEIGHT_REF_NUMBER} != null &&
+$F{WEIGHT_REF_NUMBER}.intValue() >= $V{v_highest_group0_WEIGHT_REF_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="Sum (WS_INVOICE_DTL.ADDITIONAL_VOLUME, WS_INVOICE_DTL.INVOICE_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{ADDITIONAL_VOLUME}]]></variableExpression>
+	</variable>
+	<variable name="Sum (WS_INVOICE_DTL.ADDITIONAL_AMOUNT, WS_INVOICE_DTL.INVOICE_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{ADDITIONAL_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="Maximum (WS_INVOICE_DTL.WEIGHT_REF_NUMBER, WS_INVOICE_DTL.INVOICE_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Highest">
+		<variableExpression><![CDATA[$F{WEIGHT_REF_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="RTotal_Ratio" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF2_RTCondition1} ? $F{SEGREGATION_RATIO} : null]]></variableExpression>
+	</variable>
+	<variable name="RTotal_YTD_Volume" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF3_RTCondition2} ? $F{YTD_VOLUME} : null]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{INVOICE_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="25" splitType="Prevent">
+				<staticText>
+					<reportElement uuid="334d514c-6bac-4cda-8d8e-26eea90eba46" x="146" y="10" width="81" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[TOTAL SCALE]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="b1fc73c4-5746-4968-bbff-7c1b58696815" x="233" y="10" width="35" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{RTotal_Ratio}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="473f0209-0eba-4909-907a-596892dbc70a" x="273" y="10" width="61" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{RTotal_YTD_Volume}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="43a48e9c-8deb-4c2d-9097-30d392d32d2d" x="337" y="10" width="64" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Sum (WS_INVOICE_DTL.ADDITIONAL_VOLUME, WS_INVOICE_DTL.INVOICE_NUMBER)}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="971e242f-a9c7-45f9-a27e-2a76aeae7682" x="474" y="10" width="62" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Sum (WS_INVOICE_DTL.ADDITIONAL_AMOUNT, WS_INVOICE_DTL.INVOICE_NUMBER)}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="75cdd00a-ab95-4336-98da-b9f42210d65b" x="5" y="0" width="66" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_dtl_Scale_Species_Desc}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="0e7fb62d-8321-42b1-8c98-feaa66664cdb" x="78" y="0" width="10" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOG_GRADE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="7aa2a487-27ea-400f-b82b-749e6dca5967" x="95" y="0" width="15" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WEIGHT_REF_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="a304fcc5-5606-4649-904b-41d0fbcb9e0d" x="119" y="0" width="32" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RATE_IN_DOLLARS}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="b9264418-f240-4e5d-8e18-4fc25f9a4470" x="160" y="0" width="64" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WEIGHT_X_RATE_YTD}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="0098bebb-aac8-4b65-8e66-fd5e8701e0b1" x="233" y="0" width="35" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[!($F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEGREGATION_RATIO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="fdbea42e-338c-48b7-8480-ebdb590ef08f" x="273" y="0" width="61" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[!($F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="7fbd9fb8-bc0e-47d6-91cb-80edc0e808d7" x="337" y="0" width="64" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[!($F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDITIONAL_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="f97bad9a-c897-4be1-b5be-079fb1ddb9f2" x="405" y="0" width="62" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[!($F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{YTD_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="8d8e148e-ffd0-4b8f-88dc-33a40f9964dc" x="474" y="0" width="62" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[!($F{HDBS_TREE_SPECIES}.equalsIgnoreCase( "OT" ))]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDITIONAL_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R052c" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="fb8212b0-caa7-4d50-a240-3726feea8307">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R052.DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R052c"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       PSST.TRX_ID
+     , PSST.HBS_TXN_TYPE_CODE
+     , PSST.INVOICE_NUMBER
+     , PSST.CANCELLATION_IND
+     , PSST.VERSION
+     , PSST.HBS_TXN_STATUS_CODE
+     , PSST.TALLY_SKEY
+     , PSST.DOCUMENT_CONTROL_NUMBER
+     , PSST.BATCH_ID
+     , PSST.OVERRIDE_RATING_RULE_ID
+     , PSST.SMRYRETTXN_COMMENT
+     , PSST.EVENT_SEQUENCE
+     , PSST.DEBIT_CREDIT_TYPE
+     , PSST.INTEREST_REVERSAL_IND
+     , PSST.CLIENT_NUMBER_PAID_BY
+     , PSST.CLIENT_LOCN_CODE_PAID_BY
+     , PSST.CLIENT_NUMBER_COPIED_TO
+     , PSST.CLIENT_LOCN_CODE_COPIED_TO
+     , PSST.ENTRY_USERID
+     , PSST.ENTRY_TIMESTAMP
+     , PSST.UPDATE_USERID
+     , PSST.UPDATE_TIMESTAMP
+     , PSTS.TXN_SEG_ID
+     , PSTS.SEGREGATION_ID
+     , PSTS.SCALE_GRADE_CODE
+     , PSTS.SCALE_PRODUCT_CODE
+     , PSTS.SCALE_SPECIES_CODE
+     , PSTS.VOLUME
+     , PSTS.VALUE
+     , PSTS.RATE
+     , PSTS.OVERRIDE_RATE_ID
+     , PSTS.WSTRT_ID
+     , PSTS.RATE_SOURCE
+     , PSTS.RESERVE_STMPG_RATE_COMPONENT
+     , PSTS.BONUS_BID_RATE_COMPONENT
+     , PSTS.DEV_LEVY_RATE_COMPONENT
+     , PSTS.SILV_LEVY_RATE_COMPONENT
+     , PSTS.RESERVE_STMPG_AMOUNT_COMPONENT
+     , PSTS.BONUS_BID_AMOUNT_COMPONENT
+     , PSTS.DEV_LEVY_AMOUNT_COMPONENT
+     , PSTS.SILV_LEVY_AMOUNT_COMPONENT
+     , HTTC.DESCRIPTION
+     , HTTC.EFFECTIVE_DATE
+     , HTTC.EXPIRY_DATE
+     , FINV.PAYABLE_BY_CLIENT
+     , FINV.PAYABLE_BY_CLI_LOC
+     , FINV.INVOICE_AMOUNT
+     , FINV.INVOICE_CLASS_CODE
+     , FINV.INVOICE_DATE
+     , FINV.INVOICE_TYPE_CODE
+     , FINV.INVC_SUB_TYPE_CODE
+     , FINV.CANCELLED_BY_INVC
+     , FINV.ORG_UNIT_NO
+     , FINV.RELATED_INVOICE
+     , FINV.INVOICE_RLN_TYP_CD
+     , FINV.REL_INVOICE_STS_ST
+     , FINV.REPLACED_BY_INVC
+     , FINV.SCALE_RETURN_DATE
+     , FINV.SCALE_SITE_ID_NMBR
+     , FINV.SCALER_LICENCE_NUM
+     , FINV.VOLUME_ONLY_IND
+     , FINV.COPY_TO_CLIENT
+     , FINV.COPY_TO_CLI_LOC
+     , FINV.POSTED_DATE
+     , FINV.POSTED_SEQUENCE_NO
+     , FINV.SCALED_AT
+     , OVRR.OVRRDRTRL_TYPE
+     , OVRR.TIMBER_MARK
+     , OVRR.FIELD_SCALE_DECK_ID
+     , OVRR.OVERRIDE_RULE_CATEGORY_CODE
+     , OVRR.OVERRIDE_RULE_STATUS_CODE
+     , OVRR.OVRRDRTRL_COMMENT
+     , OVRR.PROCESSING_EFFECTIVE_DATE
+     , OVRR.PROCESSING_EXPIRY_DATE
+     , OVRR.SCALE_EFFECTIVE_DATE
+     , OVRR.SCALE_EXPIRY_DATE
+     , OVRR.OVERRIDE_RATE_DATE
+     , HOPB.HBS_RETURN_TYPE_CODE
+     , HOPB.TRANSMISSION_ID
+     , HOPB.OUTPUT_BATCH_STATUS_CODE
+     , HOPB.RETURN_COUNT
+     , HOPB.SENT_DATE_TIME
+     , HOPB.RECORD_COUNT
+     , HOPB.SENT_IND
+     , HOPB.RECONCILED_TXN_COUNT
+FROM      PIECE_SCL_SMRY_TXN        PSST
+LEFT JOIN PIECE_SCL_TXN_SEGREGATION PSTS ON  PSTS.TRX_ID                  = PSST.TRX_ID
+                                         AND PSTS.DOCUMENT_CONTROL_NUMBER = PSST.DOCUMENT_CONTROL_NUMBER
+                                         AND PSTS.VERSION                 = PSST.VERSION
+LEFT JOIN HBS_TXN_TYPE_CODE         HTTC ON  HTTC.HBS_TXN_TYPE_CODE       = PSST.HBS_TXN_TYPE_CODE
+LEFT JOIN FOREST_INVOICE            FINV ON  FINV.INVOICE_NUMBER          = PSST.INVOICE_NUMBER
+                                         AND FINV.CANCELLATION_IND        = PSST.CANCELLATION_IND
+LEFT JOIN OVERRIDE_RATING_RULE      OVRR ON  OVRR.OVERRIDE_RATING_RULE_ID = PSST.OVERRIDE_RATING_RULE_ID
+LEFT JOIN HBS_OUTPUT_BATCH          HOPB ON  HOPB.BATCH_ID                = PSST.BATCH_ID
+WHERE  PSST.DOCUMENT_CONTROL_NUMBER = $P{Pm-HBS2R052.DOCUMENT_CONTROL_NUMBER}
+ORDER BY
+       PSST.EVENT_SEQUENCE DESC]]>
+	</queryString>
+	<field name="TRX_ID" class="java.math.BigDecimal"/>
+	<field name="HBS_TXN_TYPE_CODE" class="java.lang.String"/>
+	<field name="INVOICE_NUMBER" class="java.lang.String"/>
+	<field name="CANCELLATION_IND" class="java.lang.String"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="HBS_TXN_STATUS_CODE" class="java.lang.String"/>
+	<field name="TALLY_SKEY" class="java.math.BigDecimal"/>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="BATCH_ID" class="java.math.BigDecimal"/>
+	<field name="OVERRIDE_RATING_RULE_ID" class="java.math.BigDecimal"/>
+	<field name="SMRYRETTXN_COMMENT" class="java.lang.String"/>
+	<field name="EVENT_SEQUENCE" class="java.math.BigDecimal"/>
+	<field name="DEBIT_CREDIT_TYPE" class="java.lang.String"/>
+	<field name="INTEREST_REVERSAL_IND" class="java.lang.String"/>
+	<field name="CLIENT_NUMBER_PAID_BY" class="java.lang.String"/>
+	<field name="CLIENT_LOCN_CODE_PAID_BY" class="java.lang.String"/>
+	<field name="CLIENT_NUMBER_COPIED_TO" class="java.lang.String"/>
+	<field name="CLIENT_LOCN_CODE_COPIED_TO" class="java.lang.String"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="TXN_SEG_ID" class="java.math.BigDecimal"/>
+	<field name="SEGREGATION_ID" class="java.math.BigDecimal"/>
+	<field name="SCALE_GRADE_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<field name="RATE" class="java.math.BigDecimal"/>
+	<field name="OVERRIDE_RATE_ID" class="java.math.BigDecimal"/>
+	<field name="WSTRT_ID" class="java.math.BigDecimal"/>
+	<field name="RATE_SOURCE" class="java.lang.String"/>
+	<field name="RESERVE_STMPG_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="BONUS_BID_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="DEV_LEVY_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="SILV_LEVY_RATE_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="RESERVE_STMPG_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="BONUS_BID_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="DEV_LEVY_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="SILV_LEVY_AMOUNT_COMPONENT" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="PAYABLE_BY_CLIENT" class="java.lang.String"/>
+	<field name="PAYABLE_BY_CLI_LOC" class="java.lang.String"/>
+	<field name="INVOICE_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="INVOICE_CLASS_CODE" class="java.lang.String"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<field name="INVOICE_TYPE_CODE" class="java.lang.String"/>
+	<field name="INVC_SUB_TYPE_CODE" class="java.lang.String"/>
+	<field name="CANCELLED_BY_INVC" class="java.lang.String"/>
+	<field name="ORG_UNIT_NO" class="java.math.BigDecimal"/>
+	<field name="RELATED_INVOICE" class="java.lang.String"/>
+	<field name="INVOICE_RLN_TYP_CD" class="java.lang.String"/>
+	<field name="REL_INVOICE_STS_ST" class="java.lang.String"/>
+	<field name="REPLACED_BY_INVC" class="java.lang.String"/>
+	<field name="SCALE_RETURN_DATE" class="java.sql.Timestamp"/>
+	<field name="SCALE_SITE_ID_NMBR" class="java.lang.String"/>
+	<field name="SCALER_LICENCE_NUM" class="java.lang.String"/>
+	<field name="VOLUME_ONLY_IND" class="java.lang.String"/>
+	<field name="COPY_TO_CLIENT" class="java.lang.String"/>
+	<field name="COPY_TO_CLI_LOC" class="java.lang.String"/>
+	<field name="POSTED_DATE" class="java.sql.Timestamp"/>
+	<field name="POSTED_SEQUENCE_NO" class="java.math.BigDecimal"/>
+	<field name="SCALED_AT" class="java.lang.String"/>
+	<field name="OVRRDRTRL_TYPE" class="java.lang.String"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="OVERRIDE_RULE_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="OVERRIDE_RULE_STATUS_CODE" class="java.lang.String"/>
+	<field name="OVRRDRTRL_COMMENT" class="java.lang.String"/>
+	<field name="PROCESSING_EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="PROCESSING_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="SCALE_EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="SCALE_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="OVERRIDE_RATE_DATE" class="java.sql.Timestamp"/>
+	<field name="FIELD_SCALE_DECK_ID" class="java.lang.String"/>
+	<field name="HBS_RETURN_TYPE_CODE" class="java.lang.String"/>
+	<field name="TRANSMISSION_ID" class="java.math.BigDecimal"/>
+	<field name="OUTPUT_BATCH_STATUS_CODE" class="java.lang.String"/>
+	<field name="RETURN_COUNT" class="java.math.BigDecimal"/>
+	<field name="SENT_DATE_TIME" class="java.sql.Timestamp"/>
+	<field name="RECORD_COUNT" class="java.math.BigDecimal"/>
+	<field name="SENT_IND" class="java.lang.String"/>
+	<field name="RECONCILED_TXN_COUNT" class="java.math.BigDecimal"/>
+	<sortField name="EVENT_SEQUENCE"/>
+	<variable name="CCF0_Override_number" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{OVERRIDE_RATING_RULE_ID} == null
+? "None                    None"
+: new DecimalFormat("###0").format( $F{OVERRIDE_RATING_RULE_ID} )
+  + "          " +
+  ( $F{OVERRIDE_RATE_DATE} == null ? "" : new SimpleDateFormat("yyyy-MMM-dd").format( $F{OVERRIDE_RATE_DATE} ) )
+)]]></variableExpression>
+	</variable>
+	<variable name="Total_Txn_Volume" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{VOLUME}]]></variableExpression>
+	</variable>
+	<variable name="Total_Txn_Value" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{VALUE}]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{EVENT_SEQUENCE}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="12" splitType="Prevent">
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="264027a3-793a-4b4a-8d4b-aaf6fa066637" x="1" y="0" width="28" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EVENT_SEQUENCE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="652ab53a-d6df-4fa5-ac6b-2fce0686b196" x="48" y="0" width="19" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEBIT_CREDIT_TYPE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="5b69c055-1933-442a-acf5-64fb22c7e9e5" x="78" y="0" width="96" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+					<reportElement uuid="b2e3d547-c944-40d2-b603-faacfb9567c0" x="180" y="0" width="48" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{OVERRIDE_RATING_RULE_ID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+					<reportElement uuid="47841b37-49a6-4843-a4ef-d1d7566a94bd" x="234" y="0" width="60" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{OVERRIDE_RATE_DATE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+					<reportElement uuid="fb18df4d-af8d-4fb9-a6ee-8da4eab07d30" x="312" y="0" width="61" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SENT_DATE_TIME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="b9035564-184c-4647-945d-7d18c0c59ceb" x="399" y="0" width="62" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INVOICE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+					<reportElement uuid="c35ac892-ab26-4430-b0fa-347f55409d54" x="468" y="0" width="61" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+					<reportElement uuid="1eb16b7d-5cd5-4bf6-a53e-6902b23783de" x="539" y="0" width="54" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Txn_Volume}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement uuid="9437394e-91ef-4943-bdb1-9db6996b73d7" x="631" y="0" width="65" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Total_Txn_Value}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="30" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="e981396f-553c-4cb7-b344-c72151048c86" x="1" y="7" width="108" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Transaction History]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ef6246b8-7949-4e0a-803a-2a4102f2d003" x="1" y="18" width="46" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Sequence]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="090df727-4978-411a-a25d-5a034fc33aff" x="47" y="18" width="29" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[DR/CR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="91138c4d-c662-4728-8c7b-6af770e94526" x="79" y="18" width="23" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="472af534-638b-4179-9816-92520a7866a1" x="180" y="18" width="39" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Override]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ff436a13-ab3c-4edd-a0da-26a0c94c4765" x="234" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rate Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="434d3eb4-17b1-4761-a172-86ec6d5b764e" x="312" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Date Sent]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2f821587-a138-4964-a0e2-1d74d06f5134" x="399" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Invoice]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="00f41759-a51a-4254-b070-09a64a8f8d3e" x="468" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Issue Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1cb93951-a26b-40c7-9269-efa35196bdd0" x="546" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b318d0ac-cd92-492a-afc5-fd381b68d92e" x="648" y="18" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Value]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band splitType="Prevent"/>
+	</detail>
+</jasperReport>

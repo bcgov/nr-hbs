@@ -1,0 +1,61 @@
+/*
+    Flat bordered card rather than a shadowed one — that is the variant the
+    sibling apps use for icon-titled sections, and it is what reads as a panel
+    on a light canvas rather than as something floating above it.
+
+    Colours come from Carbon tokens so the card follows the active theme
+    instead of pinning itself to one.
+*/
+.section-tile {
+  background-color: var(--cds-layer-02);
+  border: 1px solid var(--cds-border-subtle-01);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+/* A page may stack several sections; space them without a per-page rule. */
+.section-tile + .section-tile {
+  margin-block-start: 1.5rem;
+}
+
+/* Title on the left, the section's buttons level with it on the right. */
+.section-tile__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-end: 1.5rem;
+}
+
+.section-tile__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* Larger and regular weight, matching the sibling apps' section headings. */
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Muted, so it reads as decoration rather than as something to click. */
+.section-tile__title svg {
+  flex: 0 0 auto;
+  fill: var(--cds-icon-secondary);
+}
+
+.section-tile__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/*
+    Pulled up under the header, whose own bottom margin is sized for a table
+    starting right after it.
+*/
+.section-tile__description {
+  margin: -1rem 0 1.5rem;
+  color: var(--cds-text-secondary);
+}

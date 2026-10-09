@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R552a" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6f30f158-ee09-4df1-8f47-4a4124f8d19d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R552.DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<parameter name="Pm-HBS2R552.VERSION" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R552a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       LTD.LOGDTL_ID
+     , LTD.DETAIL_DOCUMENT_NUMBER
+     , LTD.VERSION
+     , LTD.SCALE_SPECIES_CODE
+     , LTD.SCALE_GRADE_CODE
+     , LTD.SCALE_PRODUCT_CODE
+     , LTD.DTLSEG_ID
+     , LTD.LOG_NUMBER
+     , LTD.LENGTH
+     , LTD.TOP
+     , LTD.BUTT
+     , LTD.NET_VOLUME
+     , LTD.NMV_IND
+     , LTD.DEDUCTION_COUNT
+     , LTD.INPUT_SPECIES
+     , LTD.INPUT_GRADE
+     , LTD.ENTRY_USERID
+     , LTD.ENTRY_TIMESTAMP
+     , LTD.UPDATE_USERID
+     , LTD.UPDATE_TIMESTAMP
+     , LTDD.LOG_DEFECT_ID
+     , LTDD.DEFECT_NUMBER
+     , LTDD.DEFECT_TYPE
+     , LTDD.VOLUME
+     , LTDD.DESCRIPTOR
+FROM   	LOG_TALLY_DETAIL        LTD
+JOIN  	LOG_TALLY_DETAIL_DEFECT LTDD ON LTDD.LOGDTL_ID 	=  LTD.LOGDTL_ID
+WHERE 	LTD.DETAIL_DOCUMENT_NUMBER 			= $P{Pm-HBS2R552.DETAIL_DOCUMENT_NUMBER}
+AND   	LTD.VERSION                				= $P{Pm-HBS2R552.VERSION}
+ORDER BY	LTD.LOG_NUMBER
+      	, LTDD.DEFECT_NUMBER]]>
+	</queryString>
+	<field name="LOG_DEFECT_ID" class="java.math.BigDecimal"/>
+	<field name="LOGDTL_ID" class="java.math.BigDecimal"/>
+	<field name="DEFECT_NUMBER" class="java.math.BigDecimal"/>
+	<field name="DEFECT_TYPE" class="java.lang.String"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTOR" class="java.lang.String"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="SCALE_GRADE_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="DTLSEG_ID" class="java.math.BigDecimal"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="LOG_NUMBER" class="java.math.BigDecimal"/>
+	<field name="LENGTH" class="java.math.BigDecimal"/>
+	<field name="TOP" class="java.math.BigDecimal"/>
+	<field name="BUTT" class="java.math.BigDecimal"/>
+	<field name="NET_VOLUME" class="java.math.BigDecimal"/>
+	<field name="NMV_IND" class="java.lang.String"/>
+	<field name="DEDUCTION_COUNT" class="java.math.BigDecimal"/>
+	<field name="INPUT_SPECIES" class="java.lang.String"/>
+	<field name="INPUT_GRADE" class="java.lang.String"/>
+	<field name="INPUT_BCOMB_TIMBER_MARK" class="java.lang.String"/>
+	<sortField name="LOGDTL_ID"/>
+	<title>
+		<band height="42" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="4e64f4ad-f884-4668-8bad-823c306df349" x="3" y="15" width="59" height="27" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Log
+No ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fc88533e-4d64-47a6-8295-9a3c80c0236b" x="68" y="15" width="42" height="27" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c0c14c2f-9afa-421d-a8d9-6e9d9a9af5a9" x="115" y="15" width="72" height="27" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9ddf52fe-0caa-44f4-9314-44d20c5c006c" x="196" y="15" width="45" height="27" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c41d7d9d-d39c-41a1-8548-05dd7988ee6b" x="244" y="15" width="81" height="27" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2632033e-8a83-4b5e-9b02-2e6a40531157" x="1" y="4" width="59" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Log Defects: ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c47cf297-cff1-402a-88db-42c5a567f4c9" x="74" y="0" width="28" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEFECT_NUMBER}]]></textFieldExpression>
+				<patternExpression><![CDATA[((DecimalFormat) NumberFormat.getNumberInstance()).toPattern()]]></patternExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="92a7be00-2b0e-4de6-bfba-af5ce34d1be2" x="115" y="0" width="72" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEFECT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="796c5740-5b59-4886-9cd4-a55f2f982c93" x="189" y="0" width="45" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5fd223b1-7c3d-48d3-a7f5-cb5a9a84c129" x="244" y="0" width="363" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTOR}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ed13d8f7-1f2c-479f-8815-97c6734aeefe" x="14" y="0" width="33" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOG_NUMBER}]]></textFieldExpression>
+				<patternExpression><![CDATA[((DecimalFormat) NumberFormat.getNumberInstance()).toPattern()]]></patternExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
