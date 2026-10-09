@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS0001_sub_a" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2a11588d-e565-4f47-b8ee-879cc101ef43">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS00001.USER_TYPE" class="java.lang.String"/>
+	<parameter name="Pm-HBS00001.USER_CLILOC" class="java.lang.String"/>
+	<parameter name="GRPHEAD_GRPTYPE" class="java.lang.String"/>
+	<parameter name="GRPHEAD_GRPLEVEL" class="java.lang.String"/>
+	<parameter name="GRPHEAD_LOOKUPVAL" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS0001_sub_a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS00001_SUB_A(
+GRPHEAD_CURSOR => $P{ORACLE_REF_CURSOR},
+GRPHEAD_GRPTYPE => $P{GRPHEAD_GRPTYPE},
+GRPHEAD_GRPLEVEL => $P{GRPHEAD_GRPLEVEL},
+GRPHEAD_LOOKUPVAL => $P{GRPHEAD_LOOKUPVAL}
+)}]]>
+	</queryString>
+	<field name="LOOKUPVAL" class="java.lang.String"/>
+	<field name="RESULTSTR" class="java.lang.String"/>
+	<variable name="strNotReleasable" class="java.lang.String">
+		<variableExpression><![CDATA[$F{RESULTSTR} != null && !($F{RESULTSTR}.isEmpty())
+? (
+    $F{RESULTSTR}.length()>= 11
+    ?   $F{RESULTSTR}.substring(0,11)
+    :   $F{RESULTSTR}
+    )
+: ""]]></variableExpression>
+	</variable>
+	<variable name="strCliLoc" class="java.lang.String">
+		<variableExpression><![CDATA[//Left ({?GRPHEAD_LOOKUPVAL}, 8) + Mid ({?GRPHEAD_LOOKUPVAL}, 10,2);
+
+($P{GRPHEAD_LOOKUPVAL} != null && !($P{GRPHEAD_LOOKUPVAL}.isEmpty())
+? (
+    $P{GRPHEAD_LOOKUPVAL}.length()>= 8
+    ?   $P{GRPHEAD_LOOKUPVAL}.substring(0,8)
+    :   $P{GRPHEAD_LOOKUPVAL}
+    )
+: "" )
+
++
+
+($P{GRPHEAD_LOOKUPVAL} != null && !($P{GRPHEAD_LOOKUPVAL}.isEmpty())
+? (
+    $P{GRPHEAD_LOOKUPVAL}.length()>= 11
+    ?   $P{GRPHEAD_LOOKUPVAL}.substring(9,11)
+    :   $P{GRPHEAD_LOOKUPVAL}
+    )
+: "" )]]></variableExpression>
+	</variable>
+	<variable name="CCF0_strClientLoc" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//Local stringVar strCliLoc := Left ({?GRPHEAD_LOOKUPVAL}, 8) + Mid ({?GRPHEAD_LOOKUPVAL}, 10,2);
+//Local stringVar strNotSevered := {HBS00001_SUB_A.RESULTSTR};
+//Local stringVar strNotReleasable := Left ({HBS00001_SUB_A.RESULTSTR}, 11) + '  CLIENT NAME NOT RELEASABLE';
+
+//IF right(cstr({HBS00001_SUB_A.LOOKUPVAL}),1) <> 'I'
+//THEN
+//    strNotSevered
+//ELSE
+// (
+//   	select {?Pm-HBS00001.USER_TYPE}
+//   	  case  'MOF' : strNotSevered
+//      case  'CLI' : (
+//                    IF ISNULL ({?Pm-HBS00001.USER_CLILOC}) THEN
+//                	    strNotReleasable
+//                    ELSE IF {?Pm-HBS00001.USER_CLILOC} = strCliLoc THEN
+//                        strNotSevered
+//                    ELSE
+//                	    strNotReleasable
+//                  )
+//      default     : strNotReleasable ;
+//  )
+
+$F{LOOKUPVAL}!=null && !($F{LOOKUPVAL}.substring($F{LOOKUPVAL}.length() -1)).equalsIgnoreCase( "I" )
+? ( $F{RESULTSTR} == null || $F{RESULTSTR}.isEmpty() ? "" : $F{RESULTSTR} )
+:
+	$P{Pm-HBS00001.USER_TYPE}!=null && $P{Pm-HBS00001.USER_TYPE}.equalsIgnoreCase( "MOF" )
+	?	( $F{RESULTSTR} == null || $F{RESULTSTR}.isEmpty() ? "" : $F{RESULTSTR} )
+	:	$P{Pm-HBS00001.USER_TYPE}!=null && $P{Pm-HBS00001.USER_TYPE}.equalsIgnoreCase( "CLI" )
+    		?	$P{Pm-HBS00001.USER_CLILOC} ==null
+			?	( $V{strNotReleasable} == null || $V{strNotReleasable}.isEmpty() ? "" : $V{strNotReleasable} )
+			:	$P{Pm-HBS00001.USER_CLILOC}.equalsIgnoreCase($V{strCliLoc})
+				?	( $F{RESULTSTR} == null || $F{RESULTSTR}.isEmpty() ? "" : $F{RESULTSTR} )
+				:	( $V{strNotReleasable} == null || $V{strNotReleasable}.isEmpty() ? "" : $V{strNotReleasable} )
+		:	( $V{strNotReleasable} == null || $V{strNotReleasable}.isEmpty() ? "" : $V{strNotReleasable} )
+]]></variableExpression>
+	</variable>
+	<variable name="CCF1_strGrpDisplay" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF {?GRPHEAD_GRPTYPE} = '4' and {?GRPHEAD_GRPLEVEL} = '1' THEN
+//  {@strClientLoc}
+//else
+// {HBS00001_SUB_A.RESULTSTR}
+
+
+$P{GRPHEAD_GRPTYPE}!=null && $P{GRPHEAD_GRPTYPE}.equalsIgnoreCase( "4" ) &&
+$P{GRPHEAD_GRPLEVEL}!=null && $P{GRPHEAD_GRPLEVEL}.equalsIgnoreCase( "1" )
+? ( $V{CCF0_strClientLoc} == null || $V{CCF0_strClientLoc}.isEmpty() ? "" : $V{CCF0_strClientLoc} )
+: ( $F{RESULTSTR} == null || $F{RESULTSTR}.isEmpty() ? "" : $F{RESULTSTR} )]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="31da602b-d174-41f6-b2dd-9fd5ea3a7fb9" x="3" y="0" width="369" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_strGrpDisplay}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

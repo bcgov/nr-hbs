@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R152a" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6f3b75a0-4ae8-4b70-9057-32c13d904c13">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R152.DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<parameter name="Pm-HBS2R152.VERSION" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R152a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       SSG.SEGREGATION_ID
+     , SSG.SCALE_SPECIES_CODE
+     , SSG.SCALE_GRADE_CODE
+     , SSG.SCALE_PRODUCT_CODE
+     , SSG.DOCUMENT_CONTROL_NUMBER
+     , SSG.VERSION
+     , SSG.NUMBER_OF_PIECES
+     , SSG.INPUT_SPECIES
+     , SSG.INPUT_PRODUCT
+     , SSG.INPUT_GRADE
+     , SSG.VOLUME
+     , SSG.ENTRY_USERID
+     , SSG.ENTRY_TIMESTAMP
+     , SSG.UPDATE_USERID
+     , SSG.UPDATE_TIMESTAMP
+     , SSC.DESCRIPTION
+     , SSC.EFFECTIVE_DATE
+     , SSC.EXPIRY_DATE
+     , SSC.UPDATE_TIMESTAMP
+FROM      SAMPLE_SEGREGATION SSG
+LEFT JOIN SCALE_SPECIES_CODE SSC ON SSC.SCALE_SPECIES_CODE = SSG.SCALE_SPECIES_CODE
+LEFT JOIN SCALE_PRODUCT_CODE SPC ON SPC.SCALE_PRODUCT_CODE = SSG.SCALE_PRODUCT_CODE
+WHERE  SSG.DOCUMENT_CONTROL_NUMBER = $P{Pm-HBS2R152.DOCUMENT_CONTROL_NUMBER}
+AND    SSG.VERSION                 = $P{Pm-HBS2R152.VERSION}
+]]>
+	</queryString>
+	<field name="SEGREGATION_ID" class="java.math.BigDecimal"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="SCALE_GRADE_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="NUMBER_OF_PIECES" class="java.math.BigDecimal"/>
+	<field name="INPUT_SPECIES" class="java.lang.String"/>
+	<field name="INPUT_PRODUCT" class="java.lang.String"/>
+	<field name="INPUT_GRADE" class="java.lang.String"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<variable name="CCF0_Show_Species" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{SCALE_SPECIES_CODE} == null || $F{SCALE_SPECIES_CODE}.isEmpty()
+? ( $F{INPUT_SPECIES} == null || $F{INPUT_SPECIES}.isEmpty() ? "" : "* " + $F{INPUT_SPECIES} )
+: $F{DESCRIPTION}
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Show_Grade" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{SCALE_GRADE_CODE} == null || $F{SCALE_GRADE_CODE}.isEmpty()
+? ( $F{INPUT_GRADE} == null || $F{INPUT_GRADE}.isEmpty() ? "" : "* " + $F{INPUT_GRADE} )
+: $F{SCALE_GRADE_CODE}
+)]]></variableExpression>
+	</variable>
+	<title>
+		<band height="26" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="bd4b1da3-9aaa-4baf-88b2-23087092932b" x="1" y="3" width="71" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Segregations  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f4652934-e219-4e10-8f6e-c259ac9a9e40" x="1" y="14" width="41" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Species]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb8d8903-b6d9-4b78-905c-af9a4f4c50bb" x="126" y="14" width="31" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Grade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="630891fb-b10a-419c-8710-cb9745985f99" x="236" y="14" width="39" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="79b640ff-362b-4403-ad06-26118f66ed5d" x="176" y="14" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Pieces]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="06fb4882-6c2d-4565-9a64-5a9c9249870d" x="1" y="0" width="121" height="12" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_Species}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c62ec426-dfcd-4a04-8d24-2f091afb91ea" x="126" y="0" width="18" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_Show_Grade}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+				<reportElement uuid="2038095d-c86b-4912-a469-baff8c3eb630" x="168" y="0" width="52" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NUMBER_OF_PIECES}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="1d7e9a72-9406-46e3-8236-9014da31e4ce" x="229" y="0" width="45" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOLUME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

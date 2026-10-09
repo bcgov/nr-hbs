@@ -1,0 +1,34 @@
+.fta-tombstone {
+  position: relative;
+  /* Less at the bottom: the last row's values already carry their 0.75rem
+     margin, so the text sits as far from the bottom edge as from the top. */
+  padding: 1rem 1.25rem 0.25rem;
+  margin-bottom: 1.5rem;
+  background: var(--cds-layer);
+  border-left: 4px solid var(--bc-status-bg, var(--cds-border-interactive));
+}
+
+/* The narrow grid leaves almost no gap between columns, so a long value
+   ("RSK - Skeena Natural Resource Region") would run into the next one; the
+   end padding keeps them apart, and a single long word still wraps. */
+.fta-tombstone__label,
+.fta-tombstone__value {
+  padding-inline-end: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.fta-tombstone__label {
+  font-size: 0.75rem;
+  color: var(--cds-text-secondary);
+}
+
+.fta-tombstone__value {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.fta-tombstone__action {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}

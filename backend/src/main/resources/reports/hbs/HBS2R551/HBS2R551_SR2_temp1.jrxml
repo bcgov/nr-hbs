@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp1.rpt" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="035043a8-0a51-4d53-b5fc-c60e7ba3d951">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R551.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="ORG_NO" class="java.lang.String"/>
+	<parameter name="ORG_NO_as_num" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{ORG_NO} != null && !($P{ORG_NO}.isEmpty()) && $P{ORG_NO}.matches("[0-9]+")
+?
+Integer.parseInt($P{ORG_NO})
+: 0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp1.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ORG_UNIT_NAME
+FROM ORG_UNIT
+
+WHERE ORG_UNIT_NO = $P{ORG_NO_as_num}]]>
+	</queryString>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<detail>
+		<band splitType="Prevent">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+		</band>
+	</detail>
+	<summary>
+		<band height="20" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="699e73a4-64ac-44e3-9ad0-58ef8977b9cd" x="0" y="0" width="282" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["In " +
+($F{ORG_UNIT_NAME}!=null ? $F{ORG_UNIT_NAME} : "" )]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

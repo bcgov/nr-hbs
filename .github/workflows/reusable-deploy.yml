@@ -1,101 +1,283 @@
-# Reusable Deploy - Lite Mode Verification
+# Reusable Deploy
+#
+# Adapted from the BCGov quickstart-openshift template
+# (https://github.com/bcgov/quickstart-openshift) to drop the Postgres
+# database job — we use an external shared Oracle, not a per-PR DB.
+#
+# Each service Template (backend/frontend) is `oc process`-ed with parameters
+# specific to that service. Splitting into named jobs (rather than a matrix
+# with conditional params) keeps the wiring readable.
 name: Reusable Deploy
 
 on:
   workflow_call:
     inputs:
       environment:
-        description: GitHub/OpenShift environment
+        description: GitHub/OpenShift environment (e.g. dev, test, prod)
         default: ""
         type: string
       target:
-        description: Deployment target; usually PR number, test or prod
+        description: Deployment target; usually PR number, 'test' or 'prod'
         default: ${{ github.event.number }}
+        type: string
+      slot:
+        description: |
+          Route hostname slot — PR # mod-50'd into a fixed pool of pre-registered
+          Keycloak (CSS) redirect URIs (see pr-open.yml). Omit for TEST/PROD; defaults to
+          `target` in that case so the host stays `nr-hbs-{test,prod}.apps...`.
+        default: ""
+        type: string
+      backend_replicas:
+        description: |
+          Backend pod count (sets both Deployment.spec.replicas and the
+          backend HPA's min/max). Defaults to "1" so PR previews stay light;
+          merge.yml sets "2" for TEST and "3" for PROD. lite_mode strips the
+          HPA on PR previews regardless.
+        default: "1"
+        type: string
+      frontend_replicas:
+        description: |
+          Frontend pod count. Defaults to "2" (the original hardcoded value
+          before this template was parameterized); merge.yml sets "2" for
+          TEST and "3" for PROD. PR previews get 1 via lite_mode.
+        default: "2"
         type: string
       tag:
         description: Container tag
         default: ${{ github.event.number }}
         type: string
       triggers:
-        description: Triggers for deployment
+        description: Triggers for deployment (paths that must change)
         default: ""
         type: string
 
     secrets:
-      db_password:
-        description: Database password
-        required: true
       oc_namespace:
         description: OpenShift namespace
         required: true
       oc_token:
         description: OpenShift token
         required: true
+      database_user:
+        description: Oracle DATABASE_USER
+        required: true
+      database_password:
+        description: Oracle DATABASE_PASSWORD
+        required: true
+      database_host:
+        description: Oracle host
+        required: true
+      database_service_name:
+        description: Oracle service name
+        required: true
+      keystore_secret:
+        description: Oracle keystore passphrase
+        required: true
+      keycloak_sa_client_id:
+        description: |
+          Keycloak admin service-account client id (needs realm-management
+          'manage-clients'). Used to create/sync the HBS backend's user-lookup
+          service account. Omit to skip that step (e.g. PR previews).
+        required: false
+      keycloak_sa_client_secret:
+        description: Keycloak admin service-account client secret
+        required: false
+      user_lookup_base_url:
+        description: nr-user-lookup-api base URL for this environment.
+        required: false
+      forest_client_api_url:
+        description: nr-forest-client-api base URL (scheme + host) for this environment.
+        required: false
+      forest_client_api_key:
+        description: HBS's nr-forest-client-api key (API Services Portal) for this environment.
+        required: false
+      clamav_host:
+        description: |
+          clamd host for the backend's CLAMAV_HOST (e.g.
+          clamav.<tools-namespace>.svc.cluster.local). Required by the backend
+          template — the deploy fails if it isn't provided.
+        required: false
+
     outputs:
       triggered:
         description: Has deployment been triggered?
-        value: ${{ jobs.init.outputs.triggered }}
+        value: ${{ jobs.frontend.outputs.triggered }}
 
 permissions: {}
 
 jobs:
-  init:
-    name: Deploy (init)
+  backend:
+    name: Deploy (backend)
     environment: ${{ inputs.environment }}
-    outputs:
-      triggered: ${{ steps.deploy.outputs.triggered }}
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
-        id: deploy
-        env:
-          DB_PASSWORD: ${{ secrets.db_password }}
-        with:
-          file: common/openshift.init.yml
-          oc_namespace: ${{ secrets.oc_namespace }}
-          oc_server: ${{ vars.oc_server }}
-          oc_token: ${{ secrets.oc_token }}
-          # Secret + NetworkPolicies: create if missing. Postgres ignores
-          # POSTGRES_PASSWORD after first boot; restamping the Secret desyncs Flyway.
-          # New NetworkPolicy names still apply; existing NP specs do not update.
-          overwrite: false
-          parameters: -p DB_PASSWORD="$DB_PASSWORD"
-            -p ZONE="${{ inputs.target }}"
-            -p NAME="${{ github.event.repository.name }}"
-          triggers: ${{ inputs.triggers }}
-          debug: true
-
-  deploy:
-    name: Deploy (${{ matrix.name }})
-    environment: ${{ inputs.environment }}
-    needs: [init]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    strategy:
-      matrix:
-        name: [database, backend, frontend]
-        include:
-          - name: database
-            file: common/openshift.database.yml
-            parameters: -p DB_PVC_SIZE="256Mi"
-          - name: backend
-            file: backend/openshift.deploy.yml
-            parameters: -p IMAGE_TAG="${{ inputs.tag }}"
-          - name: frontend
-            file: frontend/openshift.deploy.yml
-            parameters: -p IMAGE_TAG="${{ inputs.tag }}"
+    permissions:
+      contents: read
+    outputs:
+      triggered: ${{ steps.deploy.outputs.triggered }}
+    # Plumb sensitive values through job-level env vars rather than expanding
+    # `${{ secrets.* }}` directly inside the `parameters` string. The deployer
+    # action ultimately runs:
+    #   TEMPLATE="$(oc process ... ${{ inputs.parameters }} ...)"
+    # which means GHA substitutes the literal secret into a bash double-quoted
+    # context. Any `$X` inside the value (where X is an unset name) gets
+    # variable-expanded by bash and silently dropped along with its leading
+    # `$`. Going through env + `"$VAR"` means bash performs only a single
+    # expansion to the literal value; characters inside that value are not
+    # re-parsed for `$`/`'`/`"` semantics.
+    env:
+      DATABASE_PASSWORD: ${{ secrets.database_password }}
+      KEYSTORE_SECRET: ${{ secrets.keystore_secret }}
+      # CLAMAV_HOST is a secret; route it through env (not inline in
+      # `parameters`) for a single bash expansion, same reasoning as
+      # DATABASE_PASSWORD above.
+      CLAMAV_HOST: ${{ secrets.clamav_host }}
+      # The Forest Client API URL and key are secrets; same single-expansion reasoning.
+      FOREST_CLIENT_API_URL: ${{ secrets.forest_client_api_url }}
+      FOREST_CLIENT_API_KEY: ${{ secrets.forest_client_api_key }}
+      # Job-level so the step `if:` below can read it (a step's own `env` isn't
+      # available to that step's `if`).
+      KC_SA_CLIENT_ID: ${{ secrets.keycloak_sa_client_id }}
+    steps:
+      # The deployer action checks out internally, but the Keycloak script runs
+      # before it, so check out here to make ./.github/scripts available.
+      - uses: actions/checkout@v7
+
+      # Idempotently create the HBS backend's user-lookup service-account client
+      # in this environment's realm and assign the nr-user-lookup-api scopes.
+      # Skipped when the admin service-account credentials aren't configured
+      # (e.g. PR previews), so those deploys are unaffected. The resulting
+      # client id/secret are exposed as step outputs (masked) for a later step
+      # to feed into the backend once the lookup integration is wired up.
+      #
+      # NOTE THE REALM. This runs against KEYCLOAK_SA_ISSUER_URI (the *forests*
+      # realm, where nr-user-lookup-api's scopes live), NOT KEYCLOAK_ISSUER_URI
+      # (the *standard* realm users log in to and the API validates tokens
+      # against). Same split as nr-fta.
+      - name: Ensure Keycloak service account
+        id: keycloak_sa
+        if: ${{ env.KC_SA_CLIENT_ID != '' && vars.KEYCLOAK_SA_ISSUER_URI != '' }}
+        env:
+          KEYCLOAK_ISSUER_URI: ${{ vars.KEYCLOAK_SA_ISSUER_URI }}
+          KC_SA_CLIENT_SECRET: ${{ secrets.keycloak_sa_client_secret }}
+        run: ./.github/scripts/ensure-keycloak-service-account.sh
+
+      - uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
+        id: deploy
+        # The user-lookup client secret is a step OUTPUT (from keycloak_sa), so
+        # it can't sit in the job-level env; set it here and reference
+        # "$USER_LOOKUP_CLIENT_SECRET" in parameters — single bash expansion,
+        # same reasoning as DATABASE_PASSWORD above. Empty when the keycloak_sa
+        # step is skipped (PR previews); the backend degrades gracefully.
+        env:
+          USER_LOOKUP_CLIENT_SECRET: ${{ steps.keycloak_sa.outputs.client_secret }}
+          # base-url is a secret; route through env (not inline in
+          # `parameters`) so bash does a single expansion. The token URL is
+          # derived from KEYCLOAK_SA_ISSUER_URI (forests realm), not
+          # KEYCLOAK_ISSUER_URI, and is empty whenever the keycloak_sa step
+          # didn't run, so token-url/client-id/secret are all set or all blank
+          # (a partial set fails backend startup).
+          USER_LOOKUP_BASE_URL: ${{ secrets.user_lookup_base_url }}
+          USER_LOOKUP_TOKEN_URL: ${{ steps.keycloak_sa.outputs.client_id != '' && format('{0}/protocol/openid-connect/token', vars.KEYCLOAK_SA_ISSUER_URI) || '' }}
+        with:
+          file: backend/openshift.deploy.yml
+          oc_namespace: ${{ secrets.oc_namespace }}
+          oc_server: ${{ vars.oc_server }}
+          oc_token: ${{ secrets.oc_token }}
+          # debug: true is intentionally OFF. With debug on, the deployer
+          # logs the processed Template (including K8s Secret stringData),
+          # and GitHub's secret-masking misses values that contain JSON-
+          # special characters (<, >, &, etc.) once they get re-encoded.
+          # If you need to debug a deploy, enable this temporarily on a
+          # commit that uses NON-sensitive placeholder values.
+          debug: false
+          overwrite: true
+          parameters:
+            -p ZONE="${{ inputs.target }}"
+            -p NAME="nr-hbs"
+            -p IMAGE_TAG="${{ inputs.tag }}"
+            -p MIN_REPLICAS="${{ inputs.backend_replicas }}"
+            -p MAX_REPLICAS="${{ inputs.backend_replicas }}"
+            -p KEYCLOAK_ISSUER_URI="${{ vars.KEYCLOAK_ISSUER_URI }}"
+            -p KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
+            -p USER_LOOKUP_BASE_URL="$USER_LOOKUP_BASE_URL"
+            -p USER_LOOKUP_TOKEN_URL="$USER_LOOKUP_TOKEN_URL"
+            -p USER_LOOKUP_CLIENT_ID="${{ steps.keycloak_sa.outputs.client_id }}"
+            -p USER_LOOKUP_CLIENT_SECRET="$USER_LOOKUP_CLIENT_SECRET"
+            -p FOREST_CLIENT_API_URL="$FOREST_CLIENT_API_URL"
+            -p FOREST_CLIENT_API_KEY="$FOREST_CLIENT_API_KEY"
+            -p CLAMAV_ENABLED="${{ vars.CLAMAV_ENABLED || 'true' }}"
+            -p CLAMAV_HOST="$CLAMAV_HOST"
+            -p CLAMAV_PORT="${{ vars.CLAMAV_PORT || '3310' }}"
+            -p CLAMAV_FAIL_OPEN="${{ vars.CLAMAV_FAIL_OPEN || 'false' }}"
+            -p EMAIL_SEND_ENABLED="${{ vars.EMAIL_SEND_ENABLED || 'true' }}"
+            -p DATABASE_HOST="${{ secrets.database_host }}"
+            -p DATABASE_SERVICE_NAME="${{ secrets.database_service_name }}"
+            -p DATABASE_USER="${{ secrets.database_user }}"
+            -p DATABASE_PASSWORD="$DATABASE_PASSWORD"
+            -p KEYSTORE_SECRET="$KEYSTORE_SECRET"
+          triggers: ${{ inputs.triggers }}
+
+      # NOTE: the ingress NetworkPolicy in the shared clamav (tools) namespace
+      # that permits this backend → clamd is created MANUALLY, out of band.
+      # The app side of the rule (the backend egress NetworkPolicy) is still
+      # applied automatically by openshift.deploy.yml above.
+
+  frontend:
+    name: Deploy (frontend)
+    environment: ${{ inputs.environment }}
+    needs: [backend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
     outputs:
       triggered: ${{ steps.deploy.outputs.triggered }}
     steps:
       - uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
         id: deploy
         with:
-          file: ${{ matrix.file }}
+          file: frontend/openshift.deploy.yml
           oc_namespace: ${{ secrets.oc_namespace }}
           oc_server: ${{ vars.oc_server }}
           oc_token: ${{ secrets.oc_token }}
-          debug: true
-          parameters: -p ZONE="${{ inputs.target }}"
-            -p NAME="${{ github.event.repository.name }}"
-            ${{ matrix.parameters }}
+          # debug: true is intentionally OFF. With debug on, the deployer
+          # logs the processed Template (including K8s Secret stringData),
+          # and GitHub's secret-masking misses values that contain JSON-
+          # special characters (<, >, &, etc.) once they get re-encoded.
+          # If you need to debug a deploy, enable this temporarily on a
+          # commit that uses NON-sensitive placeholder values.
+          debug: false
+          overwrite: true
+          # The SPA's issuer and client id come from the same variables the
+          # backend validates tokens against (issuer + `azp`), so the two
+          # can't drift apart (nr-fta).
+          parameters:
+            -p ZONE="${{ inputs.target }}"
+            -p NAME="nr-hbs"
+            -p IMAGE_TAG="${{ inputs.tag }}"
+            -p REPLICAS="${{ inputs.frontend_replicas }}"
+            -p VITE_KEYCLOAK_URL="${{ vars.KEYCLOAK_ISSUER_URI }}"
+            -p VITE_KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
+            -p VITE_API_BASE_URL="${{ vars.VITE_API_BASE_URL || '/api' }}"
           triggers: ${{ inputs.triggers }}
+
+      # Default cluster-domain Route (nr-hbs-<slot>.apps.silver...). Applied in
+      # every environment, PROD included. The PROD vanity hostname + TLS is NOT
+      # managed here: per AGENTS.md it is applied on demand by the standalone
+      # .github/workflows/route-tls.yml (workflow_dispatch), never by merge.
+      - name: Default Route
+        uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
+        with:
+          file: frontend/openshift.route.yml
+          oc_namespace: ${{ secrets.oc_namespace }}
+          oc_server: ${{ vars.oc_server }}
+          oc_token: ${{ secrets.oc_token }}
+          debug: false
+          overwrite: true
+          parameters:
+            -p NAME="nr-hbs"
+            -p ZONE="${{ inputs.target }}"
+            -p SLOT="${{ inputs.slot || inputs.target }}"
+          triggers: ${{ inputs.triggers }}
+

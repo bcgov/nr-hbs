@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS3R441_sub_b" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="866e67fc-2039-4dc7-86cc-aefb226d171d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS3R441.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="GRPHEAD_GRPTYPE" class="java.lang.String"/>
+	<parameter name="GRPHEAD_GRPLEVEL" class="java.lang.String"/>
+	<parameter name="GRPHEAD_LOOKUPVAL" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS3R441_sub_b"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS00001_SUB_A(
+GRPHEAD_CURSOR => $P{ORACLE_REF_CURSOR},
+GRPHEAD_GRPTYPE => $P{GRPHEAD_GRPTYPE},
+GRPHEAD_GRPLEVEL => $P{GRPHEAD_GRPLEVEL},
+GRPHEAD_LOOKUPVAL => $P{GRPHEAD_LOOKUPVAL}
+)}]]>
+	</queryString>
+	<field name="LOOKUPVAL" class="java.lang.String"/>
+	<field name="RESULTSTR" class="java.lang.String"/>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4f2638ad-a41e-469d-986b-e0e30398ddc6" x="3" y="0" width="504" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RESULTSTR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

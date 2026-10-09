@@ -20,66 +20,78 @@ jobs:
     name: Backend Tests
     if: (! github.event.pull_request.draft)
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: default
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: bcgov/action-test-and-analyse@8f699e3fd3fadd9a6adf6f4b1f2638ef7ecfefb9 # v2.0.0
-        env:
-          sonar_token: ${{ secrets.sonar_token_backend }}
+      - uses: actions/checkout@v7
         with:
-          commands: |
-            npm ci
-            npm run lint
-            npm run format:check
-            npm run test:cov
-          dir: backend
-          node_version: "24"
-          sonar_args: >
-            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts
-            -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=quickstart-openshift_backend
-            -Dsonar.sources=src
-            -Dsonar.test.inclusions=**/*spec.ts
-            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-          sonar_token: ${{ env.sonar_token }}
-          dep_scan: warn
-          supply_scan: true
-          triggers: ('backend/')
+          # Sonar uses git blame for new-code detection; shallow clones break it.
+          fetch-depth: 0
+
+      - name: Set up Java 21 (Temurin) + Maven cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # `-DskipITs` skips the failsafe-bound integration tests (Oracle/Jasper
+      # end-to-end checks via TestContainers). Surefire still runs all
+      # *Test.java unit tests, and the `coverage` profile (default-on in
+      # pom.xml) wires Jacoco's prepare-agent + report executions, so a
+      # jacoco.xml ends up in target/site/jacoco/ for Sonar to consume.
+      - name: Maven verify (unit tests + jacoco coverage)
+        working-directory: backend
+        run: mvn -B -DskipITs verify
+
+      # Sonar is gated on the token being present so PRs from forks (which
+      # don't get secrets) don't fail. Project key + token both come from repo
+      # secrets (SONAR_PROJECT_KEY / SONAR_TOKEN) so they match the SonarCloud
+      # project the token was issued for; host + org are BC Gov's SonarCloud.
+      # NOTE: the backend (Java) and frontend (JS) scans use the SAME project
+      # key, so each analysis replaces the previous — the project reflects
+      # whichever job finished last. Use two keys if you need both to coexist.
+      - name: SonarCloud scan
+        if: env.SONAR_TOKEN != ''
+        working-directory: backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+        run: |
+          mvn -B sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=bcgov-sonarcloud \
+            -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+            -Dsonar.projectName=nr-hbs \
+            -Dsonar.token="$SONAR_TOKEN"
 
   frontend-tests:
     name: Frontend Tests
     if: (! github.event.pull_request.draft)
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: bcgov/action-test-and-analyse@8f699e3fd3fadd9a6adf6f4b1f2638ef7ecfefb9 # v2.0.0
         env:
-          sonar_token: ${{ secrets.sonar_token_frontend }}
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
         with:
+          # `lint` already runs prettier via eslint-plugin-prettier, so no
+          # separate `format:check` step. `test:coverage` is the real script
+          # name in package.json (Vitest with --coverage; auto-installs
+          # Playwright browsers via the pretest:coverage hook).
           commands: |
             npm ci
             npm run lint
-            npm run format:check
-            npm run test:cov
+            npm run test:coverage
           dir: frontend
-          node_version: "24"
+          node_version: "22"
           sonar_args: >
-            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,**/*test.tsx,**/routeTree.gen.ts
+            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,**/*.test.ts,**/*.test.tsx,**/e2e/**
             -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=quickstart-openshift_frontend
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.sources=src
-            -Dsonar.test.inclusions=**/*spec.ts,**/*test.tsx
+            -Dsonar.test.inclusions=**/*spec.ts,**/*.test.ts,**/*.test.tsx
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
           sonar_token: ${{ env.sonar_token }}
           dep_scan: warn
@@ -90,8 +102,8 @@ jobs:
   trivy:
     name: Trivy Security Scan
     if: (! github.event.pull_request.draft)
+    continue-on-error: true
     permissions:
-      contents: read
       security-events: write
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -102,13 +114,10 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .trivycache
-          # Hashing the workflow file ensures the cache is automatically busted whenever
-          # the aquasecurity/trivy-action version changes, preventing DB schema crashes.
-          key: ${{ runner.os }}-trivy-${{ hashFiles('.github/workflows/analysis.yml') }}
+          key: ${{ runner.os }}-trivy-v0.36.0-cache-v1
+          restore-keys: |
+            ${{ runner.os }}-trivy-
 
-      # Reports every severity to the Security tab for triage.  Findings are not a merge
-      # gate: advisories are published on their own schedule, not the contributor's, and
-      # committed secrets are already blocked at push time by GitHub secret scanning.
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -117,41 +126,22 @@ jobs:
           ignore-unfixed: true
           scan-type: "fs"
           scanners: "vuln,secret,misconfig"
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          severity: "CRITICAL,HIGH"
           trivyignores: ".github/.trivyignore"
           cache-dir: .trivycache
           skip-dirs: "**/node_modules,**/coverage,**/dist,.git"
-          exit-code: "0"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          category: "trivy"
           sarif_file: "trivy-results.sarif"
 
-  # ==========================================================================
-  # WARNING: This job acts as the required merge gate for this workflow.
-  # If you add a new job to this workflow, you MUST add its ID to the 'needs'
-  # array below, otherwise its failure or cancellation will not block the PR!
-  # ==========================================================================
   results:
     name: Analysis Results
-    needs: [backend-tests, frontend-tests, trivy]
+    needs: [backend-tests, frontend-tests]
     if: always() && (! github.event.pull_request.draft)
     runs-on: ubuntu-slim
-    timeout-minutes: 1
     steps:
-      - name: Log Job Results Context
-        run: |
-          echo "=== Upstream Job Statuses ==="
-          echo '${{ toJson(needs) }}'
-
-      - name: Evaluate Overall Status
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: |
-          echo "❌ Critical Check Failure: At least one required job has failed or was cancelled."
-          exit 1
-
-      - name: Success Message
-        run: echo "✅ All critical checks passed or were intentionally skipped!"
+      - if: contains(needs.*.result, 'failure')||contains(needs.*.result, 'canceled')
+        run: echo "At least one job has failed." && exit 1
+      - run: echo "Success!"

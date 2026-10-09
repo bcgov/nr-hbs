@@ -1,0 +1,125 @@
+// Modal contents — match the main SearchPage's tile-style form so the
+// user has a consistent picker experience whether they're on /search
+// or inside this dialog.
+
+.client-search-modal {
+  // Bump field surface to layer-02 (white) so input widgets stand out
+  // inside the modal body — same trick the main search tile uses.
+  --cds-field: var(--cds-field-02);
+  --cds-field-hover: var(--cds-field-hover-02);
+
+  // Pre-search the body is short (intro + combobox), so let the Agreement
+  // Holder combobox's suggestion listbox spill out instead of being clipped
+  // by Carbon's default `overflow-y: auto` on .cds--modal-content. Same fix
+  // as hbs-species-modal--overflow-visible (DistrictPickerModal).
+  .cds--modal-content {
+    overflow: visible;
+  }
+
+  // Once a search has run the results table makes the body tall. `overflow:
+  // visible` then means the body can't scroll: it grows past the modal, the
+  // header scrolls off the top and the bottom rows become unreachable.
+  // Restore Carbon's scrolling body in that state (min-block-size: 0 lets the
+  // flex content shrink so it scrolls within the modal instead of overflowing).
+  &.client-search-modal--scroll .cds--modal-content {
+    overflow-y: auto;
+    min-block-size: 0;
+  }
+
+  // Park the open listbox above the modal chrome so it isn't painted
+  // behind the results table / modal edges.
+  .cds--list-box__menu {
+    z-index: 10000;
+  }
+
+  // When the body scrolls, Carbon adds .cds--modal-scroll-content with a bottom
+  // `mask-image` fade that reads as a hazy cutoff over the results table.
+  .cds--modal-scroll-content {
+    mask-image: none;
+  }
+}
+
+// Sub-heading under the modal title, mirroring the intro line the
+// data-submission dialogs use.
+.client-search__intro {
+  margin: 0 0 1.5rem 0;
+  color: var(--cds-text-primary, #131315);
+}
+
+// Single Agreement Holder combobox — same widget as the main SearchPage
+// filter. Full width inside the modal body.
+.client-search__holder {
+  margin-block-end: 0.5rem;
+
+  .cds--list-box__field,
+  .cds--text-input {
+    max-inline-size: none;
+  }
+}
+
+// Field label + inline "retrieving suggestions" spinner. The label is a
+// flex row so the small spinner sits snugly after the text.
+.client-search__holder-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// Carbon's `small` Loading defaults to a 1rem box; keep it label-sized and
+// aligned to the text baseline row.
+.client-search__holder-spinner {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.client-search__results {
+  margin-block-start: 1.5rem;
+}
+
+// Result count banner + table + pagination sit inside one rounded
+// `.bordered-table` border so they read as a single connected block,
+// matching the main SearchPage results panel.
+.client-search__results-header {
+  background-color: var(--cds-layer-02, #ffffff);
+  padding: 0.75rem 1rem;
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--cds-text-primary, #161616);
+  border-block-end: 1px solid var(--cds-border-subtle-01, #c6c6c6);
+}
+
+// Carbon draws its own top divider above the pagination bar; combined
+// with the wrapper's rounded corners + overflow:hidden this reads as a
+// footer attached to the bottom of the table.
+.client-search__results-panel .cds--pagination {
+  border-block-end: 0;
+}
+
+// Same in-flight overlay pattern as SearchPage: dim the table, park a
+// spinner in the middle. Keeps the rows visible (so the user has
+// context while paging) without letting them click anything stale.
+.client-search__table-container {
+  position: relative;
+}
+
+.client-search__table--loading {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
+.client-search__table-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.35);
+  z-index: 1;
+}
+
+.client-search__summary {
+  margin: 0;
+  font-weight: 600;
+  padding: 1rem 0;
+}

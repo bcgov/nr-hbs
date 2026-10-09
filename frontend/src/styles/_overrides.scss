@@ -1,0 +1,818 @@
+@use 'sass:map';
+
+// Local BCGov bits (inlined from @bcgov-nr/nr-theme 1.8.9; the package was
+// dropped — see src/styles/bcgov/_fonts.scss for why 'light' is aliased to
+// 400, and src/styles/bcgov/_colors.scss for the palette).
+@use './bcgov/fonts' as types;
+@use '@carbon/type/scss/font-family.scss' with (
+  $font-families: types.$type-family,
+  $font-weights: types.$font-weights
+);
+
+@use '@carbon/themes/scss/utilities';
+@use './variables' as variables;
+
+@use '@carbon/react/scss/themes';
+@use '@carbon/react/scss/theme' with (
+  $fallback: themes.$white,
+  $theme: themes.$white
+);
+
+@use '@carbon/react/scss/components/button/tokens' as button-tokens;
+@use './bcgov/light-buttons' as light-button-overrides;
+@use './bcgov/dark-buttons' as dark-button-overrides;
+
+@use '@carbon/react/scss/components/tag/tokens' as tag-tokens;
+@use './bcgov/light-tags' as light-tag-overrides;
+@use './bcgov/dark-tags' as dark-tag-overrides;
+
+@use '@carbon/react/scss/components/notification/tokens' as notification-tokens;
+@use './bcgov/light-notifications' as light-notification-overrides;
+@use './bcgov/dark-notifications' as dark-notification-overrides;
+
+@use '@carbon/react';
+@use '@carbon/styles/scss/grid';
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/breakpoint' as *;
+
+@include grid.flex-grid();
+
+:root[data-carbon-theme='white'] {
+  --cds-grid-gutter: 0;
+  $button-tokens: utilities.merge(
+    button-tokens.$button-tokens,
+    light-button-overrides.$light-button-token-overrides
+  );
+  $tag-tokens: utilities.merge(
+    tag-tokens.$tag-tokens,
+    light-tag-overrides.$light-tag-token-overrides
+  );
+
+  $notification-tokens: utilities.merge(
+    notification-tokens.$notification-tokens,
+    light-notification-overrides.$light-notification-token-overrides
+  );
+
+  @include theme.add-component-tokens($button-tokens);
+  @include theme.add-component-tokens($tag-tokens);
+  @include theme.add-component-tokens($notification-tokens);
+  @include theme.theme(themes.$white);
+}
+
+:root[data-carbon-theme='g100'] {
+  --cds-grid-gutter: 0;
+  $button-tokens: utilities.merge(
+    button-tokens.$button-tokens,
+    dark-button-overrides.$dark-button-token-overrides
+  );
+  $tag-tokens: utilities.merge(
+    tag-tokens.$tag-tokens,
+    dark-tag-overrides.$dark-tag-token-overrides
+  );
+  $notification-tokens: utilities.merge(
+    notification-tokens.$notification-tokens,
+    light-notification-overrides.$light-notification-token-overrides
+  );
+
+  @include theme.add-component-tokens($button-tokens);
+  @include theme.add-component-tokens($tag-tokens);
+  @include theme.add-component-tokens($notification-tokens);
+  @include theme.theme(themes.$g100);
+}
+
+/* --------------------- Buttons ---------------------
+- Border-radius: 4px all corners
+---------------------------------------------------- */
+.#{variables.$bcgov-prefix}--btn {
+  border-radius: 0.25rem;
+}
+
+/* Carbon's default pins the icon absolutely to the right edge and reserves
+   extra right padding for it, which makes both text-only and text+icon
+   buttons look lopsided. Center the contents, take the icon out of absolute
+   positioning so it flows next to the text, and equalize padding. */
+.#{variables.$bcgov-prefix}--btn:not(.#{variables.$bcgov-prefix}--btn--icon-only) {
+  justify-content: center;
+  gap: 0.5rem;
+  padding-inline-end: 1rem;
+
+  .#{variables.$bcgov-prefix}--btn__icon {
+    position: static;
+    inset-inline-end: auto;
+    transform: translateY(1px);
+  }
+}
+
+/* ------- Text Input / Text Area / Password Input -------
+- Border-radius: 4px top corners
+-------------------------------------------------------- */
+.#{variables.$bcgov-prefix}--text-input,
+.#{variables.$bcgov-prefix}--text-area {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+/* ------------------ Number Input ----------------------
+- Border-radius: 4px top corners
+- Control Button: border-radius 4px all corners (this is mistach with Figma, but is documented)
+------------------------------------------------------- */
+.#{variables.$bcgov-prefix}--number,
+.#{variables.$bcgov-prefix}--number__input-wrapper,
+input[type='number'] {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.#{variables.$bcgov-prefix}--number__control-btn {
+  border-radius: 0.25rem;
+}
+
+/* ------------------ Select ---------------------------
+- Input field: border-radius 4px top corners
+------------------------------------------------------ */
+.#{variables.$bcgov-prefix}--select-input {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+/* ------------------ Dropdown ---------------------------
+- Input field (list-box): border-radius 4px top corners
+- Dropdown menu: border-radius 4px all corners (this is mistach with Figma, but is documented)
+--------------------------------------------- */
+.#{variables.$bcgov-prefix}--list-box__field,
+.#{variables.$bcgov-prefix}--list-box {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+.#{variables.$bcgov-prefix}--list-box__menu {
+  border-radius: 0.25rem;
+}
+
+/* ------------------ Date Picker ---------------------------
+- Input field: border-radius 4px top corners
+- Calender picker and control buttons: border-radius 4px all corners
+--------------------------------------------- */
+.#{variables.$bcgov-prefix}--date-picker__input {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.flatpickr-calendar,
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  border-radius: 0.25rem;
+}
+
+/* ------------------ Time Picker ---------------------------
+- Border-radius: 4px on left top corner and right top corners, no border-radius in the middle
+----------------------------------------------------------------- */
+.#{variables.$bcgov-prefix}--time-picker__input,
+> .#{variables.$bcgov-prefix}--text-input {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0;
+}
+
+.#{variables.$bcgov-prefix}--time-picker__select,
+> .#{variables.$bcgov-prefix}--select-input {
+  border-radius: 0;
+}
+
+.#{variables.$bcgov-prefix}--time-picker,
+:last-child,
+> .#{variables.$bcgov-prefix}--select-input {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0.25rem;
+}
+
+/* --------------- Search ------------------------------
+- Border-radius: 4px top corners
+--------------------------------------------- */
+.#{variables.$bcgov-prefix}--search-input {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+/* --------------- Notification ------------------------------
+- Border-radius: 4px all corners
+- Update border color for inline notification
+- Add border for toast notification
+- Inline notifications span their full container (override Carbon's 18rem cap)
+--------------------------------------------- */
+// Dark mode
+.#{variables.$bcgov-prefix}--inline-notification,
+.#{variables.$bcgov-prefix}--toast-notification {
+  border-radius: 0.25rem;
+}
+
+.#{variables.$bcgov-prefix}--inline-notification {
+  max-inline-size: 100%;
+  inline-size: 100%;
+}
+
+// Light mode
+div.#{variables.$bcgov-prefix}--inline-notification--low-contrast::before {
+  border-radius: 0 0.25rem 0.25rem 0;
+  filter: none;
+}
+
+$types: 'error', 'info', 'success', 'warning';
+@each $notificationType in $types {
+  div.#{variables.$bcgov-prefix}--inline-notification--#{$notificationType} {
+    border-left: 0.25rem
+      solid
+      var(--#{variables.$bcgov-prefix}-support-#{$notificationType}-inverse);
+  }
+  div.#{variables.$bcgov-prefix}--inline-notification--low-contrast.#{variables.$bcgov-prefix}--inline-notification--#{$notificationType} {
+    border-left: 0.25rem solid var(--#{variables.$bcgov-prefix}-support-#{$notificationType});
+  }
+  div.#{variables.$bcgov-prefix}--inline-notification--low-contrast.#{variables.$bcgov-prefix}--inline-notification--#{$notificationType}::before {
+    border-color: var(--#{variables.$bcgov-prefix}-notification-border-#{$notificationType});
+  }
+}
+
+.#{variables.$bcgov-prefix}--toast-notification--low-contrast {
+  border-width: 0.063rem 0.063rem 0.063rem 0;
+  border-style: solid;
+}
+@each $notificationType in $types {
+  div.#{variables.$bcgov-prefix}--toast-notification--#{$notificationType} {
+    border-left: 0.25rem
+      solid
+      var(--#{variables.$bcgov-prefix}-support-#{$notificationType}-inverse);
+  }
+  div.#{variables.$bcgov-prefix}--toast-notification--low-contrast.#{variables.$bcgov-prefix}--toast-notification--#{$notificationType} {
+    border-left: 0.25rem solid var(--#{variables.$bcgov-prefix}-support-#{$notificationType});
+    border-top-color: var(--#{variables.$bcgov-prefix}-notification-border-#{$notificationType});
+    border-bottom-color: var(--#{variables.$bcgov-prefix}-notification-border-#{$notificationType});
+    border-right-color: var(--#{variables.$bcgov-prefix}-notification-border-#{$notificationType});
+  }
+}
+
+/* ----------------- Tile ----------------------------
+- Border-radius: 4px all corners
+----------------------------------------------------- */
+.#{variables.$bcgov-prefix}--tile {
+  border-radius: 0.25rem;
+}
+
+/* ------------------ Data Table ---------------------------
+- Header: border-radius 4px top corners
+- Table column header: font-weight bold
+- Table row expand button: border-radius 4px all corners
+------------------------------------------------------ */
+.#{variables.$bcgov-prefix}--data-table-header {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.#{variables.$bcgov-prefix}--table-header-label,
+.#{variables.$bcgov-prefix}--data-table thead th,
+.#{variables.$bcgov-prefix}--data-table thead .#{variables.$bcgov-prefix}--table-header {
+  @include font-family.font-weight(bold);
+}
+
+/* ----------------- Tabs (contained) -------------------
+   Bump form widgets inside the tab panel to white (--cds-field-02), so they
+   stand out against the panel's gray surface. The panel itself keeps using
+   --cds-layer-01 (gray); we deliberately do NOT override --cds-layer here.
+------------------------------------------------------- */
+.#{variables.$bcgov-prefix}--tab-content {
+  --cds-field: var(--cds-field-02);
+  --cds-field-hover: var(--cds-field-hover-02);
+  --cds-border-subtle: var(--cds-border-subtle-02);
+  --cds-border-subtle-selected: var(--cds-border-subtle-selected-02);
+}
+
+/* ── Inverted nested tabs (Agreement Workspace) ────────
+   The inner sub-tabs sit on top of a gray panel and we want the inverse
+   contrast: white tab pills + white panel, gray widgets inside.
+------------------------------------------------------- */
+.agreement-workspace-tabs,
+.property-tabs {
+  // White tab pill (selected) + white panel surface
+  --cds-layer: var(--cds-layer-02);
+
+  .#{variables.$bcgov-prefix}--tab-content {
+    // Widgets inside the inner panel revert to layer-01 (gray)
+    --cds-field: var(--cds-field-01);
+    --cds-field-hover: var(--cds-field-hover-01);
+    --cds-border-subtle: var(--cds-border-subtle-01);
+    --cds-border-subtle-selected: var(--cds-border-subtle-selected-01);
+  }
+}
+
+.#{variables.$bcgov-prefix}--table-expand__button {
+  border-radius: 0.25rem;
+}
+
+/* -------------------- Pagination -------------------------
+- Border-radius: 4px bottom corners
+- Set height of small (2.5rem), medium (3rem) and large (3.5rem) size
+- Set border-radius of the previous and next button, item per page and page select to 4px all corners
+--------------------------------------------- */
+.#{variables.$bcgov-prefix}--pagination {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+// Pagination size variants. Each rule scopes its inner selectors under the size
+// variant so heights only apply to pagination internals, not every
+// `.cds--popover-container` in the app (which Carbon uses as a tooltip wrapper
+// for icon buttons everywhere).
+.#{variables.$bcgov-prefix}--pagination--sm {
+  .#{variables.$bcgov-prefix}--pagination__control-buttons,
+  .#{variables.$bcgov-prefix}--popover-container {
+    height: 2.5rem;
+  }
+}
+
+.#{variables.$bcgov-prefix}--pagination--md {
+  .#{variables.$bcgov-prefix}--pagination__control-buttons,
+  .#{variables.$bcgov-prefix}--popover-container {
+    height: 3rem;
+  }
+}
+
+.#{variables.$bcgov-prefix}--pagination--lg {
+  .#{variables.$bcgov-prefix}--pagination__control-buttons,
+  .#{variables.$bcgov-prefix}--popover-container {
+    height: 3.5rem;
+  }
+}
+
+// Inline selects inside pagination (items-per-page and page-number) — drop the
+// 1px border and round the corners so they match the rest of the toolbar.
+// Scoped under `.cds--pagination` so we don't strip borders off every other
+// Select in the app.
+.#{variables.$bcgov-prefix}--pagination {
+  .#{variables.$bcgov-prefix}--select__item-count,
+  .#{variables.$bcgov-prefix}--select__page-number,
+  .#{variables.$bcgov-prefix}--select-input__wrapper,
+  select.#{variables.$bcgov-prefix}--select-input {
+    border-radius: 0.25rem;
+    border: 0;
+  }
+
+  .#{variables.$bcgov-prefix}--select__item-count,
+  .#{variables.$bcgov-prefix}--select__page-number,
+  .#{variables.$bcgov-prefix}--select-input__wrapper {
+    margin: 0.25rem;
+  }
+
+  .#{variables.$bcgov-prefix}--pagination__button {
+    margin: 0.25rem;
+    border: 0;
+  }
+}
+
+/* ------------------ Overflow Menu ---------------------------
+- Closed trigger button: border-radius 4px on all corners
+- Opened trigger button: border-radius 4px top corners
+- First menu item: border-radius 4px top corners
+- Last menu item: border-radius 4px bottom corners
+------------------------------------------------------------- */
+.#{variables.$bcgov-prefix}--overflow-menu.bcgov--overflow-menu--open {
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.#{variables.$bcgov-prefix}--overflow-menu-options {
+  border-radius: 0 0.25rem 0.25rem 0.25rem;
+}
+
+li.#{variables.$bcgov-prefix}--overflow-menu-options__option:first-child {
+  border-radius: 0 0.25rem 0 0;
+}
+
+li.#{variables.$bcgov-prefix}--overflow-menu-options__option:last-child {
+  border-radius: 0 0 0.25rem 0.25rem;
+}
+
+/* ------------------  Modal ---------------------------
+- Border-radius: 8px on all corners
+------------------------------------------------------ */
+.#{variables.$bcgov-prefix}--modal-container {
+  border-radius: 0.5rem;
+}
+
+/* ------------ Label ---------------
+- Update text color from text-secondary to text-primary
+This will apply to Checkbox, Data Picker, Dropdown, RadioButton, Select, Slider, Text Input, Password Input, Text Area label
+------------------------------- */
+label.#{variables.$bcgov-prefix}--label,
+legend.#{variables.$bcgov-prefix}--label {
+  color: var(--#{variables.$bcgov-prefix}-text-primary);
+}
+
+/* ------------------  Left Panel ---------------------------
+- List item height: 48px
+- Left icons use "link-primary" color
+- Add a right border for the panel
+------------------------------------------------------ */
+/* Rows only — the clickable elements. `--side-nav__menu` (the submenu <ul>)
+   and `--side-nav__menu-item` (its <li>) were in this list too, and a fixed
+   height on a container caps it at one row: a section holding ten 48px entries
+   still measured 48px, so nine of them overflowed and the next heading painted
+   straight over the top. Every section appeared to have exactly one item.
+   Containers size to their contents; only the rows get a height. */
+a.#{variables.$bcgov-prefix}--side-nav__link,
+button.#{variables.$bcgov-prefix}--side-nav__submenu,
+.#{variables.$bcgov-prefix}--side-nav__link {
+  height: 3rem;
+}
+
+// Note: this changed to link-primary, previous code is secondary
+.#{variables.$bcgov-prefix}--side-nav__icon {
+  svg {
+    fill: var(--#{variables.$bcgov-prefix}-link-primary) !important;
+  }
+}
+
+nav.#{variables.$bcgov-prefix}--side-nav--expanded {
+  border-right: 0.063rem solid var(--#{variables.$bcgov-prefix}-border-subtle-01);
+}
+
+/* ------------------ Header ---------------------------
+- Update the background color
+- Set the height
+- Adjust the side nav position for the new header height
+------------------------------------------------------ */
+.#{variables.$bcgov-prefix}--header {
+  background-color: var(--#{variables.$bcgov-prefix}-background-brand);
+  //height: 3.5rem; //TODO: height seems kinda arbitrary and doesn't reflect the rest of the menus
+}
+
+// this is new added for the side nav layout
+.#{variables.$bcgov-prefix}--header ~ .#{variables.$bcgov-prefix}--side-nav {
+  inset-block-start: 3.5rem;
+}
+
+a.#{variables.$bcgov-prefix}--header__name {
+  // previously was .#{variables.$bcgov-prefix}--header-site-name
+  // NOTE: family is "BC Sans" (with the space) — that's how
+  // @bcgov-nr/nr-theme/design-tokens/type-family.scss registers the @font-face.
+  // "BCSans" (no space) silently falls through to Noto Sans / Verdana.
+  font-family: 'BC Sans', 'Noto Sans', Verdana, Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #f3f3f5;
+  padding-left: 2rem;
+}
+
+/* ------------------ Other Overrides-------------------
+- Sets the grid gutter
+- Sets the content spacing
+------------------------------------------------------ */
+
+/// Remove overrides once Carbon bugs are fixed upstream.
+/// Need grid option to not add page gutters at large viewports, to also use when nesting grids
+/// @link https://github.com/carbon-design-system/carbon/issues/2792
+@media (min-width: 42rem) {
+  .#{variables.$bcgov-prefix}--grid--no-gutter {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/// Padding was introduced in 10.3.0, needs an option to let grid set the viewport gutter
+/// @link https://github.com/carbon-design-system/carbon/issues/3010
+html,
+body,
+.#{variables.$bcgov-prefix}--content,
+nav.#{variables.$bcgov-prefix}--side-nav,
+.#{variables.$bcgov-prefix}--side-nav__items {
+  background: var(--cds-background);
+}
+
+.#{variables.$bcgov-prefix}--content {
+  padding: 0 1.5rem;
+}
+
+.#{variables.$bcgov-prefix}--header ~ .#{variables.$bcgov-prefix}--content,
+div:has(.#{variables.$bcgov-prefix}--header) ~ .#{variables.$bcgov-prefix}--content {
+  margin-block-start: $layout-05;
+}
+
+.#{variables.$bcgov-prefix}--content .#{variables.$bcgov-prefix}--css-grid {
+  max-width: 100%;
+  @include breakpoint(md) {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+// If you don't have the Carbon mixin available:
+// Hide the "Close" tooltip label on modal close buttons
+// Hide the "Close" tooltip on modal close buttons
+.cds--modal-close-button .cds--popover {
+  display: none;
+}
+
+// Soften the focus ring on the modal close button
+.cds--modal-close:focus {
+  outline: 2px solid var(--cds-focus, #0f62fe);
+  outline-offset: -2px;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+// Suppress every IconButton's hover tooltip popover. The `label` prop is still
+// passed through (it stays as aria-labelledby content for assistive tech), but
+// the visible bubble is hidden. .cds--icon-tooltip is the wrapper class Carbon
+// applies to the Tooltip rendered around any IconButton; the popover popup
+// underneath it is what we hide.
+.cds--icon-tooltip > .cds--popover {
+  display: none;
+}
+
+/* ------------------ Dark-mode zebra striping ------------------
+Two zebra problems show up only under the g100 dark theme:
+
+1. Carbon's own `useZebraStyles` paints even rows with `$layer-accent`
+   (#393939), which sits a long way above the table base `$layer`
+   (#262626) — in dark mode that gap reads as a harsh, banded stripe
+   rather than the subtle alternation it is in light mode.
+2. A few pages (Search / Inbox / District Notification) roll their own
+   zebra with a hard-coded `#ffffff` on odd rows because Carbon's tint
+   wasn't strong enough on a white tile. In dark mode those rows glare
+   pure white.
+
+Fix both by retinting the stripe to a single subtle value that sits
+just above the dark table base. Scoping every rule under
+`:root[data-carbon-theme='g100']` keeps light mode untouched and adds
+the extra attribute-selector specificity needed to win over the
+page-level hand-rolled rules.
+--------------------------------------------------------------- */
+:root[data-carbon-theme='g100'] {
+  // Subtle lift over --cds-layer-01 (#262626); gentle enough to read as
+  // an alternation, not a band.
+  --fsp-zebra-stripe: #2c2c2c;
+
+  // 1 — Carbon's built-in zebra: soften the even-row fill and the
+  // borders Carbon also paints with $layer-accent (otherwise the
+  // horizontal divider lines stay bright even after the fill calms).
+  .cds--data-table--zebra
+    tbody
+    tr:not(.cds--parent-row):not(.cds--data-table--selected):nth-child(even) {
+    background-color: var(--fsp-zebra-stripe);
+  }
+  .cds--data-table--zebra tbody tr:not(.cds--parent-row):nth-child(even) td {
+    border-block-start-color: var(--fsp-zebra-stripe);
+    border-block-end-color: var(--fsp-zebra-stripe);
+  }
+
+  // 2 — Hand-rolled page zebra: replace the pure-white odd rows with the
+  // dark table base, and align even rows to the shared subtle stripe.
+  .fsp-search__table,
+  .fsp-inbox__table,
+  .fsp-district__table {
+    .cds--data-table tbody tr:nth-child(odd),
+    .cds--data-table tbody tr:nth-child(odd) td {
+      background-color: var(--cds-layer-01);
+    }
+    .cds--data-table tbody tr:nth-child(even),
+    .cds--data-table tbody tr:nth-child(even) td {
+      background-color: var(--fsp-zebra-stripe);
+    }
+  }
+
+  // Row hover / focus: the light-blue wash (#dfeaf8) the pages use glares in
+  // dark mode. Replace it with a subtle dark hover shade that lifts above the
+  // zebra stripe so hovered rows read clearly. The g100 prefix gives the
+  // specificity to beat the page-level :hover rules.
+  .fsp-search__table .cds--data-table tbody tr.fsp-search__row--selectable:hover td,
+  .fsp-search__table .cds--data-table tbody tr.fsp-search__row--selectable:focus-visible td,
+  .fsp-inbox__table .cds--data-table tbody tr.fsp-search__row--selectable:hover td,
+  .fsp-inbox__table .cds--data-table tbody tr.fsp-search__row--selectable:focus-visible td {
+    background-color: var(--cds-layer-hover-01);
+  }
+}
+
+/* ------------------ Dark-mode table chrome ------------------
+The list pages (Search / Submission History / Standards Search via
+SearchPage.scss, Inbox, District Notification) hard-code LIGHT hex onto
+header bands, body-cell text, footer/pagination bars and divider lines.
+Those values don't flip with the theme, so under g100 they render as a
+light header band, near-black text on a dark cell, a glaring light
+footer, etc.
+
+The zebra block above already re-tints the row backgrounds; here we
+re-point the remaining chrome (header, text, footer, borders) at the
+matching Carbon dark tokens. Everything is scoped under
+`:root[data-carbon-theme='g100']`, which both keeps light mode untouched
+AND adds the attribute-selector specificity needed to win over the
+page-level rules (which hard-code the same selectors).
+
+Light → dark token map (light values intentionally left in the page SCSS):
+  header band  #dfdfe1            → var(--cds-layer-accent-01)
+  header text  #131315            → var(--cds-text-primary)
+  body text    #131315            → var(--cds-text-primary)
+  footer bg    #dfdfe1            → var(--cds-layer-01)
+  footer text  #606062            → var(--cds-text-secondary)
+  divider/top  #dfdfe1 / #c6c6c8  → var(--cds-border-subtle-01) /
+                                    var(--cds-border-strong-01)
+--------------------------------------------------------------- */
+:root[data-carbon-theme='g100'] {
+  // ── Header band + label ──
+  .fsp-search__table .cds--data-table thead th,
+  .fsp-search__table .cds--data-table thead th .cds--table-header-label,
+  .fsp-inbox__table .cds--data-table thead th,
+  .fsp-inbox__table .cds--data-table thead th .cds--table-header-label {
+    background-color: var(--cds-layer-accent-01);
+    color: var(--cds-text-primary);
+  }
+
+  // ── Body cells ──
+  // Page SCSS repoints --cds-text-secondary to a near-black so Carbon's
+  // own cell colour resolves dark; in g100 we want it light again.
+  .fsp-search__table .cds--data-table,
+  .fsp-inbox__table .cds--data-table {
+    --cds-text-secondary: var(--cds-text-primary);
+  }
+  .fsp-search__table .cds--data-table tbody td,
+  .fsp-search__table .cds--data-table tbody td .cds--table-cell,
+  .fsp-inbox__table .cds--data-table tbody td,
+  .fsp-inbox__table .cds--data-table tbody td .cds--table-cell {
+    color: var(--cds-text-primary);
+  }
+
+  // ── Footer / pagination bar ──
+  .fsp-search__results .cds--pagination,
+  .fsp-inbox__results .cds--pagination {
+    background-color: var(--cds-layer-01);
+    border-block-start-color: var(--cds-border-strong-01);
+    color: var(--cds-text-secondary);
+  }
+  .fsp-search__results .cds--pagination .cds--select-input,
+  .fsp-search__results .cds--pagination .cds--pagination__button,
+  .fsp-search__results .cds--pagination .cds--pagination__text,
+  .fsp-search__results .cds--pagination .cds--pagination__pages-text,
+  .fsp-inbox__results .cds--pagination .cds--select-input,
+  .fsp-inbox__results .cds--pagination .cds--pagination__button,
+  .fsp-inbox__results .cds--pagination .cds--pagination__text,
+  .fsp-inbox__results .cds--pagination .cds--pagination__pages-text {
+    color: var(--cds-text-secondary);
+  }
+
+  // ── Full-bleed results dividers (Search / Submission History / Standards
+  // Search / Inbox / District) ── the hard-coded #dfdfe1 top border reads as
+  // a bright near-white line on the dark pane; retint to the dark border.
+  .fsp-search__results-fullbleed,
+  .fsp-inbox__results-fullbleed,
+  .fsp-district__results-fullbleed {
+    border-block-start-color: var(--cds-border-subtle-01);
+  }
+}
+
+/* ------------------ Dark-mode XML submission page -------------------
+The whole Data Submission screen (XmlSubmissionPage.scss) is built on its
+own fixed-LIGHT `--fds-*` tokens defined on the `.fsp-submit` root, so in
+dark mode it stayed a light page in a dark app. Re-point the ENTIRE token
+set at Carbon dark equivalents under g100 so every surface — gray backdrop,
+white header band, cards, dropzone, notifications, stepper, buttons,
+tables, confirmation — flips and stays consistent with the rest of the app.
+Light mode is untouched (this whole block is g100-scoped). A handful of
+surfaces hard-code a light value instead of reading a token; override those
+explicitly at the end.
+--------------------------------------------------------------------- */
+:root[data-carbon-theme='g100'] .fsp-submit {
+  // Neutrals / layers
+  --fds-background: var(--cds-background);
+  --fds-layer-01: var(--cds-layer-01);
+  --fds-text-primary: var(--cds-text-primary);
+  --fds-text-secondary: var(--cds-text-secondary);
+  --fds-border-subtle: var(--cds-border-subtle-01);
+  --fds-border-strong: var(--cds-border-strong-01);
+
+  // Interactive blue (primary/ghost buttons, links, stepper dots, dnd label)
+  --fds-interactive: var(--cds-interactive);
+  --fds-interactive-hover: var(--cds-link-primary);
+  --fds-interactive-light: var(--cds-layer-hover-01);
+
+  // Status colours + notification tints (Carbon notification component
+  // tokens flip per-theme; dark fallbacks in case they're unset)
+  --fds-support-error: var(--cds-support-error);
+  --fds-support-success: var(--cds-support-success);
+  --fds-support-error-bg: var(--cds-notification-background-error, #2c1a1c);
+  --fds-support-success-bg: var(--cds-notification-background-success, #1a2a1c);
+  --fds-support-info-bg: var(--cds-notification-background-info, #1a2230);
+  --fds-notif-info-border: var(--cds-support-info);
+  --fds-notif-error-border: var(--cds-support-error);
+  --fds-notif-success-border: var(--cds-support-success);
+
+  // Tables
+  --fds-table-header: var(--cds-layer-accent-01);
+  --fds-table-zebra: var(--fsp-zebra-stripe);
+
+  // Surfaces that hard-code a light value instead of reading a token:
+  .vtable tbody tr:nth-child(odd) td {
+    background: var(--cds-layer-01);
+  }
+  .file-chip--error {
+    background: var(--cds-layer-01);
+  }
+  .submit-overlay {
+    background: rgba(22, 22, 22, 0.72);
+  }
+}
+
+/* ---------------------------------------------------------------
+Tertiary (outline) buttons — hover wash.
+
+Carbon floods tertiary buttons with a dark-blue background + white text
+on hover. The FSP design instead uses a light-blue wash that keeps the
+blue text/border (the mock-up's `.btn--ghost-neutral:hover`, #ebf2fc).
+Carbon ships two hover rules (background AND colour), so both are
+overridden here. Applies app-wide to every `kind="tertiary"` button.
+--------------------------------------------------------------- */
+.cds--btn--tertiary:hover {
+  background-color: #ebf2fc;
+  border-color: var(--cds-button-tertiary);
+  color: var(--cds-button-tertiary);
+}
+
+/* ---------------------------------------------------------------
+Text rendering — crispness.
+
+Carbon's reset sets `text-rendering: optimizeLegibility` on <body>, which
+forces a heavier kerning/ligature rasterization path that reads slightly
+fuzzier than the design (the mock-up uses the browser default). Reverting
+to `optimizeSpeed` restores the crisper default. text-rendering is
+inherited, so setting it on <body> covers every descendant.
+--------------------------------------------------------------- */
+body {
+  text-rendering: optimizeSpeed;
+  // Match the design: drop Carbon's reset `font-feature-settings: 'liga' 1`.
+  font-feature-settings: normal;
+  // Carbon's reset forces `-webkit-font-smoothing: antialiased` (and
+  // `-moz-osx-font-smoothing: grayscale`), which renders text noticeably
+  // THINNER / lighter than the OS default — the real reason our text looked
+  // less crisp/dark than the mock-up (color was a red herring; #161616 vs
+  // #131315 is imperceptible). Revert to the browser default so strokes
+  // render at full weight. Inherited, so it applies to all text.
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* ---------------------------------------------------------------
+Date-picker input font — realign to the sans stack.
+
+Carbon styles the date-picker value with `type-style('code-02')`, an IBM
+Plex Mono (MONOSPACE) face, so a date field renders in a different,
+heavier-looking font than the text / number inputs beside it (which use
+`body-compact-01` / BC Sans). Override just the font-family + letter-
+spacing so a date field matches its neighbours; loaded after Carbon at
+equal specificity (0,1,0) so it wins.
+--------------------------------------------------------------- */
+.cds--date-picker__input {
+  font-family: 'BC Sans', 'Noto Sans', Verdana, Arial, sans-serif;
+  letter-spacing: 0.16px;
+}
+
+/* ---------------------------------------------------------------
+Editable form fields — bump the label and the value/input text for
+readability during data entry:
+
+  - Field labels (.cds--label): 14px (Carbon default label-01 = 12px).
+  - Value / input text: 16px (Carbon default body-compact-01 = 14px).
+
+Applies ONLY to Carbon input widgets. Read-only display uses custom
+field-list markup (.fsp-info__field dt/dd, etc.), not these classes, so
+static "editable-off" text is untouched. Loaded after Carbon at equal
+specificity so it wins.
+--------------------------------------------------------------- */
+.cds--label {
+  font-size: 0.875rem;
+}
+
+.cds--text-input,
+.cds--text-area,
+.cds--select-input,
+.cds--date-picker__input,
+.cds--number__input,
+.cds--number input[type='number'],
+.cds--list-box__label,
+.cds--list-box__menu-item__option {
+  font-size: 1rem;
+}
+
+/* ---------------------------------------------------------------
+Text colours — align Carbon's neutral greys to the BC Gov FDS palette the
+design (and the HTML mock-ups) use, so text renders the exact same shade.
+
+Carbon sets these tokens on the light THEME selectors (not bare :root) —
+`:root[data-carbon-theme=white]` (0,1,1), `.cds--white`, `.cds--g10` — so
+a plain `:root` override loses the cascade. We override the same selectors
+here (equal specificity, loaded after Carbon → wins). The dark themes
+(g90/g100) are deliberately left untouched.
+
+  --cds-text-primary    #161616 → #131315  (--fds-text-primary)
+  --cds-text-secondary  #525252 → #606062  (--fds-text-secondary)
+--------------------------------------------------------------- */
+:root,
+:root[data-carbon-theme='white'],
+:root[data-carbon-theme='g10'],
+.cds--white,
+.cds--g10 {
+  --cds-text-primary: #131315;
+  --cds-text-secondary: #606062;
+}

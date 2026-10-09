@@ -58,7 +58,7 @@ jobs:
 
             # Before date
             BEFORE=$(date +%s -d "${{ env.CUTOFF }}")
-            REPO="${{ github.event.repository.name }}"
+            REPO="nr-hbs"
 
             # Get deployments matching the repo-PR naming pattern
             DEPLOYS=$(oc get deploy --no-headers -o custom-columns=:metadata.name,:metadata.creationTimestamp 2>/dev/null | grep -E "${REPO}-[0-9]+" || :)
@@ -86,15 +86,9 @@ jobs:
                 fi
               done <<< "${DEPLOYS}"
             else
-              echo "No PR deployments found for ${{ github.event.repository.name }}"
+              echo "No PR deployments found for ${REPO}"
             fi
 
-  schema-spy:
-    name: SchemaSpy
-    permissions:
-      contents: write
-      pages: write
-    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.schema-spy.yml@a11ad3d1b9288fb40757c4314a62eb86ff227931 # v1.2.1
 
   # Run sequentially to reduce chances of rate limiting
   zap:
@@ -109,21 +103,4 @@ jobs:
           allow_issue_writing: true
           issue_title: "ZAP Security Report"
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca
-
-  load-tests:
-    name: Load
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        name: [backend, frontend]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: grafana/setup-k6-action@43b9fc21641a76002687994433dd586f56e791b1 # v1.2.2
-      - uses: grafana/run-k6-action@4082a08c7e40cf6d65863911077dfb60ae0a4f04 # v1.5.0
-        env:
-          BACKEND_URL: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca/api
-          FRONTEND_URL: https://${{ github.event.repository.name }}-test.apps.silver.devops.gov.bc.ca
-        with:
-          path: ./common/tests/load/${{ matrix.name }}-test.js
-          flags: --vus 100 --duration 300s
+          target: https://nr-hbs-test.apps.silver.devops.gov.bc.ca

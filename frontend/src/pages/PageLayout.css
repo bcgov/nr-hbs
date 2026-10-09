@@ -1,0 +1,28 @@
+/*
+    Page frame.
+
+    Deliberately thin: Carbon's <Content> supplies the inline padding and the
+    gap below the header (`.cds--content` in styles/_overrides.scss), and the
+    heading is PageTitle's. What remains is the space between the title and
+    the screen's sections, the rhythm between those sections, and room at the
+    bottom so the last one doesn't sit against the viewport edge.
+
+    Colours come from Carbon tokens rather than fixed hex, so a page follows
+    the active theme. The previous navy-on-grey chrome ignored the theme
+    entirely and went its own way visually from the sibling applications.
+*/
+.page-layout {
+  padding-block-end: 3rem;
+}
+
+.page-layout__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-block-start: 1.5rem;
+}
+
+/* The back link above the title, close to it so the two read as one header. */
+.page-layout__back {
+  margin-block-end: 0.75rem;
+}

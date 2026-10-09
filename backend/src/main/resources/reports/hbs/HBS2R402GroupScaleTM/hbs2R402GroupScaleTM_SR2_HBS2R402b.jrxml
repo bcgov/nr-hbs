@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R402b" pageWidth="122" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="122" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d5e5e6a1-4897-4fcf-8182-38374d72576e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R402GroupScaleTM.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="tmpDistrict" class="java.lang.String"/>
+	<parameter name="tmpDistrict_as_num" class="java.lang.Double" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{tmpDistrict} != null && !($P{tmpDistrict}.isEmpty()) && $P{tmpDistrict}.matches("[0-9]+")
+?
+Double.parseDouble($P{tmpDistrict})
+: 0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R402b"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from ORG_UNIT
+WHERE  ORG_UNIT_NO = $P{tmpDistrict_as_num}]]>
+	</queryString>
+	<field name="ORG_UNIT_NO" class="java.math.BigDecimal"/>
+	<field name="ORG_UNIT_CODE" class="java.lang.String"/>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="AREA_CODE" class="java.lang.String"/>
+	<field name="TELEPHONE_NO" class="java.lang.String"/>
+	<field name="ORG_LEVEL_CODE" class="java.lang.String"/>
+	<field name="OFFICE_NAME_CODE" class="java.lang.String"/>
+	<field name="ROLLUP_REGION_NO" class="java.math.BigDecimal"/>
+	<field name="ROLLUP_REGION_CODE" class="java.lang.String"/>
+	<field name="ROLLUP_DIST_NO" class="java.math.BigDecimal"/>
+	<field name="ROLLUP_DIST_CODE" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="41adad89-cda4-453b-8161-a6df14a5bd8a" x="0" y="0" width="20" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [if numerictext({?tmpDistrict}) then
+//   True
+//else
+//   False
+
+
+$P{tmpDistrict} != null && !($P{tmpDistrict}.isEmpty()) && $P{tmpDistrict}.matches("[0-9]+")
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tmpDistrict}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4ccccdeb-e474-4a3f-ab7d-f128af0c13ac" x="0" y="0" width="122" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [if numerictext({?tmpDistrict}) then
+//  False
+//else
+//  True
+//]@
+
+$P{tmpDistrict} != null && !($P{tmpDistrict}.isEmpty()) && $P{tmpDistrict}.matches("[0-9]+")]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORG_UNIT_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

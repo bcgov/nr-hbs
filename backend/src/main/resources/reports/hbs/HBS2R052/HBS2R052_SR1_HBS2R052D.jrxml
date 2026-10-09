@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R052D" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="31e24ad7-2b29-4db6-9ae7-3b0ef8d74da3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="PS_ERR_RETURN_DOCNUMBER" class="java.lang.String"/>
+	<parameter name="PS_ERR_RETURN_VERSION" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R052D"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R052D(
+PS_ERR_RETURN_CURSOR => $P{ORACLE_REF_CURSOR},
+PS_ERR_RETURN_DOCNUMBER => $P{PS_ERR_RETURN_DOCNUMBER},
+PS_ERR_RETURN_VERSION => $P{PS_ERR_RETURN_VERSION}
+)}]]>
+	</queryString>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="ERROR_ID" class="java.math.BigDecimal"/>
+	<field name="ERROR_CATEGORY" class="java.lang.String"/>
+	<field name="HBS_EDIT_ERR_MESSAGE_CODE" class="java.lang.String"/>
+	<field name="ERROR_MESSAGE" class="java.lang.String"/>
+	<sortField name="ERROR_CATEGORY"/>
+	<variable name="CCF0_Show_ErrorLabel" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{ERROR_ID} == null
+? " "
+: "Error#:"]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{ERROR_CATEGORY}]]></groupExpression>
+		<groupHeader>
+			<band height="11" splitType="Prevent">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="e9fe6fe8-b071-437d-a9b1-e87b47cff395" x="0" y="0" width="202" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ERROR_CATEGORY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Prevent">
+				<printWhenExpression><![CDATA[false]]></printWhenExpression>
+			</band>
+		</groupFooter>
+	</group>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7f80b03f-e07b-407c-8687-75d22bcf7bed" x="69" y="0" width="617" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ERROR_MESSAGE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4c3bddf3-7b3e-4fdb-9cb9-9e7e31c02c99" x="1" y="0" width="29" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_ErrorLabel}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d541f7cb-97ce-46e2-81df-7845ffb657bf" x="30" y="0" width="39" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HBS_EDIT_ERR_MESSAGE_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

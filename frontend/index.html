@@ -1,12 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="Description" content="Quickstart OpenShift" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" href="/favicon.ico" />
-    <title>QuickStart OpenShift</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="description" content="Harvest Billing System React App" />
+    <link rel="icon" type="image/png" href="/bcid-192x192.png" />
+    <title>Harvest Billing System</title>
+    <!-- Runtime config: written by docker-entrypoint.sh from VITE_* env vars
+         at container start. MUST load before the app bundle so window.config
+         is populated when env.ts initialises. In dev, public/config.js
+         provides an empty-object stub so the load doesn't 404. -->
+    <script src="/config.js"></script>
   </head>
   <body>
     <div id="root"></div>

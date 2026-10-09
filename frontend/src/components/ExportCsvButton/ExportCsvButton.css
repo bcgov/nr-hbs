@@ -1,0 +1,30 @@
+/*
+    Export button + its in-progress spinner, side by side on the results
+    banner's baseline.
+*/
+.export-csv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Carbon's `small` Loading is a 16px circle, but it ships as a block element
+   with its own line box; the flex wrapper pins it to the button's centre line
+   and keeps the banner from growing taller when it appears. */
+.export-csv__spinner {
+  display: inline-flex;
+  align-items: center;
+  block-size: 1rem;
+  inline-size: 1rem;
+}
+
+.export-csv__spinner .cds--loading {
+  block-size: 1rem;
+  inline-size: 1rem;
+}
+
+/* The stroke inherits --cds-interactive by default, which is nearly invisible
+   against the grey banner in dark mode; the icon colour tracks the theme. */
+.export-csv__spinner .cds--loading__stroke {
+  stroke: var(--cds-icon-primary, #131315);
+}

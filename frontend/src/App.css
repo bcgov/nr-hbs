@@ -1,0 +1,3 @@
+/* App-level fallbacks. The Carbon UI Shell + Layout component own most of
+   the chrome now; the few page-specific styles that remain live next to
+   their pages (e.g. src/pages/LandingPage.scss). */

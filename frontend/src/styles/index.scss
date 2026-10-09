@@ -1,0 +1,108 @@
+// FSP's top-level Carbon + BCGov style setup.
+//
+// Mirrors REPT's src/styles/index.scss. The companion partials are:
+//   _variables.scss  — Carbon class prefix ($bcgov-prefix: 'cds')
+//   _mixins.scss     — placeholder for shared mixins
+//   _overrides.scss  — BCGov palette + Carbon component overrides (radius,
+//                       header background-brand, side-nav icon color, etc.)
+//   default-grid.scss — shared grid utility class
+//   _search.scss     — the shared search-screen layout (criteria tile, field
+//                       grid, full-bleed results panel, pagination footer).
+//                       Loaded after ./tables so it sits alongside the global
+//                       table chrome it depends on.
+//   _detail.scss     — the tabbed record-detail layout (grey full-bleed tab
+//                       pane, white section tiles, label/value field list).
+@use './mixins';
+@use './overrides';
+@use './variables' as variables;
+@use './default-grid';
+@use './tables';
+@use './search';
+@use './detail';
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+
+  &:where(button) {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--cds-link-primary, #0f62fe);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Shown in place of the link while a page is mid-edit, so leaving cannot
+  // drop unsaved changes.
+  &--disabled {
+    color: var(--cds-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+// Subtle outer border + rounded corners wrapper for Carbon DataTables. Pair
+// with `useZebraStyles` on the table for striped rows.
+.bordered-table {
+  border: 1px solid var(--cds-border-subtle-01, #c6c6c6);
+  border-radius: 0.25rem;
+  overflow: hidden;
+
+  // Carbon's TableContainer has a default padding-block-start that renders
+  // as a thin white strip between this wrapper's border and the table
+  // header. Descendant selector (space, not concat) because the
+  // TableContainer is a nested child of .bordered-table, not the same
+  // element. Also flatten the container's own background so it doesn't
+  // double up against the table's zebra-row layer color.
+  .cds--data-table-container {
+    padding-block-start: 0;
+    background: transparent;
+  }
+}
+
+// Toast Notification — positions the snackbar at the top-right corner
+// and animates it in / out. Used by src/context/notification/
+// NotificationProvider.tsx. Matches nr-rept's pattern byte-for-byte so
+// timing + offsets stay consistent between the two apps.
+.#{variables.$bcgov-prefix}--toast-notification {
+  z-index: 12000 !important;
+  position: fixed !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  transform: translateX(100%);
+  opacity: 0;
+
+  &.slide-in {
+    animation: slide-in-right 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  &.slide-out {
+    animation: slide-out-right 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

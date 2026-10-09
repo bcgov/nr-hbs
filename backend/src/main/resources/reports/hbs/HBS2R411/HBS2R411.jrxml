@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R411.rpt" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" isSummaryWithPageHeaderAndFooter="true" uuid="b0c855ed-1287-438e-8b09-ee57c27a16d8">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R411.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="Avg_Rate_Coast" class="java.lang.Double"/>
+	<parameter name="Avg_Rate_NInterior" class="java.lang.Double"/>
+	<parameter name="Avg_Rate_SInterior" class="java.lang.Double"/>
+	<parameter name="PSAGED_SCALED_PRIORTO" class="java.lang.String"/>
+	<parameter name="PSAGED_JOBNO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R411.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R411(
+PSAGED_CURSOR => $P{ORACLE_REF_CURSOR},
+PSAGED_SCALED_PRIORTO => $P{PSAGED_SCALED_PRIORTO},
+PSAGED_JOBNO => $P{PSAGED_JOBNO}
+)}]]>
+	</queryString>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.lang.String"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="DOCVER" class="java.lang.String"/>
+	<field name="SCL_RTN_VERSION_STATE_CODE" class="java.lang.String"/>
+	<field name="SCALE_DATE" class="java.sql.Timestamp"/>
+	<field name="AGE_GROUP" class="java.math.BigDecimal"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="SCALE_SITE_ID_NMBR" class="java.lang.String"/>
+	<field name="ROLLUP_REGION_NO" class="java.math.BigDecimal"/>
+	<field name="REGION_NAME" class="java.lang.String"/>
+	<variable name="ROLLUP_REGION_NO" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{ROLLUP_REGION_NO}.doubleValue()]]></variableExpression>
+	</variable>
+	<variable name="Age_Group_Total_Volume" class="java.lang.Double" resetType="Group" resetGroup="Group 1" calculation="Sum">
+		<variableExpression><![CDATA[$F{VOLUME}]]></variableExpression>
+	</variable>
+	<variable name="Age_Group_Total_RecCount" class="java.lang.Integer" resetType="Group" resetGroup="Group 1" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{DOCVER}]]></variableExpression>
+	</variable>
+	<variable name="Region_Total_RecCount" class="java.lang.Integer" resetType="Group" resetGroup="Group 0" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{DOCVER}]]></variableExpression>
+	</variable>
+	<variable name="Region_Total_Volume" class="java.lang.Double" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{VOLUME}.doubleValue()]]></variableExpression>
+	</variable>
+	<variable name="Grand_Total_RecCount" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{DOCVER}]]></variableExpression>
+	</variable>
+	<variable name="Grand_Total_Volume" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{VOLUME}]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group1_Total_Rec" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$V{CCF11_RTCondition1} ? $F{DOCVER} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group2_Total_Rec" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$V{CCF12_RTCondition2} ? $F{DOCVER} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group3_Total_Rec" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$V{CCF13_RTCondition3} ? $F{DOCVER} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group4_Total_Rec" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$V{CCF14_RTCondition4} ? $F{DOCVER} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group1_Total_Vol" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF11_RTCondition1} ? $F{VOLUME} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group2_Total_Vol" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF12_RTCondition2} ? $F{VOLUME} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group3_Total_Vol" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF13_RTCondition3} ? $F{VOLUME} : null]]></variableExpression>
+	</variable>
+	<variable name="Prov_Group4_Total_Vol" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$V{CCF14_RTCondition4} ? $F{VOLUME} : null]]></variableExpression>
+	</variable>
+	<variable name="CCF0_Show_Age_Desc" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.AGE_GROUP} = 1 THEN
+//  '01 to 30 days'
+//ELSE IF ({HBS2R411.AGE_GROUP} = 2) THEN
+//  '31 to 60 days'
+//ELSE IF ({HBS2R411.AGE_GROUP} = 3) THEN
+//  '61 to 90 days'
+//ELSE IF ({HBS2R411.AGE_GROUP} = 4) THEN
+//  '91 or more days'
+//ELSE
+// '** Error unknown age'
+
+$F{AGE_GROUP}!=null
+?
+    ($F{AGE_GROUP}.intValue()==1 ? "01 to 30 days" :
+    ($F{AGE_GROUP}.intValue()==2 ? "31 to 60 days" :
+    ($F{AGE_GROUP}.intValue()==3 ? "61 to 90 days" :
+    ($F{AGE_GROUP}.intValue()==4 ? "91 or more days" : "** Error unknown age"
+    ))))
+
+: "** Error unknown age"]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Show_Region_AvgRate" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or   {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//  {?Avg_Rate_Coast}
+//else if {HBS2R411.ROLLUP_REGION_NO} = 1905 or   {HBS2R411.ROLLUP_REGION_NO} = 1906  or   {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+// {?Avg_Rate_NInterior}
+//else if {HBS2R411.ROLLUP_REGION_NO} = 1903  or   {HBS2R411.ROLLUP_REGION_NO} = 1904  or   {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+// {?Avg_Rate_SInterior}
+//else $0
+
+$V{ROLLUP_REGION_NO}!=null
+?
+    ($V{ROLLUP_REGION_NO} == 1909 || $V{ROLLUP_REGION_NO} == 1910                                 ? $P{Avg_Rate_Coast}  :
+    ($V{ROLLUP_REGION_NO} == 1905 || $V{ROLLUP_REGION_NO} == 1906 || $V{ROLLUP_REGION_NO} == 1908 ? $P{Avg_Rate_NInterior}  :
+    ($V{ROLLUP_REGION_NO} == 1903 || $V{ROLLUP_REGION_NO} == 1904 || $V{ROLLUP_REGION_NO} == 1907 ? $P{Avg_Rate_SInterior}  : 0
+        )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Calc_Estimated_Value" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//  (    {#Age_Group_Total_Volume} * {?Avg_Rate_Coast}  )
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1905 or {HBS2R411.ROLLUP_REGION_NO} = 1906 or {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//  (   {#Age_Group_Total_Volume} * {?Avg_Rate_NInterior}  )
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1903 or {HBS2R411.ROLLUP_REGION_NO} = 1904 or {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//    (   {#Age_Group_Total_Volume} * {?Avg_Rate_SInterior}  )
+//
+//ELSE $0
+
+$V{ROLLUP_REGION_NO} !=null && $V{Age_Group_Total_Volume}!=null
+?
+   (($V{ROLLUP_REGION_NO} == 1909 || $V{ROLLUP_REGION_NO}==1910 ) &&  $P{Avg_Rate_Coast} !=null                                  ?    $V{Age_Group_Total_Volume} * $P{Avg_Rate_Coast} :
+   (($V{ROLLUP_REGION_NO} == 1905 || $V{ROLLUP_REGION_NO}==1906 || $V{ROLLUP_REGION_NO}==1908 ) && $P{Avg_Rate_NInterior} !=null ?    $V{Age_Group_Total_Volume} * $P{Avg_Rate_NInterior} :
+   (($V{ROLLUP_REGION_NO} == 1903 || $V{ROLLUP_REGION_NO}==1904 || $V{ROLLUP_REGION_NO}==1907 ) && $P{Avg_Rate_SInterior} !=null ?    $V{Age_Group_Total_Volume} * $P{Avg_Rate_SInterior} : 0
+    )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Calc_Estimated_Value_Total_Region" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or  {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//  {#Region_Total_Volume} * {?Avg_Rate_Coast}
+//else if {HBS2R411.ROLLUP_REGION_NO} = 1905 or  {HBS2R411.ROLLUP_REGION_NO} = 1906 or  {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//  {#Region_Total_Volume} * {?Avg_Rate_NInterior}
+//else if {HBS2R411.ROLLUP_REGION_NO} = 1903 or  {HBS2R411.ROLLUP_REGION_NO} = 1904 or  {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//  {#Region_Total_Volume} * {?Avg_Rate_SInterior}
+//else
+// $0...
+
+
+$V{ROLLUP_REGION_NO} !=null && $V{Region_Total_Volume} !=null
+?
+   (($V{ROLLUP_REGION_NO} == 1909 || $V{ROLLUP_REGION_NO}==1910 ) &&  $P{Avg_Rate_Coast} !=null                                  ?    $V{Region_Total_Volume} * $P{Avg_Rate_Coast} :
+   (($V{ROLLUP_REGION_NO} == 1905 || $V{ROLLUP_REGION_NO}==1906 || $V{ROLLUP_REGION_NO}==1908 ) && $P{Avg_Rate_NInterior} !=null ?    $V{Region_Total_Volume} * $P{Avg_Rate_NInterior} :
+   (($V{ROLLUP_REGION_NO} == 1903 || $V{ROLLUP_REGION_NO}==1904 || $V{ROLLUP_REGION_NO}==1907 ) && $P{Avg_Rate_SInterior} !=null ?    $V{Region_Total_Volume} * $P{Avg_Rate_SInterior} : 0
+    )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF5_Show_ProvGrp1_Total" class="java.lang.Double" incrementType="Group" incrementGroup="Group 1" calculation="Sum">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or   {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//     IF {HBS2R411.AGE_GROUP} = 1 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_Coast})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1905 or {HBS2R411.ROLLUP_REGION_NO} = 1906 or {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//    IF {HBS2R411.AGE_GROUP} = 1 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_NInterior})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1903 or  {HBS2R411.ROLLUP_REGION_NO} = 1904 or {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//   IF {HBS2R411.AGE_GROUP} = 1 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_SInterior})
+//
+//ELSE 0
+
+$V{CCF5_Show_ProvGrp1_Total}!=null && $V{Age_Group_Total_Volume}!=null && $F{AGE_GROUP}.intValue() == 1
+?
+    (($V{ROLLUP_REGION_NO} ==1909 || $V{ROLLUP_REGION_NO} == 1910 ) && $P{Avg_Rate_Coast}!=null                                    ?  $V{CCF5_Show_ProvGrp1_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_Coast}) :
+    (($V{ROLLUP_REGION_NO} ==1905 || $V{ROLLUP_REGION_NO} == 1906 || $V{ROLLUP_REGION_NO} == 1908) && $P{Avg_Rate_NInterior}!=null ?  $V{CCF5_Show_ProvGrp1_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_NInterior}) :
+    (($V{ROLLUP_REGION_NO} ==1903 || $V{ROLLUP_REGION_NO} == 1904 || $V{ROLLUP_REGION_NO} == 1907) && $P{Avg_Rate_SInterior}!=null ?  $V{CCF5_Show_ProvGrp1_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_SInterior}) :  0
+    )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF6_Show_ProvGrp2_Total" class="java.lang.Double" incrementType="Group" incrementGroup="Group 1" calculation="Sum">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or   {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//     IF {HBS2R411.AGE_GROUP} = 2 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_Coast})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1905 or {HBS2R411.ROLLUP_REGION_NO} = 1906 or {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//    IF {HBS2R411.AGE_GROUP} = 2 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_NInterior})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1903 or  {HBS2R411.ROLLUP_REGION_NO} = 1904 or {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//   IF {HBS2R411.AGE_GROUP} = 2 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_SInterior})
+//
+//ELSE 0
+
+$V{CCF6_Show_ProvGrp2_Total}!=null &&  $V{Age_Group_Total_Volume}!=null && $F{AGE_GROUP}.intValue() == 2
+?
+    (($V{ROLLUP_REGION_NO} ==1909 || $V{ROLLUP_REGION_NO} == 1910 ) && $P{Avg_Rate_Coast}!=null                                    ?  ($V{Age_Group_Total_Volume} * $P{Avg_Rate_Coast}) :
+    (($V{ROLLUP_REGION_NO} ==1905 || $V{ROLLUP_REGION_NO} == 1906 || $V{ROLLUP_REGION_NO} == 1908) && $P{Avg_Rate_NInterior}!=null ?  ($V{Age_Group_Total_Volume} * $P{Avg_Rate_NInterior}) :
+    (($V{ROLLUP_REGION_NO} ==1903 || $V{ROLLUP_REGION_NO} == 1904 || $V{ROLLUP_REGION_NO} == 1907) && $P{Avg_Rate_SInterior}!=null ?  ($V{Age_Group_Total_Volume} * $P{Avg_Rate_SInterior}) : 0
+    )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF7_Show_ProvGrp3_Total" class="java.lang.Double" incrementType="Group" incrementGroup="Group 1" calculation="Sum">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or   {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//     IF {HBS2R411.AGE_GROUP} = 3 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_Coast})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1905 or {HBS2R411.ROLLUP_REGION_NO} = 1906 or {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//    IF {HBS2R411.AGE_GROUP} = 3 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_NInterior})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1903 or  {HBS2R411.ROLLUP_REGION_NO} = 1904 or {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//   IF {HBS2R411.AGE_GROUP} = 3 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_SInterior})
+//
+//ELSE 0
+
+$V{CCF7_Show_ProvGrp3_Total}!=null &&  $V{Age_Group_Total_Volume}!=null && $F{AGE_GROUP}.intValue() == 3
+?
+    (($V{ROLLUP_REGION_NO} ==1909 || $V{ROLLUP_REGION_NO} == 1910 ) && $P{Avg_Rate_Coast}!=null                                    ?  $V{CCF7_Show_ProvGrp3_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_Coast}) :
+    (($V{ROLLUP_REGION_NO} ==1905 || $V{ROLLUP_REGION_NO} == 1906 || $V{ROLLUP_REGION_NO} == 1908) && $P{Avg_Rate_NInterior}!=null ?  $V{CCF7_Show_ProvGrp3_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_NInterior}) :
+    (($V{ROLLUP_REGION_NO} ==1903 || $V{ROLLUP_REGION_NO} == 1904 || $V{ROLLUP_REGION_NO} == 1907) && $P{Avg_Rate_SInterior}!=null ?  $V{CCF7_Show_ProvGrp3_Total} + ($V{Age_Group_Total_Volume} * $P{Avg_Rate_SInterior}) :  0
+    )))
+: 0]]></variableExpression>
+	</variable>
+	<variable name="CCF8_Show_ProvGrp4_Total" class="java.lang.Double" incrementType="Group" incrementGroup="Group 1" calculation="Sum">
+		<variableExpression><![CDATA[//IF {HBS2R411.ROLLUP_REGION_NO} = 1909 or   {HBS2R411.ROLLUP_REGION_NO} = 1910 THEN
+//     IF {HBS2R411.AGE_GROUP} = 4 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_Coast})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1905 or {HBS2R411.ROLLUP_REGION_NO} = 1906 or {HBS2R411.ROLLUP_REGION_NO} = 1908 THEN
+//    IF {HBS2R411.AGE_GROUP} = 4 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_NInterior})
+//
+//ELSE IF {HBS2R411.ROLLUP_REGION_NO} = 1903 or  {HBS2R411.ROLLUP_REGION_NO} = 1904 or {HBS2R411.ROLLUP_REGION_NO} = 1907 THEN
+//   IF {HBS2R411.AGE_GROUP} = 4 THEN
+//       nProvTotal1 :=  nProvTotal1 +  ({#Age_Group_Total_Volume} * {?Avg_Rate_SInterior})
+//
+//ELSE 0
+
+$V{CCF8_Show_ProvGrp4_Total}!=null && $V{Age_Group_Total_Volume}!=null && $F{AGE_GROUP}.intValue() == 4
+?
+    (($V{ROLLUP_REGION_NO} ==1909 || $V{ROLLUP_REGION_NO} == 1910 ) && $P{Avg_Rate_Coast}!=null                                    ?    ($V{Age_Group_Total_Volume} * $P{Avg_Rate_Coast}) :
+    (($V{ROLLUP_REGION_NO} ==1905 || $V{ROLLUP_REGION_NO} == 1906 || $V{ROLLUP_REGION_NO} == 1908) && $P{Avg_Rate_NInterior}!=null ?    ($V{Age_Group_Total_Volume} * $P{Avg_Rate_NInterior}) :
+    (($V{ROLLUP_REGION_NO} ==1903 || $V{ROLLUP_REGION_NO} == 1904 || $V{ROLLUP_REGION_NO} == 1907) && $P{Avg_Rate_SInterior}!=null ?    ($V{Age_Group_Total_Volume} * $P{Avg_Rate_SInterior}) :  0
+    )))
+:   0]]></variableExpression>
+	</variable>
+	<variable name="CCF9_Show_Prov_TotalValue" class="java.lang.Double" resetType="None">
+		<variableExpression><![CDATA[//WhilePrintingRecords;
+//CurrencyVar nProvTotal1;
+//CurrencyVar nProvTotal2;
+//CurrencyVar nProvTotal3;
+//CurrencyVar nProvTotal4;
+//nProvTotal1 + nProvTotal2 + nProvTotal3 + nProvTotal4;
+
+$V{CCF5_Show_ProvGrp1_Total} +
+$V{CCF6_Show_ProvGrp2_Total} +
+$V{CCF7_Show_ProvGrp3_Total} +
+$V{CCF8_Show_ProvGrp4_Total}]]></variableExpression>
+	</variable>
+	<variable name="CCF10_Format_PriorTo_date" class="java.util.Date" resetType="None">
+		<variableExpression><![CDATA[// CStr(CDate(1996, 11, 1), "yy MMM dd, dddd")
+//cstr(cdate({?PSAGED_SCALED_PRIORTO}), "yyyy-MMM-dd" )
+
+$P{PSAGED_SCALED_PRIORTO} == null || $P{PSAGED_SCALED_PRIORTO}.isEmpty()
+? null
+: new SimpleDateFormat("yyyy-MM-dd").parse($P{PSAGED_SCALED_PRIORTO})]]></variableExpression>
+	</variable>
+	<variable name="CCF11_RTCondition1" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.AGE_GROUP} = 1 THEN
+// true
+
+
+$F{AGE_GROUP} !=null && $F{AGE_GROUP}.intValue() == 1
+? true
+: false]]></variableExpression>
+	</variable>
+	<variable name="CCF12_RTCondition2" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.AGE_GROUP} = 2 THEN
+// TRUE
+
+
+$F{AGE_GROUP} !=null && $F{AGE_GROUP}.intValue() == 2
+? true
+: false]]></variableExpression>
+	</variable>
+	<variable name="CCF13_RTCondition3" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.AGE_GROUP} = 3 THEN
+// TRUE
+
+
+$F{AGE_GROUP} !=null && $F{AGE_GROUP}.intValue() == 3
+? true
+: false]]></variableExpression>
+	</variable>
+	<variable name="CCF14_RTCondition4" class="java.lang.Boolean" resetType="None">
+		<variableExpression><![CDATA[//IF {HBS2R411.AGE_GROUP} = 4 THEN
+// TRUE
+
+
+$F{AGE_GROUP} !=null && $F{AGE_GROUP}.intValue() == 4
+? true
+: false]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{ROLLUP_REGION_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="12" splitType="Prevent">
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="2d31d574-fa15-4cbc-b7e3-6304fa9f9056" x="1" y="1" width="153" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REGION_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20" splitType="Prevent">
+				<line>
+					<reportElement uuid="2b02b8db-3a6f-4c47-9b11-3e642ee1bcf1" x="0" y="1" width="537" height="1"/>
+					<graphicElement>
+						<pen lineWidth="1.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+				<staticText>
+					<reportElement uuid="84b5d515-e4f7-4747-93d3-4d28f3b27da6" x="154" y="2" width="31" height="10" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Total ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+					<reportElement uuid="a91484b4-f402-4780-bcad-f7c1d24642ea" x="242" y="2" width="41" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Region_Total_RecCount}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="ea94d23a-ec57-4028-9f77-23213c6cb611" x="308" y="2" width="41" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Region_Total_Volume}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0.00" isBlankWhenNull="true">
+					<reportElement uuid="97281d3c-166a-4c2a-9d10-bf4367fd2b36" x="412" y="2" width="49" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF1_Show_Region_AvgRate}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+					<reportElement uuid="3c03150f-714e-42dc-a27f-8e9eb79f5dc5" x="475" y="2" width="61" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF3_Calc_Estimated_Value_Total_Region}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="14c5ea81-69ec-4619-aacd-f69cad1a5f4f" x="1" y="2" width="153" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{REGION_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Group 1">
+		<groupExpression><![CDATA[$F{AGE_GROUP}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="12" splitType="Prevent">
+				<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="28109465-dc5a-4104-bdc1-c7328c6a97bf" x="310" y="0" width="39" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Age_Group_Total_Volume}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="6b314b21-96fa-456b-8673-03034d82bad0" x="155" y="0" width="68" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF0_Show_Age_Desc}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+					<reportElement uuid="b751ecb2-8da0-4c17-b92f-750bc91dba94" x="244" y="0" width="39" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Age_Group_Total_RecCount}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+					<reportElement uuid="27bf23a8-f4b6-4116-82cf-30089dfa8fe2" x="478" y="0" width="58" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF2_Calc_Estimated_Value}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<pageHeader>
+		<band height="70">
+			<line>
+				<reportElement uuid="57825bb6-e307-4c8a-8783-c62e8ab8de9c" x="0" y="60" width="540" height="1" isPrintWhenDetailOverflows="true"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="8b3fca5e-3cf8-46c1-8645-fc7251eb3967" x="181" y="15" width="180" height="15" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Harvest Billing System]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2093279b-9b08-44a5-a1ac-fd157afa9eed" x="181" y="30" width="180" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Aged Unbilled Piece Scale Report]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b6c4d64e-68e2-4311-8a33-4a0f4df70076" x="522" y="1" width="9" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[of]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b38ec6a9-ab2d-4972-a430-805a29bd8be0" x="450" y="1" width="37" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Page:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b174837c-3f84-410b-bbf9-14a070aa22ca" x="450" y="10" width="37" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rundate:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="773c51db-cc78-43a6-9f20-c422f399e247" x="450" y="19" width="37" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Runtime:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bc5a63c6-4a91-493e-90be-80236897a403" x="450" y="28" width="37" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Report Id:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="491bc44b-6a1f-4dc3-b91f-f9857882dae5" x="450" y="36" width="37" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Request No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="97926f72-bd8a-4cdd-a663-ee5ed89dbc2f" x="196" y="44" width="84" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scaled Prior To:]]></text>
+			</staticText>
+			<image>
+				<reportElement uuid="13dd33bb-c4e8-4818-a33f-5f0b18be69e3" x="3" y="4" width="145" height="36" isPrintWhenDetailOverflows="true"/>
+				<imageExpression><![CDATA[($P{SUBREPORT_DIR} + "hbs_logo1.jpg" )]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="df223589-53bc-4946-872e-64c64d1289c9" x="486" y="1" width="36" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement uuid="94fc3d02-462b-4f64-989e-a27590c43fcb" x="531" y="1" width="9" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="25743183-0356-4723-8915-c5f5613c1374" x="486" y="10" width="54" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="HH:mm.ss" isBlankWhenNull="true">
+				<reportElement uuid="cbb2ad25-24dc-46c7-8a39-a4f4a8335f94" x="486" y="19" width="54" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9b81140d-8bd9-4203-aa68-046f56674bf8" x="486" y="28" width="54" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{p_report_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="037288a6-d967-40e8-9ce6-cfc84eebb0d3" x="486" y="36" width="54" height="9" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="6" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PSAGED_JOBNO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="cb1f9ae2-18de-4e9e-b6ae-fbeb1dc78408" x="281" y="44" width="61" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF10_Format_PriorTo_date}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement uuid="5c1779a7-c39c-4090-bdf0-0162e713d55d" x="111" y="1" width="333" height="14" isPrintWhenDetailOverflows="true"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HBS_HEADER" + $P{SUBREPORT_EXT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="12">
+			<staticText>
+				<reportElement uuid="c6fd3867-ae5b-4836-b80b-a841bd656bbf" x="464" y="0" width="72" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Estimated Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1596ac88-1c18-46ea-a3ff-a1b9d404d8b2" x="0" y="0" width="90" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Region]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f8444832-7da5-4c3d-a320-c99c0ed43ae4" x="360" y="0" width="104" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Estimated Average Rate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6238f614-3b99-4eb5-9b74-ae4184cb78d0" x="129" y="0" width="104" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Age of Return]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b77dcac1-faf0-414b-89e7-cbb2a4e8e661" x="294" y="0" width="66" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume (M3)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="03206d6a-2791-4932-965e-5dd993d36d3b" x="233" y="0" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Return Count]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Prevent"/>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Prevent">
+			<line>
+				<reportElement uuid="7bbbac8c-e712-49f5-81a1-2a5991992d6a" x="0" y="4" width="540" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="f9c95dfe-dc5e-4a8f-8df7-d72dd04469e0" mode="Opaque" x="0" y="8" width="540" height="9" forecolor="#000000" backcolor="#EAEAEA"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="6" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Note:  While every effort has been made to ensure that the information presented on this report is accurate and complete, it cannot be guaranteed.]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="52" splitType="Prevent">
+			<line>
+				<reportElement uuid="700113d9-8c81-4382-9536-2b3c86278d01" x="0" y="39" width="537" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="a5cc19d1-00a0-4847-8db6-817d1a17b418" x="0" y="1" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Province ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="36f55abd-8810-4ea2-9c6c-bbd56ff58281" x="154" y="1" width="82" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[01 to 30 days ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="11514fb0-f87a-40c5-b0d9-179fd849878f" x="154" y="10" width="82" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[31 to 60 days ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9329baf2-b38f-4d9e-bbd6-80fb90967cdb" x="154" y="19" width="82" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[61 to 90 days ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a5aad866-cad8-48b4-a330-c6eb5313d455" x="154" y="29" width="82" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[91 or more days ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ed8c6501-ac9c-4151-a978-1fc153867d1d" x="0" y="41" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Province ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="803accfe-9d13-4f8e-8af7-0328b7800bb3" x="154" y="41" width="31" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Total ]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="85423d70-fb7e-4eb0-8475-64a05dc4220c" x="241" y="41" width="41" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand_Total_RecCount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="99246d7b-3880-4106-99ea-048dbeaef971" x="306" y="41" width="41" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Grand_Total_Volume}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="465be52d-7cae-41b0-8f2c-91a4e1cafe7d" x="243" y="1" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group1_Total_Rec}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="bb9479bd-9d5f-4ac9-bb6f-0baa8ce5dbc3" x="243" y="10" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group2_Total_Rec}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="af4ef0e1-2afb-46ad-9400-9f7ab08d6e4c" x="243" y="19" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group3_Total_Rec}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="8fa4510a-8e67-4e08-8964-7f585f972b3f" x="243" y="29" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group4_Total_Rec}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="b431fbed-746e-4bce-927e-6a46edbcfa0c" x="309" y="1" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group1_Total_Vol}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="9d1ae02d-6ee5-4049-b1dc-ebe9d50decc9" x="309" y="10" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group2_Total_Vol}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="f02ba098-701c-4752-84df-e17e6ae3b362" x="308" y="19" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group3_Total_Vol}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="d2d1691d-ee7e-41f2-a1c8-61a08158dca4" x="309" y="29" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Prov_Group4_Total_Vol}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement uuid="c7f3372a-4421-4ea7-8279-7d8048d4fec8" x="475" y="1" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF5_Show_ProvGrp1_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement uuid="1290dd90-528d-4780-b178-4eb71a1450a2" x="475" y="10" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF6_Show_ProvGrp2_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement uuid="18708775-ba10-4f27-be15-fc6a58746a46" x="475" y="20" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF7_Show_ProvGrp3_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement uuid="8afa60fd-cc08-4c6f-8a1e-ae2be2d1d613" x="475" y="29" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF8_Show_ProvGrp4_Total}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="¤ #,##0" isBlankWhenNull="true">
+				<reportElement uuid="b08274d7-3676-4fc4-a2a9-cd5d861543e2" x="455" y="41" width="80" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF9_Show_Prov_TotalValue}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

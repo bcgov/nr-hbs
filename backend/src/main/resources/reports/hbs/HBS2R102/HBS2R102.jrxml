@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R102.rpt" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="720" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="f8428700-8053-4ed4-9b62-acbde7068420">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R102.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="WSRETURN_DOCUMENTNUMBER" class="java.lang.String"/>
+	<parameter name="WSRETURN_VERSIONNUMBER" class="java.lang.String"/>
+	<parameter name="WSRETURN_JOBNO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R102.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "I:\\!Project\\VM Application Revitalization\\Application Sub-Projects\\CIA\\5 Development QA\\CrystalReports\\HBS\\hbs_04_25_02\\Jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R102(
+WSRETURN_CURSOR => $P{ORACLE_REF_CURSOR},
+WSRETURN_DOCUMENTNUMBER => $P{WSRETURN_DOCUMENTNUMBER},
+WSRETURN_VERSIONNUMBER => $P{WSRETURN_VERSIONNUMBER},
+WSRETURN_JOBNO => $P{WSRETURN_JOBNO}
+)}]]>
+	</queryString>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="HBS_RETURN_TYPE_CODE" class="java.lang.String"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="SCL_RTN_VERSION_STATE_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="SCL_RTN_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="RETURN_CATEGORY_DESCRIPTION" class="java.lang.String"/>
+	<field name="POPULATION_NUMBER" class="java.lang.String"/>
+	<field name="INPUT_POPULATION" class="java.lang.String"/>
+	<field name="STRATUM_NUMBER" class="java.lang.String"/>
+	<field name="INPUT_STRATUM" class="java.lang.String"/>
+	<field name="FIELD_SCALE_DECK_ID" class="java.lang.String"/>
+	<field name="SAMPLING_YEAR" class="java.math.BigDecimal"/>
+	<field name="INPUT_SAMPLING_YEAR" class="java.lang.String"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="INPUT_TIMBER_MARK" class="java.lang.String"/>
+	<field name="LICENSE_NUMBER" class="java.lang.String"/>
+	<field name="SCALE_SITE_ID_NMBR" class="java.lang.String"/>
+	<field name="SCALE_DATE" class="java.sql.Timestamp"/>
+	<field name="CLIENT_NUMBER_PAID_BY" class="java.lang.String"/>
+	<field name="CLIENT_LOCN_CODE_PAID_BY" class="java.lang.String"/>
+	<field name="CLIENT_NUMBER_COPIED_TO" class="java.lang.String"/>
+	<field name="CLIENT_LOCN_CODE_COPIED_TO" class="java.lang.String"/>
+	<field name="DAY" class="java.math.BigDecimal"/>
+	<field name="DAY_NUMBER_OF_LOADS" class="java.math.BigDecimal"/>
+	<field name="DAY_WEIGHT" class="java.math.BigDecimal"/>
+	<sortField name="DOCUMENT_CONTROL_NUMBER"/>
+	<variable name="v_start_string" class="java.lang.String">
+		<variableExpression><![CDATA[""]]></variableExpression>
+	</variable>
+	<variable name="v_start_length" class="java.lang.Integer">
+		<variableExpression><![CDATA[1]]></variableExpression>
+	</variable>
+	<variable name="v_start_length2" class="java.lang.Integer">
+		<variableExpression><![CDATA[2]]></variableExpression>
+	</variable>
+	<variable name="v_start_length_DAY_NUMBER_OF_LOADS" class="java.lang.Integer">
+		<variableExpression><![CDATA[19]]></variableExpression>
+	</variable>
+	<variable name="v_start length_DAY_WEIGHT" class="java.lang.Integer">
+		<variableExpression><![CDATA[18]]></variableExpression>
+	</variable>
+	<variable name="v_empty_day" class="java.lang.String">
+		<variableExpression><![CDATA[//Global StringVar empty_day := space(18) + "0" + space(22) + "0";
+//"                  " + "0" + "                      " + "0"
+org.apache.commons.lang3.StringUtils.leftPad("", 18, " ") + "0" + org.apache.commons.lang3.StringUtils.leftPad("", 22, " ") + "0"]]></variableExpression>
+	</variable>
+	<variable name="v_string_DAY" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} == null
+? "" :
+new DecimalFormat("###0").format( $F{DAY} )]]></variableExpression>
+	</variable>
+	<variable name="v_string_DAY_NUMBER_OF_LOADS" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY_NUMBER_OF_LOADS} == null
+? "" :
+new DecimalFormat("###0").format( $F{DAY_NUMBER_OF_LOADS} )]]></variableExpression>
+	</variable>
+	<variable name="v_string_DAY_WEIGHT" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY_WEIGHT} == null
+? "" : new DecimalFormat("#,##0").format( $F{DAY_WEIGHT} )]]></variableExpression>
+	</variable>
+	<variable name="v_length_DAY" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{v_string_DAY}.length()]]></variableExpression>
+	</variable>
+	<variable name="v_length_DAY_NUMBER_OF_LOADS" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{v_string_DAY_NUMBER_OF_LOADS}.length()]]></variableExpression>
+	</variable>
+	<variable name="v_length_DAY_WEIGHT" class="java.lang.Integer">
+		<variableExpression><![CDATA[($V{v_string_DAY_WEIGHT}.trim()).length()]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_01" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 1
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_02" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 2
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_03" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 3
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_04" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 4
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_05" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 5
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_06" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 6
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_07" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 7
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_08" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 8
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length2}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_09" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 9
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length2}) +
+  $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_10" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 10
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_11" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 11
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_12" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 12
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_13" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 13
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_14" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 14
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_15" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 15
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_16" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 16
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_17" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 17
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_18" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 18
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_19" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 19
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_20" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 20
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_21" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 21
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_22" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 22
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_23" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 23
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_24" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 24
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_25" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 25
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_26" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 26
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_27" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 27
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_28" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 28
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_29" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 29
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_30" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 30
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_day_load_31" class="java.lang.String">
+		<variableExpression><![CDATA[$F{DAY} != null && $F{DAY}.intValue() == 31
+? $V{v_string_DAY} +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start_length_DAY_NUMBER_OF_LOADS} - $V{v_length_DAY_NUMBER_OF_LOADS}) ) +
+  $V{v_string_DAY_NUMBER_OF_LOADS}  +
+  org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, ($V{v_start length_DAY_WEIGHT} - $V{v_length_DAY_WEIGHT}) ) +
+  $V{v_string_DAY_WEIGHT}
+: ""]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_01" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_01}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_02" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_02}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_03" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_03}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_04" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_04}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_05" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_05}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_06" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_06}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_07" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_07}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_08" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_08}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_09" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_09}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_10" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_10}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_11" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_11}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_12" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_12}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_13" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_13}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_14" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_14}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_15" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_15}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_16" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_16}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_17" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_17}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_18" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_18}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_19" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_19}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_20" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_20}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_21" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_21}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_22" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_22}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_23" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_23}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_24" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_24}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_25" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_25}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_26" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_26}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_27" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_27}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_28" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_28}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_29" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_29}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_30" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_30}]]></variableExpression>
+	</variable>
+	<variable name="v_max_day_load_31" class="java.lang.String" calculation="Highest">
+		<variableExpression><![CDATA[$V{v_day_load_31}]]></variableExpression>
+	</variable>
+	<variable name="CCF0_Day1_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_01} == null || $V{v_max_day_load_01}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "1" + $V{v_empty_day}
+: $V{v_max_day_load_01}]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Day2_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_02} == null || $V{v_max_day_load_02}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "2" + $V{v_empty_day}
+: $V{v_max_day_load_02}]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Day3_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_03} == null || $V{v_max_day_load_03}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "3" + $V{v_empty_day}
+: $V{v_max_day_load_03}]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Day4_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_04} == null || $V{v_max_day_load_04}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "4" + $V{v_empty_day}
+: $V{v_max_day_load_04}]]></variableExpression>
+	</variable>
+	<variable name="CCF4_Day5_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_05} == null || $V{v_max_day_load_05}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "5" + $V{v_empty_day}
+: $V{v_max_day_load_05}]]></variableExpression>
+	</variable>
+	<variable name="CCF5_Day6_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_06} == null || $V{v_max_day_load_06}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "6" + $V{v_empty_day}
+: $V{v_max_day_load_06}]]></variableExpression>
+	</variable>
+	<variable name="CCF6_Day7_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_07} == null || $V{v_max_day_load_07}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "7" + $V{v_empty_day}
+: $V{v_max_day_load_07}]]></variableExpression>
+	</variable>
+	<variable name="CCF7_Day8_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_08} == null || $V{v_max_day_load_08}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "8" + $V{v_empty_day}
+: $V{v_max_day_load_08}]]></variableExpression>
+	</variable>
+	<variable name="CCF8_Day9_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_09} == null || $V{v_max_day_load_09}.isEmpty()
+? org.apache.commons.lang3.StringUtils.leftPad($V{v_start_string}, $V{v_start_length}) + "9" + $V{v_empty_day}
+: $V{v_max_day_load_09}]]></variableExpression>
+	</variable>
+	<variable name="CCF9_Declare_array" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//// This function declares the array for the daily load values
+//Global StringVar Array day_load;
+//Global StringVar empty_day := space(18) + "0" + space(22) + "0";
+//redim day_load [31];
+//// Crystal must return something from every function therefore just retunr one blank space
+" "]]></variableExpression>
+	</variable>
+	<variable name="CCF10_Read_daily_loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//// for each row in the recordset that is processed,  store the daily load data into the approriate array element
+//WhilePrintingRecords;
+//Global StringVar Array day_load;
+//Local NumberVar Len_Loadstr;
+//Local NumberVar Len_Weightstr;
+//Len_Loadstr := Len(totext({HBS2R102.DAY_NUMBER_OF_LOADS}));
+//Len_Weightstr := Len(totext({HBS2R102.DAY_WEIGHT}));
+//
+//if {HBS2R102.DAY} = 1 then
+//  // for the one digit days add a space to start string
+//  day_load[1] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 2 then
+//  day_load[2] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 3 then
+//  day_load[3] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 4 then
+//  day_load[4] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 5 then
+//  day_load[5] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 6 then
+//  day_load[6] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 7 then
+//  day_load[7] := space(1) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 8 then
+//  day_load[8] := space(2) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 9 then
+//  day_load[9] := space(2) + totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 10 then
+//  day_load[10] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 11 then
+//  day_load[11] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 12 then
+//  day_load[12] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 13 then
+//  day_load[13] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 14 then
+//  day_load[14] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 15 then
+//  day_load[15] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 16 then
+//  day_load[16] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 17 then
+//  day_load[17] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 18 then
+//  day_load[18] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 19 then
+//  day_load[19] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 20 then
+//  day_load[20] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 21 then
+//  day_load[21] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 22 then
+//  day_load[22] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 23 then
+//  day_load[23] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 24 then
+//  day_load[24] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 25 then
+//  day_load[25] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 26 then
+//  day_load[26] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 27 then
+//  day_load[27] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 28 then
+//  day_load[28] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 29 then
+//  day_load[29] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 30 then
+//  day_load[30] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else if {HBS2R102.DAY} = 31 then
+//  day_load[31] := totext({HBS2R102.DAY},0) + space(18 - Len_Loadstr) + totext({HBS2R102.DAY_NUMBER_OF_LOADS},'#####',0) + space(18 - Len_Weightstr) + totext({HBS2R102.DAY_WEIGHT},'###,###,###', 0)
+//else
+//    ' '
+" "]]></variableExpression>
+	</variable>
+	<variable name="CCF11_Day10_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_10} == null || $V{v_max_day_load_10}.isEmpty()
+? "10" + $V{v_empty_day}
+: $V{v_max_day_load_10}]]></variableExpression>
+	</variable>
+	<variable name="CCF12_Day11_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_11} == null || $V{v_max_day_load_11}.isEmpty()
+? "11" + $V{v_empty_day}
+: $V{v_max_day_load_11}]]></variableExpression>
+	</variable>
+	<variable name="CCF13_Day12_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_12} == null || $V{v_max_day_load_12}.isEmpty()
+? "12" + $V{v_empty_day}
+: $V{v_max_day_load_12}]]></variableExpression>
+	</variable>
+	<variable name="CCF14_Day13_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_13} == null || $V{v_max_day_load_13}.isEmpty()
+? "13" + $V{v_empty_day}
+: $V{v_max_day_load_13}]]></variableExpression>
+	</variable>
+	<variable name="CCF15_Day14_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_14} == null || $V{v_max_day_load_14}.isEmpty()
+? "14" + $V{v_empty_day}
+: $V{v_max_day_load_14}]]></variableExpression>
+	</variable>
+	<variable name="CCF16_Day15_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_15} == null || $V{v_max_day_load_15}.isEmpty()
+? "15" + $V{v_empty_day}
+: $V{v_max_day_load_15}]]></variableExpression>
+	</variable>
+	<variable name="CCF17_Day16_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_16} == null || $V{v_max_day_load_16}.isEmpty()
+? "16" + $V{v_empty_day}
+: $V{v_max_day_load_16}]]></variableExpression>
+	</variable>
+	<variable name="CCF18_Day17_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_17} == null || $V{v_max_day_load_17}.isEmpty()
+? "17" + $V{v_empty_day}
+: $V{v_max_day_load_17}]]></variableExpression>
+	</variable>
+	<variable name="CCF19_Day18_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_18} == null || $V{v_max_day_load_18}.isEmpty()
+? "18" + $V{v_empty_day}
+: $V{v_max_day_load_18}]]></variableExpression>
+	</variable>
+	<variable name="CCF20_Day19_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_19} == null || $V{v_max_day_load_19}.isEmpty()
+? "19" + $V{v_empty_day}
+: $V{v_max_day_load_19}]]></variableExpression>
+	</variable>
+	<variable name="CCF21_Day20_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_20} == null || $V{v_max_day_load_20}.isEmpty()
+? "20" + $V{v_empty_day}
+: $V{v_max_day_load_20}]]></variableExpression>
+	</variable>
+	<variable name="CCF22_Day21_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_21} == null || $V{v_max_day_load_21}.isEmpty()
+? "21" + $V{v_empty_day}
+: $V{v_max_day_load_21}]]></variableExpression>
+	</variable>
+	<variable name="CCF23_Day22_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_22} == null || $V{v_max_day_load_22}.isEmpty()
+? "22" + $V{v_empty_day}
+: $V{v_max_day_load_22}]]></variableExpression>
+	</variable>
+	<variable name="CCF24_Day23_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_23} == null || $V{v_max_day_load_23}.isEmpty()
+? "23" + $V{v_empty_day}
+: $V{v_max_day_load_23}]]></variableExpression>
+	</variable>
+	<variable name="CCF25_Day24_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_24} == null || $V{v_max_day_load_24}.isEmpty()
+? "24" + $V{v_empty_day}
+: $V{v_max_day_load_24}]]></variableExpression>
+	</variable>
+	<variable name="CCF26_Day25_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_25} == null || $V{v_max_day_load_25}.isEmpty()
+? "25" + $V{v_empty_day}
+: $V{v_max_day_load_25}]]></variableExpression>
+	</variable>
+	<variable name="CCF27_Day26_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_26} == null || $V{v_max_day_load_26}.isEmpty()
+? "26" + $V{v_empty_day}
+: $V{v_max_day_load_26}]]></variableExpression>
+	</variable>
+	<variable name="CCF28_Day27_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_27} == null || $V{v_max_day_load_27}.isEmpty()
+? "27" + $V{v_empty_day}
+: $V{v_max_day_load_27}]]></variableExpression>
+	</variable>
+	<variable name="CCF29_Day28_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_28} == null || $V{v_max_day_load_28}.isEmpty()
+? "28" + $V{v_empty_day}
+: $V{v_max_day_load_28}]]></variableExpression>
+	</variable>
+	<variable name="CCF30_Day29_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_29} == null || $V{v_max_day_load_29}.isEmpty()
+? "29" + $V{v_empty_day}
+: $V{v_max_day_load_29}]]></variableExpression>
+	</variable>
+	<variable name="CCF31_Day30_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_30} == null || $V{v_max_day_load_30}.isEmpty()
+? "30" + $V{v_empty_day}
+: $V{v_max_day_load_30}]]></variableExpression>
+	</variable>
+	<variable name="CCF32_Day31_Loads" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$V{v_max_day_load_31} == null || $V{v_max_day_load_31}.isEmpty()
+? "31" + $V{v_empty_day}
+: $V{v_max_day_load_31}]]></variableExpression>
+	</variable>
+	<variable name="CCF33_Show_Pop" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{POPULATION_NUMBER} == null || $F{POPULATION_NUMBER}.isEmpty()
+? ( $F{INPUT_POPULATION} == null || $F{INPUT_POPULATION}.isEmpty() ? "" : "* " + $F{INPUT_POPULATION} )
+: $F{POPULATION_NUMBER}
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF34_Show_Stratum" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{STRATUM_NUMBER} == null || $F{STRATUM_NUMBER}.isEmpty()
+? ( $F{INPUT_STRATUM} == null || $F{INPUT_STRATUM}.isEmpty() ? "" : "* " + $F{INPUT_STRATUM} )
+: $F{STRATUM_NUMBER}
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF35_Show_Sample_Year" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{SAMPLING_YEAR} == null
+? ( $F{INPUT_SAMPLING_YEAR} == null || $F{INPUT_SAMPLING_YEAR}.isEmpty() ? "" : "* " + $F{INPUT_SAMPLING_YEAR} )
+: new DecimalFormat("###0").format( $F{SAMPLING_YEAR} )
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF36_Show_Timber_Mark" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{TIMBER_MARK} == null || $F{TIMBER_MARK}.isEmpty()
+? ( $F{INPUT_TIMBER_MARK} == null || $F{INPUT_TIMBER_MARK}.isEmpty() ? "" : "* " + $F{INPUT_TIMBER_MARK} )
+: $F{TIMBER_MARK}
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF37_Show_Bill_To_Client" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{CLIENT_NUMBER_PAID_BY} == null || $F{CLIENT_NUMBER_PAID_BY}.isEmpty()
+? ""
+: $F{CLIENT_NUMBER_PAID_BY} + " " + ( $F{CLIENT_LOCN_CODE_PAID_BY} == null || $F{CLIENT_LOCN_CODE_PAID_BY}.isEmpty() ? "" : $F{CLIENT_LOCN_CODE_PAID_BY} )]]></variableExpression>
+	</variable>
+	<variable name="CCF38_Show_Copy_To_Client" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{CLIENT_NUMBER_COPIED_TO} == null || $F{CLIENT_NUMBER_COPIED_TO}.isEmpty()
+? ""
+: $F{CLIENT_NUMBER_COPIED_TO} + " " + ( $F{CLIENT_LOCN_CODE_COPIED_TO} == null || $F{CLIENT_LOCN_CODE_COPIED_TO}.isEmpty() ? "" : $F{CLIENT_LOCN_CODE_COPIED_TO} )]]></variableExpression>
+	</variable>
+	<variable name="Sum (HBS2R102.DAY_NUMBER_OF_LOADS, HBS2R102.DOCUMENT_CONTROL_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{DAY_NUMBER_OF_LOADS}]]></variableExpression>
+	</variable>
+	<variable name="Sum (HBS2R102.DAY_WEIGHT, HBS2R102.DOCUMENT_CONTROL_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
+		<variableExpression><![CDATA[$F{DAY_WEIGHT}]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{DOCUMENT_CONTROL_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band height="20" splitType="Prevent">
+				<subreport>
+					<reportElement uuid="e158717e-a685-4659-bddf-5e588fb37a76" x="10" y="2" width="699" height="16"/>
+					<subreportParameter name="WS_ERR_RETURN_DOCNUMBER">
+						<subreportParameterExpression><![CDATA[$P{WSRETURN_DOCUMENTNUMBER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="WS_ERR_RETURN_VERSION">
+						<subreportParameterExpression><![CDATA[$P{WSRETURN_VERSIONNUMBER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[($P{SUBREPORT_DIR} + "HBS2R102_SR1_HBS2R102D" + $P{SUBREPORT_EXT})]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="96" splitType="Prevent">
+				<staticText>
+					<reportElement uuid="bb91f93b-a953-4d38-8ae3-ca366ef8a48a" x="10" y="1" width="45" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Scale Data]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="83a2d650-022a-4446-a328-6481e416106f" x="10" y="15" width="60" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Population:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="2b861d11-1bdf-4a24-a3ce-27954c7f8eb4" x="10" y="26" width="60" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Stratum:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9832eb05-c13b-4656-81a5-ccc16034b229" x="10" y="38" width="60" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Sampling Year:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="8e138cf2-b0ff-404d-936f-f408b1afe3fa" x="10" y="51" width="59" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Timber Mark:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="c953fe37-3c8b-43e8-9e33-cde9366b4202" x="232" y="15" width="68" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Scale Site:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="49bea083-f7e0-462f-979f-c96adce5d261" x="232" y="26" width="68" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Scale Date:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="84d491c0-8501-446b-b927-3af04639c2d4" x="232" y="38" width="68" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Bill To Client:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="ffef5e6e-1690-47c3-8dd1-9c53bd171021" x="232" y="51" width="68" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Copy To Client:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9114fb0d-c6a1-4cbd-9163-6a3f7c65c499" x="510" y="12" width="54" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Total Loads:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="68ac4c62-636e-4249-a359-153d8def8cb0" x="510" y="24" width="54" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Total Weight:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="048acf7e-f53f-4b12-9337-2329ee3549e5" x="510" y="36" width="54" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Field Deck ID:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="bd0fcf86-def4-4979-8d4a-ccc8e3da699b" x="9" y="72" width="61" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Daily Loads]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="1a0124a3-49e6-4a97-80e9-0d155e251062" x="9" y="84" width="27" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Day]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="0de81f53-9291-4616-a1a5-2af91e529775" x="44" y="84" width="31" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Loads]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9d671966-df64-4ae3-a44e-86a7978381de" x="95" y="84" width="45" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Weight]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="4a833f88-3934-4c41-8bcd-fe3b98747fdc" x="216" y="84" width="27" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Day]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="bdea223e-bd89-4222-b4be-2b2e6c0fa516" x="252" y="84" width="31" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Loads]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="9c92d9ea-86e8-49f5-ba6f-7703cabf41b2" x="300" y="84" width="45" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Weight]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5bf576a3-cac4-41c2-a74f-6e48081ed390" x="390" y="84" width="27" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Day]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="ae049aea-8167-4b58-b10c-78e511d4e5ba" x="432" y="84" width="31" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Loads]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="1432c1d5-4c19-4a6a-8c9e-fb28d29e27b3" x="477" y="84" width="45" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Weight]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="2208fd9e-44d9-427b-af11-23b95c2738d8" x="573" y="84" width="27" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Day]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="03a87ea5-75b7-4654-8932-379b1eab5373" x="609" y="84" width="31" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Loads]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="23f4eabb-7516-4303-99fc-fe725f78f9a7" x="657" y="84" width="45" height="12" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Weight]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="53e51e26-835e-4cbb-80dd-89bf40fd3f2d" x="77" y="15" width="59" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF33_Show_Pop}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="48960db5-2dd1-49d3-8fa6-13df7e5ca644" x="77" y="27" width="58" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF34_Show_Stratum}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="a2ec43de-7806-4353-84a1-3f31e6c677bc" x="77" y="38" width="83" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF35_Show_Sample_Year}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="91be091e-cca0-42ab-927f-2d56b3105d44" x="77" y="51" width="78" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF36_Show_Timber_Mark}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="68215a76-1446-4903-af32-0cc40644b80f" x="310" y="15" width="55" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SCALE_SITE_ID_NMBR}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+					<reportElement uuid="d00414c2-fec3-4b54-85c6-c16118f7f681" x="310" y="27" width="57" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SCALE_DATE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="dfcca42d-3cc1-4ec1-86f8-087e906e02f0" x="310" y="38" width="68" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF37_Show_Bill_To_Client}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="9c409d1b-e869-4d22-b1d5-a39eccb88c6d" x="310" y="51" width="68" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF38_Show_Copy_To_Client}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="Group 0" pattern="###0;-###0" isBlankWhenNull="true">
+					<reportElement uuid="90e1b4d6-a576-4590-9212-1fb6b219f2b3" x="564" y="12" width="55" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Sum (HBS2R102.DAY_NUMBER_OF_LOADS, HBS2R102.DOCUMENT_CONTROL_NUMBER)}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="Group 0" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+					<reportElement uuid="6869771e-16f4-47b1-b7bf-960947df22f3" x="564" y="24" width="55" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{Sum (HBS2R102.DAY_WEIGHT, HBS2R102.DOCUMENT_CONTROL_NUMBER)}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="4d0e025b-7ae0-4965-9a90-73e9078875bd" x="565" y="36" width="54" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{FIELD_SCALE_DECK_ID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="f760eeb8-8ac5-4463-bd64-940cd48f447b" x="85" y="72" width="57" height="11" forecolor="#000000">
+						<printWhenExpression><![CDATA[false]]></printWhenExpression>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF9_Declare_array}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="74" splitType="Prevent">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="7941ba85-14b7-4a0f-a534-808889f5574d" x="14" y="0" width="112" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF0_Day1_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="73d24c17-3a3c-4a36-8c88-a7210f17d1d8" x="14" y="9" width="112" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF1_Day2_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="cecef73f-85ba-4128-ad7c-7877db32a239" x="14" y="18" width="126" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF2_Day3_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="f6c0e91a-070c-4905-921f-4b7c3ca3227a" x="14" y="27" width="126" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF3_Day4_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="1b207c29-df05-45bf-9b85-b3ef1f613e9b" x="14" y="36" width="126" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF4_Day5_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c81d3ee8-cb41-4685-9738-d1badb6c4acd" x="14" y="44" width="126" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF5_Day6_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="3206a188-5cca-472c-bea5-b20af1594622" x="14" y="53" width="126" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF6_Day7_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="95b3d439-a9e9-4295-8f83-f9ba41860bf5" x="219" y="0" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF7_Day8_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="a042ad16-95ce-4714-9719-b96f7f408ff3" x="219" y="9" width="125" height="11" forecolor="#000000"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF8_Day9_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="b293cd9f-73b6-4bf1-9a0f-faa3505440ac" x="219" y="18" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF11_Day10_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="205ad671-ab70-4167-8882-11ef81d9c551" x="219" y="27" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF12_Day11_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="a091507f-d0d2-4224-8b68-275426822d14" x="219" y="36" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF13_Day12_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c6edfbba-ea0a-42eb-959c-adc39c65f5e9" x="219" y="44" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF14_Day13_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="0952229e-8046-48e5-a154-9d6cc5199b29" x="219" y="53" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF15_Day14_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="70d57d6c-0ef7-4fc6-ab05-514d21dec12d" x="219" y="62" width="125" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF16_Day15_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="315ad89d-f773-4f99-9c0f-932ee881ed22" x="396" y="0" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF17_Day16_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="5e66bcc0-bea9-4e9b-a4a8-51fb374da8d1" x="396" y="9" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF18_Day17_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="743315b9-874f-4cbf-8037-55ff97131fc7" x="396" y="18" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF19_Day18_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="a52e8f77-3bb6-4d91-801f-0367b28743d9" x="396" y="27" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF20_Day19_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="8c2a6ee4-71bc-4326-96a5-3ce185ce8132" x="396" y="36" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF21_Day20_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="86b944c4-9975-4c5a-81b6-e1f335fcee61" x="396" y="44" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF22_Day21_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="8484c15c-cee4-4cb4-8e85-a28a3629a6a2" x="396" y="53" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF23_Day22_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="1dc992c6-72ca-4c15-9af9-890efd676024" x="396" y="62" width="123" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF24_Day23_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c6a82273-73e7-4534-848a-7b0d416ccae9" x="576" y="0" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF25_Day24_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="c324492d-0552-4ed6-9643-f84f5d756be0" x="576" y="9" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF26_Day25_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="d4336163-dafa-4003-942b-66102dfeb8fc" x="576" y="18" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF27_Day26_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="e840b331-1fbe-4160-83b7-7804f384e836" x="576" y="27" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF28_Day27_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="22874f4f-6512-4bce-8155-9a5500da3868" x="576" y="36" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF29_Day28_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="841036c1-c1b8-40bd-b289-601969808aec" x="576" y="44" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF30_Day29_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="60e3378a-d9ff-4815-b4f4-db22e33a9bb9" x="576" y="53" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF31_Day30_Loads}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement uuid="e1882235-fad4-47c7-8674-1e68d9faf122" x="576" y="62" width="130" height="11" forecolor="#000000"/>
+					<textElement>
+						<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{CCF32_Day31_Loads}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="20" splitType="Prevent">
+				<subreport>
+					<reportElement uuid="7dca939d-6ac4-43a1-a3b0-e7ba405285d3" x="10" y="2" width="699" height="16"/>
+					<subreportParameter name="Pm-HBS2R102.DOCUMENT_CONTROL_NUMBER">
+						<subreportParameterExpression><![CDATA[$F{DOCUMENT_CONTROL_NUMBER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="Pm-HBS2R102.VERSION">
+						<subreportParameterExpression><![CDATA[$F{VERSION}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[($P{SUBREPORT_DIR} + "HBS2R102_SR2_HBS2R102b" + $P{SUBREPORT_EXT})]]></subreportExpression>
+				</subreport>
+			</band>
+			<band height="22" splitType="Prevent">
+				<subreport>
+					<reportElement uuid="600f215f-20c5-43ac-9a03-ff34c1bc0078" x="10" y="4" width="701" height="16"/>
+					<subreportParameter name="Pm-HBS2R102.DOCUMENT_CONTROL_NUMBER">
+						<subreportParameterExpression><![CDATA[$F{DOCUMENT_CONTROL_NUMBER}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA[($P{SUBREPORT_DIR} + "HBS2R102_SR3_HBS2R102c" + $P{SUBREPORT_EXT})]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupFooter>
+	</group>
+	<pageHeader>
+		<band height="119">
+			<line>
+				<reportElement uuid="d2f00647-bec5-49f8-a924-68c164bc1216" x="0" y="53" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="867c2c95-1648-4cc2-b36d-dd9945b9ad60" x="279" y="16" width="180" height="15" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Harvest Billing System]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ab080415-368d-4366-9b65-88b6f314ed37" x="279" y="33" width="180" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Weight Scale Return Report]]></text>
+			</staticText>
+			<image>
+				<reportElement uuid="cc6b0208-a973-4fdf-bad4-e9a6a5baec6a" x="3" y="4" width="145" height="36"/>
+				<imageExpression><![CDATA[($P{SUBREPORT_DIR} + "hbs_logo1.jpg" )]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="565c321e-d216-4098-b3b3-8847006cc81e" x="675" y="2" width="21" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement uuid="b5296343-aa08-4343-9e39-c7e25497e0da" x="704" y="2" width="13" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="3ddaccec-2990-42af-a922-1169123d6937" x="659" y="12" width="58" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="HH:mm:ss" isBlankWhenNull="true">
+				<reportElement uuid="e8e1e3fa-8c26-41c0-b0bc-afa94fa74fe9" x="659" y="23" width="58" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d165ef31-0850-491c-ba34-2865542c7ef4" x="663" y="33" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{p_report_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4b503b2c-5161-4e81-b39f-69341837b4aa" x="663" y="43" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{WSRETURN_JOBNO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6c1c07bf-8e53-4c6a-ab12-3467214e986b" x="616" y="2" width="37" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Page:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6f0cefe2-5790-4e5f-8a92-766dfbda3939" x="697" y="2" width="7" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[of]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b27517da-3738-46e3-b1c1-124a2ddc4d8a" x="616" y="12" width="37" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rundate:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="87640323-b3fe-451d-b3ac-1b137c90f360" x="616" y="23" width="37" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Runtime:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4a39cdaf-ea70-4c67-9d00-5d2769290c45" x="616" y="33" width="37" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Report Id:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b5287731-8619-4d04-b9e1-4192d0cbcdd2" x="616" y="43" width="46" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Request No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e4c5265d-c304-4c1a-aff0-2c71244276b2" x="10" y="70" width="88" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Summary Document:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="4db98c4e-0998-4bb9-80c6-5500d4487398" x="107" y="70" width="92" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOCUMENT_CONTROL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4ee7164c-cf0d-4e68-878a-a236dd0472ab" x="10" y="81" width="88" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Version Status:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a6247b95-1a0a-4de6-bef1-49a13c0dae9e" x="107" y="81" width="202" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="673e6e6b-d8c7-4341-86d3-9385ed2865a5" x="10" y="92" width="68" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Version:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="777369f8-8c8b-409c-8a6c-239413e266ab" x="107" y="92" width="25" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VERSION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="22147911-87e3-4ac1-bf4d-087a9e40c298" x="10" y="103" width="68" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Return Type:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="0b048d99-4dbf-4219-afeb-8375d95d03b2" x="107" y="103" width="202" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RETURN_CATEGORY_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement uuid="a53331a3-2682-410c-8bf0-197cfbc9119e" x="222" y="0" width="330" height="19"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HBS_HEADER" + $P{SUBREPORT_EXT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2b8c1d13-e3b9-4a04-b939-9dcc61c36941" x="15" y="0" width="73" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[false]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF10_Read_daily_loads}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="15" splitType="Prevent">
+			<line>
+				<reportElement uuid="adc9c3eb-d5c7-4429-bb34-ec46d2f5d037" x="0" y="3" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="b88e3cfa-9962-49e5-9155-aa59bcbb9f20" mode="Opaque" x="0" y="6" width="719" height="9" forecolor="#000000" backcolor="#EAEAEA"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="6" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Note:  While every effort has been made to ensure that the information presented on this report is accurate and complete, it cannot be guaranteed.]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

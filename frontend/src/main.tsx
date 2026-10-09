@@ -1,26 +1,31 @@
-import '@bcgov/bc-sans/css/BC_Sans.css'
-import { StrictMode } from 'react'
-import * as ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
-// Import bootstrap styles
-import '@/scss/styles.scss'
+import App from './App';
+import { AuthProvider } from './context/auth/AuthProvider';
+import { NotificationProvider } from './context/notification/NotificationProvider';
+import OrgProvider from './context/org/OrgProvider';
+import ThemeProvider from './context/theme/ThemeProvider';
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import './index.scss';
 
-// Create a new router instance
-const router = createRouter({ routeTree })
+// Auth is BC Gov SSO (Keycloak) via oidc-client-ts — see services/keycloak.ts.
+// Nothing to configure at boot: the UserManager is created lazily, after
+// window.config (runtime env) is available.
 
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
+const container = document.getElementById('root');
+if (!container) throw new Error('Root container #root not found');
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-)
+createRoot(container).render(
+  <React.StrictMode>
+    <AuthProvider>
+      <OrgProvider>
+        <ThemeProvider>
+          <NotificationProvider>
+            <App />
+          </NotificationProvider>
+        </ThemeProvider>
+      </OrgProvider>
+    </AuthProvider>
+  </React.StrictMode>,
+);

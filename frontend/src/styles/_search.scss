@@ -1,0 +1,309 @@
+// ── Shared search-screen layout ──
+// Every FTA search screen renders the same shape: criteria in a white tile over
+// a responsive field grid, then a full-bleed grey results panel whose count
+// banner, table and pagination footer read as one connected block. Ported from
+// nr-fsp-new's SearchPage.scss so the two applications match.
+//
+// This is the page-local half only. The table chrome — grey header, 16px
+// near-black body text, white/grey zebra, the selectable-row hover wash, and
+// the whole g100 dark-mode flip — is already global in `_tables.scss` for every
+// `.cds--data-table`, and `_overrides.scss` carries the app-wide pagination
+// chrome plus g100 overrides that expect the light base defined here.
+//
+// The `fsp-search__*` names are shared with the sibling apps on purpose: the
+// rules in `_tables.scss` and `_overrides.scss` key off them, so renaming to
+// something FTA-specific would silently drop that styling.
+//
+// Loaded after `./tables` in `styles/index.scss`. The g100 blocks in
+// `_overrides.scss` still win over the light values below because they carry a
+// `:root[data-carbon-theme='g100']` attribute selector.
+
+// ── Criteria tile ──
+// White surface with grey widgets: bump the tile's --cds-layer to layer-02
+// (white) and push the field surfaces back down to layer-01 (grey) so inputs
+// read as distinct against it. Overriding the token on the element (rather
+// than setting background-color) means nested Carbon components that consume
+// the token follow along.
+.fsp-search__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  --cds-layer: var(--cds-layer-02);
+  --cds-field: var(--cds-field-01);
+  --cds-field-hover: var(--cds-field-hover-01);
+  --cds-border-subtle: var(--cds-border-subtle-01);
+  background-color: var(--cds-layer-02);
+
+  // Field label: 14px in the primary text colour (Carbon's default is a 12px
+  // secondary caption), input text at 16px (Carbon default 14px). Scoped to
+  // the tile so other forms in the app are untouched.
+  .cds--label {
+    font-size: 14px;
+    line-height: 1.125rem;
+    letter-spacing: 0.16px;
+    margin-block-end: 0.25rem;
+    color: var(--cds-text-primary);
+  }
+
+  .cds--text-input,
+  .cds--select-input {
+    font-size: 16px;
+  }
+}
+
+// Drop Carbon's default inline padding so the fields line up with the page
+// title above, which sits at the content edge rather than inside the tile.
+.fsp-search__tile.cds--tile {
+  padding-inline: 0;
+  padding-block-end: 0.5rem;
+}
+
+.fsp-search__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ── Field grid ──
+// One column on small screens, two at Carbon's md, four at lg — same
+// breakpoints as the sibling apps.
+.fsp-search__field-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 672px) {
+  .fsp-search__field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1056px) {
+  .fsp-search__field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+// Section heading inside the criteria grid (e.g. "Date ranges"). Spans the full
+// width so it sits on its own row and pushes the fields below it to a fresh
+// one. Negative margins on both sides tighten the 1rem row gaps so the heading
+// sits snug against the fields it introduces.
+.fsp-search__field-grid .fsp-search__group-heading {
+  grid-column: 1 / -1;
+  margin: -0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.125rem;
+  letter-spacing: 0.16px;
+  color: var(--cds-text-secondary);
+}
+
+// A cell that spans the whole grid — the sort-by radio row, and anywhere else a
+// control needs the full width.
+.fsp-search__field-grid .fsp-search__sort-cell,
+.fsp-search__field-grid .fsp-search__full-cell {
+  grid-column: 1 / -1;
+}
+
+.fsp-search__field-grid .fsp-search__sort-cell .cds--radio-button-group {
+  gap: 1.5rem;
+}
+
+// A cell spanning two columns — for a wider control (a client autocomplete,
+// say) that would be cramped in a quarter-width cell at lg.
+@media (min-width: 672px) {
+  .fsp-search__field-grid .fsp-search__wide-cell {
+    grid-column: span 2;
+  }
+
+  .fsp-search__field-grid .fsp-search__wide-cell .cds--list-box__wrapper {
+    inline-size: 100%;
+  }
+}
+
+// Each date picker fills its own grid cell. Carbon nests the input four levels
+// deep and several of those resist stretching — the form item is a flex column
+// with `align-items: flex-start`, the picker is a flex row, and the input has a
+// fixed 18rem width. Forcing the whole subtree to 100% is cheaper than
+// out-specifying each rule individually.
+.fsp-search__field-grid .cds--date-picker,
+.fsp-search__field-grid .cds--date-picker-container,
+.fsp-search__field-grid .cds--date-picker-input__wrapper,
+.fsp-search__field-grid .cds--date-picker-input__wrapper > span,
+.fsp-search__field-grid .cds--date-picker__input {
+  inline-size: 100% !important;
+  min-inline-size: 0 !important;
+  max-inline-size: 100% !important;
+}
+
+@media (min-width: 1056px) {
+  // Force the marked field to start a new row at column 1. The auto-flow grid
+  // would otherwise tuck it into the next empty cell on the current row; a
+  // clean break keeps a group (the date fields, say) together on its own row.
+  .fsp-search__field-grid .fsp-search__row-start {
+    grid-column: 1;
+  }
+}
+
+// Centred spinner while a screen's code lists load, sized to the viewport minus
+// the Carbon header so it sits in the middle of the content area.
+.fsp-search__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: calc(100vh - 3rem);
+}
+
+.fsp-search__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+// ── Results ──
+// A full-bleed grey panel. `.cds--content` supplies `padding: 0 1.5rem`
+// (_overrides.scss), and the negative inline margin is sized to cancel exactly
+// that one layer so the table runs edge to edge. `flex: 1 1 auto` stretches the
+// grey to the bottom of the viewport when the result set is short, so the page
+// doesn't end in a ragged band of page background.
+.fsp-search__results-fullbleed {
+  background-color: var(--cds-layer-01);
+  margin-block-start: 1rem;
+  margin-inline: -1.5rem;
+  flex: 1 1 auto;
+  border-block-start: 1px solid #dfdfe1;
+  // Scrolled to after a search: stop below Carbon's fixed 3rem header, not under it.
+  scroll-margin-block-start: 3rem;
+}
+
+// Banner, table and pagination sit flush so they read as one block.
+.fsp-search__results {
+  display: flex;
+  flex-direction: column;
+}
+
+.fsp-search__results-header {
+  background-color: var(--cds-layer-01);
+  padding: 0.75rem 1rem;
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--cds-text-primary);
+  // The count sits left, the export action right. Wraps on a narrow screen
+  // rather than squeezing the button off the row.
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  // Carbon's small ghost button is 2rem tall against the count's ~1.4rem line,
+  // so trim the block padding to keep the banner its original height.
+  padding-block: 0.375rem;
+}
+
+.fsp-search__results-count {
+  display: inline-block;
+}
+
+// In-flight: the banner shows "Searching" and a spinner where the count goes.
+.fsp-search__results-count--searching {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cds-text-secondary);
+}
+
+.fsp-search__searching-spinner {
+  display: inline-block;
+  inline-size: 16px;
+  block-size: 16px;
+  flex-shrink: 0;
+  border: 2px solid #c6c6c8;
+  border-top-color: var(--cds-interactive, #0073e6);
+  border-radius: 50%;
+  animation: fsp-search-spin 0.7s linear infinite;
+}
+
+@keyframes fsp-search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fsp-search__results,
+.fsp-search__table {
+  inline-size: 100%;
+}
+
+// Flat full-width grid rather than a card: drop the container's rounded,
+// padded wrapper so the table meets the banner above it.
+.fsp-search__table .cds--data-table-container {
+  padding-block-start: 0;
+  background: transparent;
+}
+
+// Opt-in: keep a cell's value on one line. Dates are the usual case — they
+// otherwise wrap to "Apr 10," / "2021" once the column narrows. Applied per
+// column by the page, because which columns hold dates differs per screen.
+.fsp-search__table .cds--data-table tbody td.fsp-search__cell--nowrap {
+  white-space: nowrap;
+}
+
+// ── Pagination footer ──
+// Light base for the bar; `_overrides.scss` re-tints these under g100. The
+// app-wide pagination rules there inset the inline selects and nav buttons and
+// strip their borders, so each section is reset here (three classes beats two,
+// so this wins regardless of load order) to fill the bar height and carry a
+// full-height divider.
+.fsp-search__results {
+  .cds--pagination {
+    background-color: #f4f4f4;
+    border: none;
+    border-block-start: 1px solid #c6c6c8;
+    border-block-end: 1px solid #c6c6c8;
+    color: var(--cds-text-secondary, #606062);
+    font-size: 14px;
+  }
+
+  .cds--pagination .cds--select__item-count,
+  .cds--pagination .cds--select__page-number,
+  .cds--pagination .cds--pagination__button {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  // Carbon draws its own short divider on the items-per-page select, which
+  // would sit just inside the full-height one below and read as a double
+  // line. The wrapper divider is the only one wanted.
+  .cds--pagination .cds--select__item-count .cds--select-input {
+    border-inline-end: 0;
+  }
+
+  .cds--pagination .cds--select__item-count {
+    border-inline-end: 1px solid #c6c6c8;
+  }
+
+  .cds--pagination__right {
+    border-inline-start: 1px solid #c6c6c8;
+  }
+
+  // The arrow buttons are 40px inside a 3rem-tall wrapper; centring them lines
+  // the icons up with the vertically centred "of N pages" text.
+  .cds--pagination__control-buttons .cds--popover-container {
+    border-inline-start: 1px solid #c6c6c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Let the grey bar show through Carbon's own white inner surfaces. Borders
+  // are left alone so the dividers above stay visible.
+  .cds--pagination .cds--select-input,
+  .cds--pagination .cds--pagination__button,
+  .cds--pagination .cds--pagination__text,
+  .cds--pagination .cds--pagination__pages-text {
+    background-color: transparent;
+    color: var(--cds-text-secondary, #606062);
+  }
+}

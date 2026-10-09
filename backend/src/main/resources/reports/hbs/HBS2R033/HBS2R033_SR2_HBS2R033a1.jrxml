@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R033a1" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="30329109-07d3-4d01-974a-1ed52bb953f4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R032.BATCH_ID" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R033a1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       DBFE.ERROR_ID
+     , DDBD.BATDOC_ID
+     , DBFE.HBS_EDIT_ERR_CATEGORY_CODE
+     , DBFE.HBS_EDIT_ERR_MESSAGE_CODE
+     , DBFE.ERROR_TIMESTAMP
+     , DBFE.INPUT_SCALE_SITE
+     , DBFE.INPUT_DATE
+     , DBFE.INPUT_PRIMARY_SCALER_LIC
+     , DBFE.INPUT_WEIGH_SLIP_NUMBER
+     , DBFE.INPUT_SOURCE
+     , DBFE.INPUT_SCALE_EVENT_TYPE
+     , DBFE.INPUT_RETURN_NUMBER
+     , DDBD.BATCH_ID
+     , DDBD.ACCEPTED_IND
+     , DDBD.SOFTWARE_PRODUCT
+     , DDBD.SOFTWARE_VERSION
+     , DDBD.SOFTWARE_REVISION
+     , DDBD.DETAIL_DOCUMENT_NUMBER
+     , DDBD.INPUT_DDN
+     , DDBD.INPUT_DV
+     , DDBD.ENTRY_USERID
+     , DDBD.ENTRY_TIMESTAMP
+     , EEMC.DESCRIPTION
+     , EEMC.EFFECTIVE_DATE
+     , EEMC.EXPIRY_DATE
+     , EEMC.UPDATE_TIMESTAMP
+FROM      DTL_DOC_BATCH_DOCUMENT    DDBD
+LEFT JOIN DTL_BAT_DOC_FORMAT_ERROR  DBFE ON  DBFE.BATDOC_ID = DDBD.BATDOC_ID
+LEFT JOIN HBS_EDIT_ERR_MESSAGE_CODE EEMC ON  EEMC.HBS_EDIT_ERR_CATEGORY_CODE = DBFE.HBS_EDIT_ERR_CATEGORY_CODE
+                                         AND EEMC.HBS_EDIT_ERR_MESSAGE_CODE  = DBFE.HBS_EDIT_ERR_MESSAGE_CODE
+WHERE  DDBD.DETAIL_DOCUMENT_NUMBER IS NULL
+AND    DDBD.BATCH_ID               =  $P{Pm-HBS2R032.BATCH_ID}]]>
+	</queryString>
+	<field name="ERROR_ID" class="java.math.BigDecimal"/>
+	<field name="BATDOC_ID" class="java.math.BigDecimal"/>
+	<field name="HBS_EDIT_ERR_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="HBS_EDIT_ERR_MESSAGE_CODE" class="java.lang.String"/>
+	<field name="ERROR_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="INPUT_SCALE_SITE" class="java.lang.String"/>
+	<field name="INPUT_DATE" class="java.lang.String"/>
+	<field name="INPUT_PRIMARY_SCALER_LIC" class="java.lang.String"/>
+	<field name="INPUT_WEIGH_SLIP_NUMBER" class="java.lang.String"/>
+	<field name="INPUT_SOURCE" class="java.lang.String"/>
+	<field name="INPUT_SCALE_EVENT_TYPE" class="java.lang.String"/>
+	<field name="INPUT_RETURN_NUMBER" class="java.lang.String"/>
+	<field name="BATCH_ID" class="java.math.BigDecimal"/>
+	<field name="ACCEPTED_IND" class="java.lang.String"/>
+	<field name="SOFTWARE_PRODUCT" class="java.lang.String"/>
+	<field name="SOFTWARE_VERSION" class="java.lang.String"/>
+	<field name="SOFTWARE_REVISION" class="java.lang.String"/>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="INPUT_DDN" class="java.lang.String"/>
+	<field name="INPUT_DV" class="java.lang.String"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<variable name="CCF0_Show_DDN" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{DETAIL_DOCUMENT_NUMBER} == null || $F{DETAIL_DOCUMENT_NUMBER}.isEmpty()
+? $F{INPUT_DDN}
+: $F{DETAIL_DOCUMENT_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="DistinctCount (@Show_DDN)" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$V{CCF0_Show_DDN}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="30" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="f0b40399-8123-40e2-9b69-e4b4b5b022dc" x="1" y="0" width="109" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rejected Documents]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b47f59a5-72fb-4b26-99d3-8d57964d8541" x="4" y="18" width="45" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[DDN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7c15c130-392e-46c6-ab85-e8ffb09aebcc" x="66" y="18" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Xmit Version]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="885b3335-667f-46fb-8e3d-62a810f6b840" x="126" y="18" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fba09a00-5463-4ad0-9fed-32320e8f0db0" x="186" y="18" width="66" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Primary Scaler
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3fa601fa-337a-4d3b-ae72-c6615d43e0dd" x="258" y="18" width="36" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Return]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a8f7496-db7c-43f1-9ac6-40dae5bd37dd" x="300" y="18" width="54" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Timber Mark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="46f63050-d93a-421b-a142-faa2da66dc68" x="360" y="18" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Site]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1cd67beb-ebfb-48df-84d7-ec5d85dfbd08" x="414" y="18" width="48" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Event Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a740f721-70c0-4678-a247-b761df921083" x="468" y="18" width="24" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Error]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="08fa0836-a10c-44f6-9f5c-5354d17b92e7" x="4" y="0" width="92" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_DDN}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="cbc3c042-fabc-4875-8b97-9b986bd0ad8c" x="83" y="0" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_DV}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="47a45118-2484-42da-a7d6-a268e035c096" x="126" y="0" width="60" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="469ff397-206d-45c9-bbc4-2ca4aaa7f993" x="186" y="0" width="66" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_PRIMARY_SCALER_LIC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="83498a48-dce3-4079-921b-b534b84254bd" x="258" y="0" width="36" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_RETURN_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e143b5a3-705d-43ed-a6e0-a27cd68e8dd3" x="300" y="0" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_SOURCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="458a130d-9010-4196-9634-4c215f08e1d3" x="360" y="0" width="48" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_SCALE_SITE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="0516774e-a9c9-4f04-958c-218bde370795" x="414" y="0" width="48" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INPUT_SCALE_EVENT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5915d6ef-61a8-4057-9b8c-4aa3f13cc041" x="468" y="0" width="42" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HBS_EDIT_ERR_MESSAGE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="6e918770-9729-483d-be16-9cadd12a5853" x="516" y="0" width="174" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="48" splitType="Prevent">
+			<line>
+				<reportElement uuid="eda00dc2-0387-4e64-bf35-6426184f4a62" x="6" y="4" width="106" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="ce3f9653-a9b1-424f-8c44-a8302a79257d" x="4" y="6" width="87" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Total Rejected Docs: ]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0" isBlankWhenNull="true">
+				<reportElement uuid="2503c8f1-d04f-4417-ae90-825c57756a34" x="96" y="6" width="19" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{DistinctCount (@Show_DDN)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

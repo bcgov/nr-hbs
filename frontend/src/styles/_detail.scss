@@ -1,0 +1,443 @@
+// Record detail pages (Tenure detail, …) — the tabbed layout from
+// nr-fsp-new's FSP information page (pages/FspInformation/fsp-info.scss).
+// Class names keep that page's fsp-info__ block so a grep lines the two apps
+// up, the same way the search screens share fsp-search__.
+
+// Page-level tabs, applied to a <div> wrapping Carbon's <Tabs> (a className on
+// <Tabs> itself is dropped — it renders only a context provider). The contained
+// tab bar reads --cds-layer, so the active tab is white and the others grey;
+// the panel beneath is a grey canvas that the white section tiles sit on.
+//
+// Carbon paints the panel with `.cds--tabs--contained ~ .cds--tab-content`
+// (0,2,0); the same sibling shape under this class (0,3,0) wins regardless of
+// bundle order. The child combinator keeps the grey off any tabs nested inside
+// a panel.
+.fsp-info__page-tabs {
+  > .cds--tabs--contained ~ .cds--tab-content {
+    background-color: var(--cds-layer-01);
+    // Full-bleed the grey pane from the side nav to the screen edge. FTA pages
+    // sit directly in `.cds--content`, whose only inline inset is 1.5rem
+    // (_overrides.scss) — there is no Carbon Grid margin on top, unlike the
+    // FSP page — so the breakout is 1.5rem each side. The matching padding
+    // keeps the tiles aligned with the tab bar and page title. Overshooting
+    // this is what produces a horizontal scrollbar.
+    margin-inline: -1.5rem;
+    width: calc(100% + 3rem);
+    padding: 1.5rem;
+    box-sizing: border-box;
+    // Run the grey to the bottom of the viewport when the active tab is short,
+    // so no page background shows beneath it. The offset approximates the
+    // chrome above the pane (header, title, back link, tab bar).
+    min-block-size: calc(100dvh - 18rem);
+  }
+}
+
+// A tombstone right above the tabs: the page layout's gap already spaces them,
+// so its own bottom margin would double it.
+.fta-tombstone:has(+ .fsp-info__page-tabs) {
+  margin-block-end: 0;
+}
+
+// The page's bottom padding would otherwise leave a band of page background
+// under the grey pane.
+.page-layout:has(.fsp-info__page-tabs) {
+  padding-block-end: 0;
+}
+
+// Tab-panel body — consistent spacing between the tiles/tables in a tab.
+.fsp-info__tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// White section card on the grey tab canvas, with the flat outline the FSP
+// Information tab uses for its icon-titled sections.
+.fsp-info__tile {
+  background-color: var(--cds-layer-02);
+  border: 1px solid #ececec;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+
+  @media (min-width: 672px) {
+    padding: 1.25rem 2rem 1.75rem;
+  }
+}
+
+.fsp-info__tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-end: 1.5rem;
+}
+
+.fsp-info__section-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--cds-text-primary);
+
+  svg {
+    flex: 0 0 auto;
+    fill: var(--cds-icon-secondary);
+  }
+}
+
+// Tiles side by side, each sized to its content: they share the row in
+// proportion to what they hold, and wrap to one per row when they do not fit.
+.fsp-info__tile-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1.5rem;
+
+  // An even split of the row. Sizing each tile to its content let one long value
+  // (a mark type description, say) widen a tile until the pair no longer fitted
+  // beside the side nav, and the second dropped beneath the first. They stack only
+  // when the row is narrower than two 24rem tiles.
+  > .fsp-info__tile {
+    flex: 1 1 24rem;
+    min-width: 0;
+  }
+
+  // Two columns sharing the tile's width; long values wrap within them rather
+  // than widening it. (Not more on wide screens: the media query sees the
+  // viewport, not the half-row the tile actually has.)
+  .fsp-info__field-list {
+    @media (min-width: 672px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+// Label/value pairs — the Information tab's "Plan details" list: bold labels
+// over values, content-sized columns packed to the left.
+.fsp-info__field-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: start;
+  gap: 2rem 1.5rem;
+  margin: 0;
+
+  @media (min-width: 672px) {
+    grid-template-columns: repeat(3, minmax(0, max-content));
+    column-gap: 3rem;
+  }
+
+  @media (min-width: 1312px) {
+    grid-template-columns: repeat(4, minmax(0, max-content));
+  }
+}
+
+.fsp-info__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  dt {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--cds-text-primary);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--cds-text-primary);
+    word-break: break-word;
+  }
+}
+
+// A field spanning the whole list — long free text. Line breaks typed into it
+// are kept.
+.fsp-info__field--wide {
+  grid-column: 1 / -1;
+
+  dd {
+    white-space: pre-wrap;
+    max-width: 72rem;
+  }
+}
+
+// A field that begins a new row, however many columns the list has.
+.fsp-info__field--row-start {
+  grid-column-start: 1;
+}
+
+// A field two columns wide. Only where the list has columns to span — on a
+// phone it is a single column, and spanning would invent a second.
+.fsp-info__field--span-2 {
+  @media (min-width: 672px) {
+    grid-column-end: span 2;
+  }
+}
+
+// The lone row of a tab's table when it has nothing to list.
+.fsp-info__empty-cell {
+  color: var(--cds-text-secondary);
+  text-align: center;
+}
+
+// Record-level actions above a detail tab's tiles (Edit, Print…), right-aligned,
+// with any note on why one is disabled beside them.
+.fsp-info__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fsp-info__toolbar-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--cds-text-secondary);
+}
+
+// ── Detail tabs with an add action (private-mark Land index and the like,
+// tenure Cutting permit / mark) — nr-fsp-new's Attachments tab:
+// the Add button right-aligned above the table.
+.detail-tab__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-block-end: 0.5rem;
+}
+
+// Why the Add button is disabled — beside it above the table, under it in the
+// empty state.
+.detail-tab__reason {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--cds-text-secondary);
+}
+
+// Free text in a table cell (the Amendments tab's requested changes): keep its
+// line breaks and let it wrap.
+.detail-tab__long-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-inline-size: 16rem;
+}
+
+// A row's Update button, at the end of the row: snug, and kept on one line.
+.detail-tab__row-action {
+  inline-size: 1%;
+  white-space: nowrap;
+  text-align: end;
+  padding-block: 0;
+}
+
+.detail-tab__empty-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// Small add dialogs — nr-fsp-new's .fsp-species-modal: a stacked form with the
+// Cancel / primary pair in the body, bottom-right.
+.detail-dialog {
+  // The action row is the content's last child: Carbon's 3rem bottom padding
+  // would leave dead space beneath it.
+  .cds--modal-content {
+    padding-block-end: 1rem;
+  }
+
+  // Carbon fades scrolling content's bottom edge, which would shade the buttons.
+  .cds--modal-scroll-content {
+    mask-image: none;
+  }
+}
+
+.detail-dialog__subtitle {
+  margin: 0;
+  color: var(--cds-text-primary);
+}
+
+.detail-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-block-start: 1.5rem;
+}
+
+// Two short fields side by side in a dialog (ClientsPanel's start / end dates).
+.detail-dialog__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+// Carbon fixes the single date picker's input at 18rem with (0,3,0) rules that load
+// after this file, so ties go to Carbon; the doubled classes out-rank them whatever
+// the order, and a dialog's date fills its column instead.
+.detail-dialog.detail-dialog .detail-dialog__date.detail-dialog__date {
+  // The class lands on Carbon's outer form-item, so the picker is a descendant.
+  .cds--date-picker.cds--date-picker--single .cds--date-picker__input,
+  .cds--date-picker-container,
+  .cds--date-picker-input__wrapper,
+  .cds--date-picker-input__wrapper > span {
+    inline-size: 100%;
+  }
+}
+
+// A row of checkboxes in a dialog (the cutting permit's indicators).
+.detail-dialog__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  border: 0;
+  margin: 0;
+  padding: 0;
+
+  legend {
+    inline-size: 100%;
+  }
+}
+
+// ── Inline edit of a detail tab (private-mark Mark application, tenure Details…) —
+// the nr-fsp-new
+// FSP Information edit treatment: inputs take the place of values inside the
+// same sections, Cancel / Save changes bottom-right.
+
+// The Edit button (or the strap-line while editing) above the summary row.
+.detail-edit__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.detail-edit__strap {
+  margin: 0;
+  font-size: 0.875rem;
+  margin-inline-end: auto;
+  color: var(--cds-text-primary);
+}
+
+.detail-edit {
+  // The sections are white (layer-02), and inputs default to white too, so
+  // they would vanish into them. Back to the grey field tokens, as FSP does.
+  --cds-field: var(--cds-field-01);
+  --cds-field-hover: var(--cds-field-hover-01);
+  --cds-border-subtle: var(--cds-border-subtle-01);
+
+  // Read-only, the field grid sizes its columns to their values. Inputs have
+  // no natural width, so while editing the columns share the space evenly
+  // instead and each input fills its column — FSP's edit cells, but flexible.
+  .fsp-info__field-list {
+    column-gap: 2rem;
+
+    @media (min-width: 672px) {
+      grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    }
+  }
+
+  // The row tiles keep their read-only layout (_detail.scss: an even split, two
+  // columns each) — only the full-width Location section changes columns here.
+  .fsp-info__tile-row .fsp-info__field-list {
+    @media (min-width: 672px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .fsp-info__field dd {
+    word-break: normal;
+  }
+}
+
+// An input's sized wrapper. Everything Carbon renders inside fills it.
+.detail-edit .detail-edit__input {
+  .cds--form-item,
+  .cds--text-input-wrapper,
+  .cds--text-input__field-wrapper,
+  .cds--text-input,
+  .cds--select,
+  .cds--select-input__wrapper,
+  .cds--select-input,
+  .cds--date-picker,
+  .cds--date-picker-container,
+  .cds--date-picker-input__wrapper,
+  .cds--combo-box,
+  .cds--list-box__wrapper,
+  .cds--list-box {
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  // Carbon fixes the single date picker's input at 18rem with
+  // `.cds--date-picker.cds--date-picker--single .cds--date-picker__input`
+  // (0,3,0), loaded after this file — so it needs a stronger selector, or the
+  // input overflows its column and its calendar icon lands on the next field.
+  .cds--date-picker.cds--date-picker--single .cds--date-picker__input {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  // A combo box's visually hidden title still leaves its label's margin,
+  // dropping the input below its row; take the label out of the flow.
+  .cds--label:has(> .cds--visually-hidden) {
+    position: absolute;
+    margin: 0;
+  }
+
+  // …and the span Carbon wraps the input in, or the input fills only that.
+  .cds--date-picker-input__wrapper > span {
+    inline-size: 100%;
+  }
+}
+
+.detail-edit__input--cell {
+  inline-size: 100%;
+}
+
+.detail-edit__input--sm {
+  inline-size: 8rem;
+}
+
+.detail-edit__input--xs {
+  inline-size: 4.5rem;
+}
+
+.detail-edit__textarea {
+  inline-size: 100%;
+  max-inline-size: 72rem;
+}
+
+// Reg / Comp: two short inputs with a slash between.
+.detail-edit__pair {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+
+  > span {
+    line-height: 2.5rem;
+  }
+}
+
+.detail-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+// "Assigned on save" / "on save" while a chosen Mark Type waits to issue the mark.
+.detail-edit__pending {
+  color: var(--cds-text-secondary);
+  font-size: 0.875rem;
+}

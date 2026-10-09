@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp1.rpt" pageWidth="160" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="160" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="38996888-317f-4ed6-8410-8182a6b502e0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R101.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="ORG_NO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp1.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ORG_UNIT_NAME FROM ORG_UNIT
+
+WHERE ORG_UNIT_NO = TO_NUMBER($P{ORG_NO})]]>
+	</queryString>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<summary>
+		<band height="14" splitType="Prevent">
+			<textField>
+				<reportElement uuid="5eb93db4-1b1c-454a-bb9d-865ed716831b" x="0" y="0" width="160" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["In " + $F{ORG_UNIT_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

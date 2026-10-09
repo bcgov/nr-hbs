@@ -1,0 +1,89 @@
+.welcome__intro {
+  max-width: 44rem;
+  margin-bottom: 1.5rem;
+}
+
+.welcome__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  max-width: 64rem;
+}
+
+/* Qualified with .cds--tile on purpose. Carbon sets `.cds--tile{display:block}`
+   and its bundle is emitted after this file, so a bare `.welcome__tile` ties on
+   specificity and loses on source order — the icon, label and description then
+   run together on one line. Two classes beat one wherever the rules sit. */
+.cds--tile.welcome__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  min-height: 8rem;
+}
+
+/* Spans are inline by default, so they need to be block-level to stack. */
+.welcome__tile-label {
+  display: block;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.welcome__tile-desc {
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--cds-text-secondary);
+}
+
+/* ── HBS: work queues ────────────────────────────────────────────────
+   The legacy home.jsp blocks (mainmenu_ministry / _industry / _spcuser), as
+   grey cards on the white section tile — the quick-link tiles' surface, but
+   not clickable themselves: each holds several links. */
+.home__alert.cds--inline-notification {
+  max-inline-size: none;
+  margin: 0;
+}
+
+.home-queue__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.home-queue {
+  background-color: var(--cds-layer-01);
+  padding: 1rem;
+}
+
+.home-queue__title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.375;
+  color: var(--cds-text-primary);
+}
+
+.home-queue__rows {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.75rem;
+    color: var(--cds-text-secondary);
+    margin-block-end: 0.25rem;
+  }
+
+  dd {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+.home-queue__link--missing {
+  color: var(--cds-text-disabled);
+}

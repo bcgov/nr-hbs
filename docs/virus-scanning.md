@@ -1,0 +1,171 @@
+# Virus scanning (ClamAV)
+
+Every uploaded file — today the scale-data XML submitted on "Submit File of
+Detail Returns" (legacy P505, which never scanned) — is virus-scanned before it
+is validated or stored. Scanning is done by a shared
+**ClamAV `clamd`** daemon spoken over **raw TCP** using the native `INSTREAM`
+socket protocol (port `3310`). It is **not** HTTP — ClamAV has no HTTP API.
+
+## Where it runs in the pipeline
+
+The scan happens on the raw bytes, up front, before any parsing:
+
+```
+upload ──▶ VIRUS SCAN ──▶ XSD validate ──▶ transmission record ──▶ store for intake
+           (clamd INSTREAM)
+```
+
+| Upload | Scanned in | On rejection |
+|--------|-----------|--------------|
+| Scale-data XML (P505) | `submission/SubmissionService.submit` (`scanOrThrow`) | `VirusDetectedException` → `422` |
+
+Two rejection codes surface (both `422`), shown as the error on the
+submission page (`SubmitScaleDataPage.tsx`):
+
+| Code | Meaning | UI label |
+|------|---------|----------|
+| `VIRUS_DETECTED` | clamd reported a signature match | "Virus detected" |
+| `VIRUS_SCAN_UNAVAILABLE` | scanner unreachable/errored under a fail-closed policy | "Virus scan unavailable" |
+
+## Fail-open vs fail-closed
+
+When the scanner can't be reached (or errors), the `hbs.clamav.fail-open`
+policy decides what happens:
+
+- **fail-closed** (`false`, the default) — reject the upload
+  (`VIRUS_SCAN_UNAVAILABLE`). Secure: no upload is ever stored unscanned.
+- **fail-open** (`true`) — allow the upload through. Used where a reliable
+  clamd isn't available (local dev; ephemeral PR previews that can't reach the
+  shared clamd).
+
+An **infected** verdict is always rejected regardless of this policy.
+
+## Configuration
+
+All via env (defaults in `application.properties`):
+
+| Env var | Default | Purpose |
+|---------|---------|---------|
+| `CLAMAV_ENABLED` | `true` | Master switch. `false` = skip scanning entirely (no-op). |
+| `CLAMAV_HOST` | — (**required**) | clamd host, e.g. `clamav.<tools-namespace>.svc.cluster.local`. No default — the deploy fails unless it's set (GitHub **secret** `CLAMAV_HOST` per environment, threaded through `reusable-deploy.yml`). |
+| `CLAMAV_PORT` | `3310` | clamd TCP port. |
+| `CLAMAV_FAIL_OPEN` | `false` | See above. `true` tolerates a scanner outage. |
+| `CLAMAV_CONNECT_TIMEOUT` | `5s` | Socket connect timeout. |
+| `CLAMAV_READ_TIMEOUT` | `30s` | Reply read timeout. |
+
+### Startup health check
+
+On boot the backend sends a `PING` to clamd and logs the result (`INFO` when it
+replies `PONG`, `WARN` otherwise) so a misconfigured/unreachable scanner is
+visible immediately in the logs rather than only on the first upload.
+
+### Per-scan logging
+
+Every scan emits one greppable verdict line carrying the filename and size:
+
+```
+clamav scan: 'my-submission.xml' (9581760 bytes) → CLEAN          # INFO
+clamav scan: 'evil.pdf' (2048 bytes) → INFECTED (Eicar-Test-Signature) — rejecting   # WARN
+clamav scan: 'doc.pdf' (1024 bytes) → UNAVAILABLE (connection refused) — failing CLOSED, rejecting   # WARN
+```
+
+## Deployment — reaching clamd across namespaces
+
+> ⚠️ **Required manual step:** a `NetworkPolicy` must exist **inside the ClamAV
+> (tools) namespace** to let this app's backend reach clamd. The deploy pipeline
+> does **not** create it — you (or whoever owns the tools namespace) must apply
+> it by hand, once per app namespace/environment. Without it every upload fails
+> closed with "Virus scan unavailable". The manifest is below (policy #1).
+
+clamd runs in the shared **tools** namespace, not the app namespace. Reaching it
+cross-namespace can be blocked on **either side**, so there are two policies:
+
+**1. Ingress on clamd (tools namespace) — created MANUALLY.** The clamd pod only
+accepts traffic an ingress `NetworkPolicy` in the tools namespace allows. This
+rule must let the app namespace open TCP 3310 to the clamd pods (e.g.
+`podSelector: app.kubernetes.io/name=clamav` — the standard ClamAV Helm chart's
+pod label; one `allow-<app-ns>-to-clamav` policy per environment). **The deploy
+pipeline does not create this** — the tools namespace is managed out of band, so
+apply this policy by hand (or via whatever manages the tools namespace). A
+starting-point manifest:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-<app-namespace>-to-clamav
+  namespace: <tools-namespace>
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: clamav
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: <app-namespace>
+      ports:
+        - protocol: TCP
+          port: 3310
+  policyTypes:
+    - Ingress
+```
+
+**2. Egress from the backend (app namespace) — always applied.** The backend
+`openshift.deploy.yml` includes an egress `NetworkPolicy`
+(`${NAME}-backend-${ZONE}-egress`) that permits **all** egress from the backend
+pods. It ships with every backend deploy — no flag, no separate step. It's
+permit-all rather than a narrow `DNS + clamd` allow-list because NetworkPolicy
+egress is all-or-nothing per pod: the backend also needs Oracle, Keycloak,
+user-lookup, and SMTP, so a narrow policy would silently break those wherever
+the namespace baseline doesn't already default-deny egress. Permit-all can't
+reduce access below the current open baseline and guarantees the app side never
+blocks clamd.
+
+> **Diagnosing "can't connect to clamd":** the egress side (#2) is handled
+> automatically, so a failure almost always means the tools **ingress** (#1) —
+> confirm the manual `allow-<app-ns>-to-clamav` policy was applied into clamd's
+> namespace and that its `podSelector` matches the real clamd pod labels
+> (`oc -n <tools-ns> get pods --show-labels`). Note clamd must be in a namespace
+> your app namespace is allowed to reach — cross-license-plate connections are
+> generally blocked.
+
+### Required GitHub Actions secrets
+
+Set these per GitHub Environment (`dev`, `test`, later `prod`), threaded through
+`pr-open.yml` / `merge.yml` → `reusable-deploy.yml`:
+
+| Secret | Value |
+|--------|-------|
+| `CLAMAV_HOST` | clamd host — **required** for the backend deploy (the template has no default) |
+
+The pipeline no longer touches the tools namespace, so no tools-scoped token or
+`OC_NAMESPACE_TOOLS` / `OC_TOKEN_TOOLS` secrets are needed — the clamd ingress
+policy (#1 above) is applied manually.
+
+## Local development
+
+There is no clamd locally. Rather than run one, the `local` profile keeps the
+scan path wired but **fails open** so offline uploads still work:
+
+```properties
+# application-local.properties
+hbs.clamav.enabled=true
+hbs.clamav.fail-open=true
+```
+
+Set `hbs.clamav.enabled=false` instead if you'd rather skip scanning outright.
+Without one of these, every local upload is rejected with "Virus scan
+unavailable" (the fail-closed default with no reachable clamd). 
+
+## Code map
+
+| Concern | Code |
+|---------|------|
+| Policy layer (enable / fail-open, rejection codes, startup PING, logging) | `service/v1/VirusScanner` |
+| Low-level clamd client (INSTREAM framing, `scan`, `ping`) | `client/ClamAvClient` |
+| Scan result value | `client/ScanResult` |
+| Throw-style rejection → `422` | `exception/VirusDetectedException` (+ `RestExceptionHandler`) |
+| UI | `frontend/src/pages/SubmitScaleDataPage.tsx` |
+| Backend egress NetworkPolicy | `backend/openshift.deploy.yml` (`${NAME}-backend-${ZONE}-egress`) |
+| Clamd ingress NetworkPolicy (tools ns) | applied manually — see "Deployment" above |

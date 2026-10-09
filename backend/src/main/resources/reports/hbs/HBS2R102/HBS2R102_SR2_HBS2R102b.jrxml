@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R102b" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="5cfac0e1-9e03-4c46-afd1-0e6101516a24">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-HBS2R102.DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<parameter name="Pm-HBS2R102.VERSION" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R102b"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from WEIGHT_SCALE_NOTATION
+ WHERE VERSION = $P{Pm-HBS2R102.VERSION}
+
+and
+
+DOCUMENT_CONTROL_NUMBER = $P{Pm-HBS2R102.DOCUMENT_CONTROL_NUMBER}]]>
+	</queryString>
+	<field name="NTN_ID" class="java.math.BigDecimal"/>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="NOTATION_TYPE_CODE" class="java.lang.String"/>
+	<field name="NOTATION_NUMBER" class="java.math.BigDecimal"/>
+	<field name="TEXT" class="java.lang.String"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<sortField name="NOTATION_NUMBER"/>
+	<title>
+		<band height="25" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="5d080a77-1cac-435c-9ac8-521b8506fe6c" x="1" y="2" width="61" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Notations  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c70006f8-4be0-4548-a20e-d8ee7e48d914" x="1" y="13" width="49" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="edf20e15-12a0-4c59-ae71-2d42795acafa" x="62" y="13" width="31" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Text]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="88c7000c-46c6-4b57-8272-48e7054880eb" x="1" y="0" width="39" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTATION_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b38495e9-a355-426a-ab73-98142bf7d216" x="63" y="0" width="629" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TEXT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

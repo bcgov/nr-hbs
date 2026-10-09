@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp1.rpt" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="12a8c4da-236d-46b2-b5ff-93653eaa3c20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ORG_NO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp1.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ORG_NO_INT" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{ORG_NO} == null || $P{ORG_NO}.isEmpty() || $P{ORG_NO}.equalsIgnoreCase( "ALL" )
+? 0
+: Integer.parseInt( $P{ORG_NO} )]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ORG_UNIT_NAME FROM ORG_UNIT
+WHERE ORG_UNIT_NO = $P{ORG_NO_INT}]]>
+	</queryString>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<summary>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f0db149c-5d88-4558-ba90-4562c88db978" x="0" y="0" width="234" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{ORG_UNIT_NAME} == null || $F{ORG_UNIT_NAME}.isEmpty() ? "" : "In " + $F{ORG_UNIT_NAME} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

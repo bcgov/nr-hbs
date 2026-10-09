@@ -1,0 +1,7 @@
+The Harvest Billing System batch job {{jobName}} did not complete successfully.
+
+{{detail}}
+
+This message was sent automatically by the HBS API. Check the backend logs
+(job name {{jobName}}) for the full stack trace before re-running the job —
+invoicing jobs are NOT safe to re-run blindly; see docs/batch-jobs.md.

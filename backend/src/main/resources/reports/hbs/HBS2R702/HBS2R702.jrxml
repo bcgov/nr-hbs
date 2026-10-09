@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R702.rpt" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="720" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="8aae3cfe-6210-4bf0-b96b-241634a2c8fc">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R702.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="LEDGERDTL_DOCUMENTNUMBER" class="java.lang.String"/>
+	<parameter name="LEDGERDTL_VERSIONNUMBER" class="java.lang.String"/>
+	<parameter name="LEDGERDTL_LEDGERTYPE" class="java.lang.String"/>
+	<parameter name="LEDGERDTL_JOBNO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R702.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R702(
+LEDGERDTL_CURSOR => $P{ORACLE_REF_CURSOR},
+LEDGERDTL_DOCUMENTNUMBER => $P{LEDGERDTL_DOCUMENTNUMBER},
+LEDGERDTL_VERSIONNUMBER => $P{LEDGERDTL_VERSIONNUMBER},
+LEDGERDTL_LEDGERTYPE => $P{LEDGERDTL_LEDGERTYPE},
+LEDGERDTL_JOBNO => $P{LEDGERDTL_JOBNO}
+)}]]>
+	</queryString>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="SCALE_EVENT_TYPE_CODE" class="java.lang.String"/>
+	<field name="SCALE_EVENT_TYPE_DESC" class="java.lang.String"/>
+	<field name="SCALE_SITE_ID_NMBR" class="java.lang.String"/>
+	<field name="LICENSE_NUMBER" class="java.lang.String"/>
+	<field name="RETURN_NUMBER" class="java.math.BigDecimal"/>
+	<field name="ARRIVAL_DATE" class="java.sql.Timestamp"/>
+	<field name="LOAD_ARRIVAL_NUMBER" class="java.lang.String"/>
+	<field name="INCOMING_LDS_NUMBER" class="java.lang.String"/>
+	<field name="TRANSPORT_IDENTIFIER" class="java.lang.String"/>
+	<field name="FIELD_SCALE_IND" class="java.lang.String"/>
+	<field name="FIELD_SCALE_DECK_ID" class="java.lang.String"/>
+	<field name="SCALE_DATE" class="java.sql.Timestamp"/>
+	<field name="ARRIVAL_LEDGER_WEIGH_SLIP" class="java.lang.String"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="CUT_BLOCK_ID" class="java.lang.String"/>
+	<field name="TIMBER_BRAND" class="java.lang.String"/>
+	<field name="PARCEL_IDENTIFIER" class="java.math.BigDecimal"/>
+	<field name="PARCEL_COUNT" class="java.math.BigDecimal"/>
+	<field name="INPUT_PRIMARY_SCALER_LIC" class="java.lang.String"/>
+	<field name="INPUT_SCALE_SITE" class="java.lang.String"/>
+	<field name="INPUT_CUTBLOCK_ID" class="java.lang.String"/>
+	<field name="DEPARTURE_DATE" class="java.sql.Timestamp"/>
+	<field name="LOAD_DEPARTURE_NUMBER" class="java.lang.String"/>
+	<field name="OUTGOING_LDS_NUMBER" class="java.lang.String"/>
+	<field name="OUTGOING_TRANSPORT_ID" class="java.lang.String"/>
+	<field name="DESTINATION" class="java.lang.String"/>
+	<field name="SCALE_RETURN_STATE_CODE" class="java.lang.String"/>
+	<field name="SCL_RTN_VERSION_STATE_CODE" class="java.lang.String"/>
+	<field name="ORIG_SCALE_SITE" class="java.lang.String"/>
+	<variable name="CCF0_Show_ScaleSite" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[// If the column is null then it was entered in error so show the unvalidated original entry field
+//IF ISNULL({HBS2R702.SCALE_SITE_ID_NMBR}) THEN
+//    '* ' + {HBS2R702.INPUT_SCALE_SITE}
+//ELSE
+//    {HBS2R702.SCALE_SITE_ID_NMBR}
+
+
+$F{SCALE_SITE_ID_NMBR}==null
+? "* " + $F{INPUT_SCALE_SITE}
+: $F{SCALE_SITE_ID_NMBR}]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Show_PrimaryScaler" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[// If the column is null then it was entered in error so show the unvalidated original entry field
+//IF ISNULL({HBS2R702.LICENSE_NUMBER}) THEN
+//    '* ' + {HBS2R702.INPUT_PRIMARY_SCALER_LIC}
+//ELSE
+//    {HBS2R702.LICENSE_NUMBER}
+
+$F{LICENSE_NUMBER}==null
+? "* " + $F{INPUT_PRIMARY_SCALER_LIC}
+: $F{LICENSE_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Show_CutBlock" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[// If the column is null then it was entered in error so show the unvalidated original entry field
+//IF ISNULL({HBS2R702.CUT_BLOCK_ID}) THEN
+//    '* ' + {HBS2R702.INPUT_CUTBLOCK_ID}
+//ELSE
+//    {HBS2R702.CUT_BLOCK_ID}
+
+$F{CUT_BLOCK_ID}==null
+? "* " + $F{INPUT_CUTBLOCK_ID}
+: $F{CUT_BLOCK_ID}]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Show_LedgerTitle" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  'Arrival Ledger Entry Details'
+//ELSE
+//  'Departure Ledger Entry Details'
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? "Arrival Ledger Entry Details"
+: "Departure Ledger Entry Details"]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="149">
+			<line>
+				<reportElement uuid="5f218074-f5e0-4297-b0a8-1e148e2ea8e7" x="0" y="51" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="6f2596bc-b45a-4326-9516-ec01507e1f70" x="279" y="16" width="180" height="15" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Harvest Billing System]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eea005ba-7aa8-4abf-9aee-0bd6b9bffa72" x="693" y="1" width="12" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[of]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b80b5361-d631-4917-8c1b-0e3860a16a71" x="618" y="1" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Page:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2e5731bb-462e-44f8-8548-39d088967edb" x="618" y="9" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Rundate:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d4a5d569-81f6-4562-a84c-bb12bb1947f4" x="618" y="18" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Runtime:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="120c87c2-fdb1-4029-903c-3cdf33675cf9" x="618" y="27" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Report Id:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c1861e65-6b32-4a26-aaef-3296fd77f7ef" x="618" y="37" width="47" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Request No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9c9658ca-a06b-42d5-bd65-7869eab57448" x="11" y="66" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Detail Document:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="54ddb75d-06cd-4327-9511-6bc0e82cb978" x="12" y="100" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Version:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fc88c20-6878-43c6-ac8e-4d1b9167a154" x="12" y="136" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Event Type:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52167325-1574-4980-b9b9-4e792eb5997a" x="12" y="82" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[State:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="37e894a3-8559-4337-953f-281ba757a5c9" x="12" y="118" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Status:]]></text>
+			</staticText>
+			<image>
+				<reportElement uuid="3389495d-2fcb-4f4f-a7d8-5ef3415ea7a8" x="3" y="4" width="145" height="36"/>
+				<imageExpression><![CDATA[($P{SUBREPORT_DIR} + "hbs_logo1.jpg" )]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ce1d0fe9-1b0b-4f95-8757-4cfa0e41db37" x="681" y="1" width="12" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement uuid="eb4d7fff-b988-46ed-811a-6fb2c5a09482" x="705" y="1" width="14" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="e7b6df90-71aa-4430-a499-4d17e1aa1877" x="665" y="9" width="55" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="HH:mm.ss" isBlankWhenNull="true">
+				<reportElement uuid="f940fa75-c7a8-4f4d-8cb6-c2c8945678ba" x="666" y="18" width="53" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8e7baf80-ed12-4c7a-af96-9daa53596252" x="665" y="28" width="54" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{p_report_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="cc40782d-0915-4ca2-83d2-cabf1b36e08b" x="671" y="37" width="48" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{LEDGERDTL_JOBNO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9172b406-69a6-4ad5-8cee-f381c44dc8ba" x="279" y="33" width="180" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF3_Show_LedgerTitle}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="1b1a06d7-0d0e-4f0c-b365-90cb0db340a2" x="97" y="66" width="68" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DETAIL_DOCUMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="dc38e98e-f8fa-470b-a8e4-7ade10dae55f" x="97" y="100" width="41" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VERSION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="84b6a212-00e6-4e1b-966b-ad1b7c71175d" x="97" y="136" width="202" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCALE_EVENT_TYPE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="77b4864b-aab2-4132-9e50-83daf5f15975" x="97" y="82" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCALE_RETURN_STATE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3403dcf2-9416-47aa-9afd-4d09328788f8" x="97" y="118" width="128" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCL_RTN_VERSION_STATE_CODE}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement uuid="fad0390e-ad4f-4761-ba2c-ed112d2d0b0a" x="200" y="2" width="333" height="14"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HBS_HEADER" + $P{SUBREPORT_EXT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="123" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b30932b8-b53b-47f8-8186-c688ad0d00ba" x="270" y="32" width="84" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIMBER_MARK}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="10c2f5ee-a8c0-4415-8411-8b119bf78286" x="270" y="32" width="90" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : True
+//      case 'SB' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "SB" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TIMBER_BRAND}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2132feb1-5604-44a1-975a-115a63d40447" x="97" y="84" width="202" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OUTGOING_TRANSPORT_ID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="80b8c6e5-53a7-4d5f-a602-8e416d7c9c15" x="12" y="84" width="72" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Transport ID Out:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2cd373ee-cd5c-45b4-b14f-c5f78bc7c400" x="96" y="66" width="202" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OUTGOING_LDS_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4e2664fb-d73a-414f-b3ac-fadd65e58c39" x="12" y="66" width="72" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[LDS Out:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="157217fc-25e4-4a0a-bfd0-1e891d564d2a" x="96" y="48" width="83" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTURE_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="60706864-a996-463c-bb65-5f03eb79113d" x="12" y="48" width="72" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Departure Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52f10d34-18ff-4eca-ae2a-1bea1d3595e0" x="12" y="30" width="88" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Departure Number:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="35deb1a7-3bc3-4357-817e-dbfdd5b4fab7" x="97" y="30" width="202" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+// False]@
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOAD_DEPARTURE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="8310ba25-6add-403a-abf4-516c98922a65" x="192" y="12" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Load Arrival:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ad1a01d3-c90c-4e80-b2e8-5408eb61dbc5" x="12" y="30" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[LDS In:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ab3a65ee-102a-48fe-97d8-3efe03ef424e" x="12" y="48" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Transport ID In:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7c4d015b-c87d-459e-91ad-0943b782cecb" x="12" y="12" width="75" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Site:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3dac1b08-d3e7-4fad-aadc-9699e3963414" x="192" y="30" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Timber Mark:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a2c6dfc3-aa0a-46ee-980c-e45a1e2e0d2a" x="12" y="84" width="76" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Return Number:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="3fd0d5f2-8058-4bbd-8841-9a1ccbb2bef4" x="96" y="86" width="66" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RETURN_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="13abd245-423f-4901-bbfa-ab83c08fd77a" x="270" y="14" width="85" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOAD_ARRIVAL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="17eb8e05-e14f-43c9-b830-9c802959e83e" x="96" y="32" width="90" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INCOMING_LDS_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ef66a060-caf3-4677-94ba-bd7887362305" x="96" y="50" width="83" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANSPORT_IDENTIFIER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5f740520-17ac-4808-9473-a0791d06c382" x="96" y="14" width="31" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_ScaleSite}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="67d210e3-0379-4462-8c76-b2058462c247" x="12" y="66" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Orig.Scale Site:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="248931bf-5dd5-47c4-b2a7-6ff4651cd99e" x="96" y="68" width="92" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ORIG_SCALE_SITE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="9f2ac9a8-1b9e-4a7c-8c1f-0e85c09017e2" x="192" y="48" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Field Scale:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5bdb1006-b4f1-430b-affa-e5eb6bc8c470" x="270" y="50" width="11" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIELD_SCALE_IND}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="e31e5abd-664f-4f6d-a3cf-51e0af15d293" x="192" y="66" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Weigh Slip:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="bdf5cf8f-37f1-48d0-b593-66fead231a72" x="270" y="68" width="85" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//     case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ARRIVAL_LEDGER_WEIGH_SLIP}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c5a6ca5d-cc10-4e3f-982e-90ef00f1fbd7" x="192" y="84" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="f48ba65d-f173-417f-b10c-c02e2836bd5c" x="270" y="86" width="88" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCALE_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="bc6cb45d-bae3-4e02-888e-0aab1801b301" x="360" y="12" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Arrival Date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="6e945dc4-ff08-43fa-8365-aeeed79e807c" x="444" y="14" width="81" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ARRIVAL_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c0444b00-6c2e-43f6-8e1f-701d3532e86e" x="360" y="30" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Cut Block:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="71c97a36-8a94-4678-879e-d5865e8a930c" x="444" y="32" width="90" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF2_Show_CutBlock}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="377c628b-72e3-4c83-b8fe-254f004116ee" x="360" y="48" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Deck ID:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d8afc3ee-58e4-463a-99ee-7f672f3532fa" x="444" y="50" width="11" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : True
+//      case 'TD' : False
+//      case 'FD' : False
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FIELD_SCALE_DECK_ID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="7b5ec23c-3407-4b8a-af03-52ab1fd83bc3" x="360" y="66" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Primary Scaler:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="478c046b-2dda-4ef5-8d0b-f61cd0556b4b" x="444" y="68" width="31" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : False
+//      case 'RS' : False
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_Show_PrimaryScaler}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a8c18552-39e2-42cb-88a4-29ac71403404" x="360" y="84" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Parcel ID:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="f5fa6557-d0c3-41c3-b72e-c3b63b1e5eeb" x="444" y="86" width="41" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARCEL_IDENTIFIER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="22fd3e61-9cc7-47bd-bafb-52623c846a04" x="360" y="102" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Parcel Count:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="22403ba2-2478-42e6-8867-7d6d6410c721" x="444" y="104" width="41" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : False
+//      case 'B4' : True
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : False
+//      default : False;]@
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PARCEL_COUNT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c73e78c3-269d-4350-b6cb-219d386e022a" x="192" y="30" width="75" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF {?LEDGERDTL_LEDGERTYPE} = 'D' THEN
+// TRUE
+//ELSE
+//   select {HBS2R702.SCALE_EVENT_TYPE_CODE}
+//      case 'PS' : True
+//      case 'B4' : False
+//      case '4R' : False
+//      case 'TD' : True
+//      case 'FD' : True
+//      case 'RS' : True
+//      case 'RR' : True
+//      case 'SB' : False
+//      default : False;]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "D" )
+?false
+:
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "PS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "B4" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "4R" ) ? true  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "TD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "FD" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RS" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "SB" ) ? false  :
+    $F{SCALE_EVENT_TYPE_CODE}!=null && $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) ? true  : true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Timber Brand:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e7c895ee-7df6-4533-a179-5a50d9a52c8b" x="12" y="102" width="72" height="12" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Destination Site:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="75d856cb-f209-4e44-857c-600ce248f478" x="96" y="102" width="202" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[//@NOT [IF UpperCase({?LEDGERDTL_LEDGERTYPE}) = 'A' THEN
+//  TRUE
+//ELSE
+//  FALSE]@
+
+$P{LEDGERDTL_LEDGERTYPE}!=null && $P{LEDGERDTL_LEDGERTYPE}.equalsIgnoreCase( "A" )
+? false
+: true]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESTINATION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="39" splitType="Prevent">
+			<line>
+				<reportElement uuid="6c3fc769-904e-45c7-b06c-ff51d084f777" x="0" y="3" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="95efecc3-b4c1-4ced-a9e8-487bacf5d6e5" x="8" y="8" width="121" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Runtime Filtering Parameters ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8d5beec4-586c-4e14-b3b7-a1c772ce3fc8" mode="Opaque" x="0" y="30" width="721" height="9" forecolor="#000000" backcolor="#EAEAEA"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="6" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Note:  While every effort has been made to ensure that the information presented on this report is accurate and complete, it cannot be guaranteed.]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="51" splitType="Prevent"/>
+	</summary>
+</jasperReport>

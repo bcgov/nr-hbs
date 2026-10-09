@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R552b" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="18cc3c1b-e79d-45c2-b17f-2228964e4bb9">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="369"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="PSRETURN_DETAILDOCUMENTNUMBER" class="java.lang.String"/>
+	<parameter name="PSRETURN_VERSIONNUMBER" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R552b"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R552B(
+PSRETURN_CURSOR => $P{ORACLE_REF_CURSOR},
+PSRETURN_DETAILDOCUMENTNUMBER => $P{PSRETURN_DETAILDOCUMENTNUMBER},
+PSRETURN_VERSIONNUMBER => $P{PSRETURN_VERSIONNUMBER}
+)}]]>
+	</queryString>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="DETAIL_DOCUMENT_VERSION" class="java.math.BigDecimal"/>
+	<field name="DOCUMENT_CONTROL_NUMBER" class="java.math.BigDecimal"/>
+	<field name="SUMMARY_DOCUMENT_VERSION" class="java.math.BigDecimal"/>
+	<field name="EVENT_SEQUENCE" class="java.math.BigDecimal"/>
+	<field name="HBS_TXN_TYPE_CODE" class="java.lang.String"/>
+	<field name="TXN_TYPE_DESC" class="java.lang.String"/>
+	<field name="DEBIT_CREDIT_TYPE" class="java.lang.String"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="INVOICE_DATE" class="java.sql.Timestamp"/>
+	<title>
+		<band height="42" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="8872ed88-b350-4cd0-8a4e-d3213b4cdd8f" x="12" y="19" width="44" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Txn
+Seq]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="160d5f9c-5878-42ba-b505-4f36d53b9f0a" x="134" y="19" width="44" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Txn
+Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2fe431ab-293c-49e3-86ca-ec08ec51010f" x="1" y="5" width="98" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Transaction History:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba88872f-fc32-4f2a-a8fe-9046c7b2eeee" x="62" y="29" width="38" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[DR/CR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8bba57e5-a5ea-4df9-b887-995e1fc4b284" x="226" y="18" width="54" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Date
+Summarized
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3e86e2e5-9fe4-4f95-9d5c-8bd8a4118a38" x="318" y="18" width="54" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Summary
+Document]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="690f6cfb-fd29-40c8-8d36-b17142fd0547" x="407" y="18" width="54" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Date
+Invoiced
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="be810cef-1cfe-4c90-8782-a910dcad2305" x="486" y="27" width="38" height="15" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1152f6e5-3b56-4c93-a328-bbb88c0b6ced" x="545" y="28" width="38" height="14" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Value]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="11" splitType="Prevent">
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="59a6b7ff-4622-4943-8106-0820243d6960" x="311" y="0" width="74" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOCUMENT_CONTROL_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement uuid="d6fcdf70-daf4-4d37-9ff6-e940a4531f23" x="12" y="0" width="43" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EVENT_SEQUENCE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="722fc323-4ff8-457d-b762-49a59aea6742" x="62" y="0" width="37" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEBIT_CREDIT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="cfbf19f9-c41f-4aac-b9e3-d4316bd8f69f" x="221" y="0" width="72" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ENTRY_TIMESTAMP}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="2a20c2b0-9308-4810-9e6c-57e7b05dafd2" x="480" y="0" width="42" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement uuid="8566b9a6-0baf-4361-bd99-e918fa5b0483" x="533" y="0" width="44" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="a0099376-60a1-4687-b3a1-15300e856ecb" x="408" y="0" width="52" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVOICE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="18a068dd-7043-436b-9afb-55e266573d24" x="105" y="0" width="106" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TXN_TYPE_DESC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

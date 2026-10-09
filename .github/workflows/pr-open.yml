@@ -10,7 +10,37 @@ concurrency:
 permissions: {}
 
 jobs:
-  # https://github.com/bcgov/action-builder-ghcr
+  # The OIDC client is configured with a fixed pool of redirect URIs and each
+  # PR is bucketed into one, rather than registering a URI per PR on every
+  # open/close (same scheme as nr-fta). The redirect URIs live on the CSS
+  # (Keycloak) integration; if CSS permits a wildcard there this whole scheme
+  # can be deleted and every PR can have its own hostname.
+  #
+  # The client is configured once with 50 fixed redirect URIs of the form
+  #   https://nr-hbs-<N>.apps.silver.devops.gov.bc.ca/...   for N in 0..49
+  # and each PR is bucketed into a slot via `slot = PR # mod 50`. The PR's
+  # OpenShift objects still carry the full PR # (so cleanup is unambiguous),
+  # but the frontend Route's `spec.host` uses the slot.
+  #
+  # Trade-off: if two PRs land in the same slot (PR 7 and PR 57) and are
+  # both open simultaneously, the second deploy's Route will fail to be
+  # admitted by the OpenShift router with `HostAlreadyClaimed`. Bounded by
+  # having 50 slots and our typical concurrent-PR count being a handful.
+  vars:
+    name: Variables
+    runs-on: ubuntu-24.04
+    outputs:
+      slot: ${{ steps.calc.outputs.slot }}
+    steps:
+      - id: calc
+        run: |
+          slot=$(( ${{ github.event.number }} % 50 ))
+          echo "slot=${slot}" >> "$GITHUB_OUTPUT"
+          echo "PR ${{ github.event.number }} -> redirect-URI slot ${slot}"
+
+  # Build per-PR images tagged with the PR number. `tag_fallback: latest`
+  # means a frontend-only PR doesn't trigger a backend rebuild — the action
+  # aliases the existing :latest digest forward as :<PR#> instantly.
   builds:
     name: Builds
     permissions:
@@ -20,79 +50,70 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        package: [backend, frontend, migrations]
+        package: [backend, frontend]
     timeout-minutes: 10
     steps:
       - uses: bcgov/action-builder-ghcr@cb2629351c87dd1c2130073e4ebb7233a9653a63 # v4.4.1
         with:
           package: ${{ matrix.package }}
-          # The PR tag is mutable (reused every push) and is what merge.yml
-          # deploys/promotes; the head SHA tag is immutable and is what PR
-          # deploys use, so each push changes the pod spec and forces a rollout.
-          tags: |
-            ${{ github.event.number }}
-            ${{ github.event.pull_request.head.sha }}
+          tags: ${{ github.event.number }}
           tag_fallback: latest
-          triggers: ('${{ matrix.package }}/', '.github/workflows/pr-open.yml')
+          triggers: ('${{ matrix.package }}/', '.github/workflows/')
 
+  # Deploy the PR's images to a preview environment in the dev namespace.
+  # `environment: dev` resolves secrets/vars from the dev GitHub Environment.
+  #
+  # `permissions: contents: read` is required HERE on the calling job — GitHub
+  # bounds a called workflow's permissions by the caller. Without this, the
+  # workflow-level `permissions: {}` above propagates as contents=none and
+  # the nested deploy jobs error: "is requesting 'contents: read', but is
+  # only allowed 'contents: none'".
   deploys:
     name: Deploys (${{ github.event.number }})
-    needs: [builds]
+    needs: [builds, vars]
+    permissions:
+      contents: read
     uses: ./.github/workflows/reusable-deploy.yml
     secrets:
-      db_password: ${{ secrets.db_password }}
       oc_namespace: ${{ secrets.oc_namespace }}
       oc_token: ${{ secrets.oc_token }}
+      database_user: ${{ secrets.database_user }}
+      database_password: ${{ secrets.database_password }}
+      database_host: ${{ secrets.database_host }}
+      database_service_name: ${{ secrets.database_service_name }}
+      keystore_secret: ${{ secrets.keystore_secret }}
+      keycloak_sa_client_id: ${{ secrets.KEYCLOAK_SA_CLIENT_ID }}
+      keycloak_sa_client_secret: ${{ secrets.KEYCLOAK_SA_CLIENT_SECRET }}
+      user_lookup_base_url: ${{ secrets.USER_LOOKUP_BASE_URL }}
+      forest_client_api_url: ${{ secrets.FOREST_CLIENT_API_URL }}
+      forest_client_api_key: ${{ secrets.FOREST_CLIENT_API_KEY }}
+      clamav_host: ${{ secrets.CLAMAV_HOST }}
     with:
+      environment: dev
       target: ${{ github.event.number }}
-      tag: ${{ github.event.pull_request.head.sha }}
-      triggers: ('backend/', 'frontend/', 'migrations/', 'common/', '.github/workflows/pr-open.yml')
+      slot: ${{ needs.vars.outputs.slot }}
+      triggers: ('backend/', 'frontend/', '.github/workflows/')
 
   tests:
     name: Tests
     if: needs.deploys.outputs.triggered == 'true'
-    needs: [deploys]
-    uses: ./.github/workflows/reusable-tests.yml
-
-  comment:
-    name: Deployment Links
-    needs: [deploys]
-    if: needs.deploys.outputs.triggered == 'true'
-    runs-on: ubuntu-24.04
+    needs: [deploys, vars]
     permissions:
-      pull-requests: write
-    steps:
-      - name: Post Deploy Links
-        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
-        with:
-          header: pr-deployment-links
-          message: |
-            ### 🚀 Deployments Available
-            - [Frontend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca)
-            - [Backend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/api)
+      contents: read
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets:
+      e2e_idir_user: ${{ secrets.E2E_IDIR_USER }}
+      e2e_idir_password: ${{ secrets.E2E_IDIR_PASSWORD }}
+    with:
+      target: ${{ github.event.number }}
+      slot: ${{ needs.vars.outputs.slot }}
 
-  # ==========================================================================
-  # WARNING: This job acts as the required merge gate for this workflow.
-  # If you add a new job to this workflow, you MUST add its ID to the 'needs'
-  # array below, otherwise its failure or cancellation will not block the PR!
-  # ==========================================================================
   results:
     name: PR Results
-    needs: [builds, deploys, tests, comment]
+    needs: [builds, deploys, tests]
     if: always()
     runs-on: ubuntu-slim
-    timeout-minutes: 1
     steps:
-      - name: Log Job Results Context
-        run: |
-          echo "=== Upstream Job Statuses ==="
-          echo '${{ toJson(needs) }}'
-
-      - name: Evaluate Overall Status
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: |
-          echo "❌ Critical Check Failure: At least one required job has failed or was cancelled."
-          exit 1
-
-      - name: Success Message
-        run: echo "✅ All critical checks passed or were intentionally skipped!"
+      - if: contains(needs.*.result, 'failure')||contains(needs.*.result, 'cancelled')
+        run: echo "At least one job has failed." && exit 1
+      - run: echo "Success!"

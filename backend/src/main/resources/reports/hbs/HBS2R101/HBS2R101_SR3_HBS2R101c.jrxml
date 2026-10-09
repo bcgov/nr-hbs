@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R101c" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="10b4559f-9236-4314-8d20-e617ce9ad98c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R101.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="Pm-?PSR_ERRORCODE" class="java.lang.String"/>
+	<parameter name="Pm-?PSR_EXCLUDEERROR" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R101c"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from HBS_EDIT_ERR_MESSAGE_CODE
+ WHERE HBS_EDIT_ERR_MESSAGE_CODE = $P{Pm-?PSR_ERRORCODE}]]>
+	</queryString>
+	<field name="HBS_EDIT_ERR_MESSAGE_CODE" class="java.lang.String"/>
+	<field name="HBS_EDIT_ERR_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="HBS_EDIT_ERR_RESPONSIBLTY_CODE" class="java.lang.String"/>
+	<variable name="CCF0_Show_description" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[////START BT10645
+// IF UPPERCASE({?Pm-?PSR_ERRORCODE})<> '' THEN
+//    IF UPPERCASE({?Pm-?PSR_EXCLUDEERROR}) = 'Y' THEN
+//        'Everything but ' + {HBS_EDIT_ERR_MESSAGE_CODE.HBS_EDIT_ERR_MESSAGE_CODE}
+//    ELSE
+//        {HBS_EDIT_ERR_MESSAGE_CODE.HBS_EDIT_ERR_MESSAGE_CODE}
+////END BT10645
+
+( $P{Pm-?PSR_ERRORCODE} != null && !($P{Pm-?PSR_ERRORCODE}.isEmpty())
+? ( $P{Pm-?PSR_EXCLUDEERROR}.equalsIgnoreCase( "Y" )
+  ? ( $F{HBS_EDIT_ERR_MESSAGE_CODE} == null || $F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty() ? "" : "Everything but " + $F{HBS_EDIT_ERR_MESSAGE_CODE} )
+  : $F{HBS_EDIT_ERR_MESSAGE_CODE}
+  )
+: ""
+)]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Show_ErrorDescription" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[////START BT10645
+//IF UPPERCASE({?Pm-?PSR_ERRORCODE})<> '' THEN
+//    IF UPPERCASE({?Pm-?PSR_EXCLUDEERROR}) = 'Y' THEN
+//        '(i.e. everything but '+ {HBS_EDIT_ERR_MESSAGE_CODE.HBS_EDIT_ERR_MESSAGE_CODE}+')'
+////END BT10645
+
+$P{Pm-?PSR_ERRORCODE}.toUpperCase() != "" ? ($P{Pm-?PSR_EXCLUDEERROR}.equalsIgnoreCase( "Y" ) ? "(i.e. everything but " + $F{HBS_EDIT_ERR_MESSAGE_CODE} + ")" : "") : ""]]></variableExpression>
+	</variable>
+	<detail>
+		<band height="30" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b70fc164-aff4-481f-a9d5-5d1773a231d6" x="0" y="0" width="102" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

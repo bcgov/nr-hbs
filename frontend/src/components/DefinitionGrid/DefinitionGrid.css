@@ -1,0 +1,16 @@
+.fta-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem 2rem;
+  padding: 1rem 0;
+  max-width: 56rem;
+}
+
+.fta-facts__label {
+  font-size: 0.75rem;
+  color: var(--cds-text-secondary);
+}
+
+.fta-facts__value {
+  font-weight: 600;
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="temp.rpt" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="921725f4-aa65-4818-b584-73ef2049232c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ORG_NO" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["temp.rpt"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ORG_UNIT_NAME
+FROM ORG_UNIT
+
+WHERE ORG_UNIT_NO =  $P{ORG_NO}]]>
+	</queryString>
+	<field name="ORG_UNIT_NAME" class="java.lang.String"/>
+	<variable name="CCF0_show_orgunit_name" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//'In ' + {Command.ORG_UNIT_NAME}
+
+$F{ORG_UNIT_NAME}!=null
+? "In " + $F{ORG_UNIT_NAME}
+: "In "]]></variableExpression>
+	</variable>
+	<title>
+		<band height="1">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+		</band>
+	</title>
+	<detail>
+		<band height="1" splitType="Prevent">
+			<printWhenExpression><![CDATA[false]]></printWhenExpression>
+		</band>
+	</detail>
+	<summary>
+		<band height="14">
+			<staticText>
+				<reportElement uuid="eb0e7575-18a7-419c-8e21-6f414cd8731b" x="6" y="0" width="60" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale Sites:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="290b5a79-a77e-407c-bfad-a85a92f12dbd" x="138" y="0" width="282" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_show_orgunit_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

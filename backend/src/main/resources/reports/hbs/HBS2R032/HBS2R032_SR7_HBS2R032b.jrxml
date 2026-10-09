@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R032b" pageWidth="768" pageHeight="588" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="768" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="04197dd6-1bf9-45b4-9d5e-fb4916417741">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.jasperserver.reportUnit" value="/JCRS/HBS/Reports/HBS/HBS2R032.rpt"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/jasperserver/services/repository"/>
+	<parameter name="RB_BATCH_ID" class="java.math.BigDecimal"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R032b"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call HBS2R032B(
+RB_CURSOR => $P{ORACLE_REF_CURSOR},
+RB_BATCH_ID => $P{RB_BATCH_ID}
+)}]]>
+	</queryString>
+	<field name="BATCH_ID" class="java.math.BigDecimal"/>
+	<field name="ACCEPTED_IND" class="java.lang.String"/>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="XMIT_VERSION" class="java.math.BigDecimal"/>
+	<field name="ACTIVE_VERSION" class="java.math.BigDecimal"/>
+	<field name="SCALE_EVENT_TYPE_CODE" class="java.lang.String"/>
+	<field name="SCL_RTN_VERSION_STATE_CODE" class="java.lang.String"/>
+	<field name="SCALE_DATE" class="java.sql.Timestamp"/>
+	<field name="CUT_BLOCK_ID" class="java.lang.String"/>
+	<field name="TIMBER_MARK" class="java.lang.String"/>
+	<field name="PRIMARY_LICENSE_NUMBER" class="java.lang.String"/>
+	<field name="RETURN_NUMBER" class="java.math.BigDecimal"/>
+	<field name="LOG_COUNT" class="java.math.BigDecimal"/>
+	<field name="NET_VOLUME" class="java.math.BigDecimal"/>
+	<field name="RED_TAG_WEIGH_SLIP" class="java.lang.String"/>
+	<field name="LOAD_ARRIVAL_NUMBER" class="java.lang.String"/>
+	<field name="INPUT_CUTBLOCK_ID" class="java.lang.String"/>
+	<field name="INPUT_PRIMARY_SCALER_LIC" class="java.lang.String"/>
+	<field name="INPUT_SOURCE" class="java.lang.String"/>
+	<field name="HBS_EDIT_ERR_MESSAGE_CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<sortField name="DETAIL_DOCUMENT_NUMBER"/>
+	<variable name="CCF0_Show_PrimaryScaler" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{PRIMARY_LICENSE_NUMBER} == null || $F{PRIMARY_LICENSE_NUMBER}.isEmpty()
+  ?  "* " + ( $F{INPUT_PRIMARY_SCALER_LIC} == null || $F{INPUT_PRIMARY_SCALER_LIC}.isEmpty() ? "" : $F{INPUT_PRIMARY_SCALER_LIC} )
+  : $F{PRIMARY_LICENSE_NUMBER} )]]></variableExpression>
+	</variable>
+	<variable name="CCF1_Show_TM" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{TIMBER_MARK} == null || $F{TIMBER_MARK}.isEmpty()
+  ?  "* " + ( $F{INPUT_SOURCE} == null || $F{INPUT_SOURCE}.isEmpty() ? "" : $F{INPUT_SOURCE} )
+  : $F{TIMBER_MARK} )]]></variableExpression>
+	</variable>
+	<variable name="CCF2_Show_CutBlock" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[( $F{CUT_BLOCK_ID} == null || $F{CUT_BLOCK_ID}.isEmpty()
+  ?  "* " + ( $F{INPUT_CUTBLOCK_ID} == null || $F{INPUT_CUTBLOCK_ID}.isEmpty() ? "" : $F{INPUT_CUTBLOCK_ID} )
+  : $F{CUT_BLOCK_ID} )]]></variableExpression>
+	</variable>
+	<variable name="CCF3_Show_LoadArrival" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[$F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RR" ) || $F{SCALE_EVENT_TYPE_CODE}.equalsIgnoreCase( "RT" )
+? $F{RED_TAG_WEIGH_SLIP}
+: $F{LOAD_ARRIVAL_NUMBER}]]></variableExpression>
+	</variable>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{DETAIL_DOCUMENT_NUMBER}]]></groupExpression>
+	</group>
+	<title>
+		<band height="39" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="bd53e4cc-c8b1-4338-94a9-86daaa747040" x="1" y="1" width="95" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Accepted Documents]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c6021d2c-69af-416f-b55e-3bb293f58f72" x="1" y="19" width="25" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[DDN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e963d5b0-8135-4ff5-8c67-c507dc08a617" x="54" y="12" width="30" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Xmit
+Version]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c13c1733-94cc-4d57-87e4-1828399a79cf" x="90" y="12" width="30" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Active
+Version]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8e7020db-3cb7-48d0-b0ba-9e805f63885b" x="120" y="19" width="47" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Scale_Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b0fb81f9-d807-444f-a3c3-e8bb958021ca" x="168" y="12" width="33" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Primary
+Scaler]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="935eadf0-0c46-4c0e-96c0-f94aae2ea774" x="204" y="19" width="30" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Return]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="47629a1f-104b-4ee1-939b-5124720f6bba" x="234" y="12" width="38" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Timber Mark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fbcdc56d-e40a-48e7-93e4-d85ff51e3c2b" x="270" y="12" width="32" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Cut Block]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c0d431f0-ff8e-4f8c-871d-f88ebdbb4711" x="300" y="12" width="50" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Load Arrival
+Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d476356a-c4ba-4841-a394-7810e8fc707a" x="354" y="12" width="30" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Total
+Pieces]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="baf02e1d-5f6e-46d8-abb6-aff62e308636" x="384" y="12" width="28" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Total
+m3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="821c2231-8a98-40d5-b0e9-f201d243d858" x="414" y="6" width="34" height="33" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Active
+Version
+Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a73a7af2-6e6f-4d96-8c37-b9e03bc90250" x="462" y="19" width="36" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[ ERROR]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="13" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ae0518bc-62db-4712-91d0-a277eaad2e13" isPrintRepeatedValues="false" x="0" y="0" width="68" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DETAIL_DOCUMENT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7bbbae61-3393-425d-b72c-c285e09465ce" x="72" y="0" width="18" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{XMIT_VERSION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="1433d9cc-0896-4a6f-ac95-22b3e7f84f6a" x="96" y="0" width="18" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACTIVE_VERSION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="yyyy-MMM-dd" isBlankWhenNull="true">
+				<reportElement uuid="c2911f15-3358-492e-9931-00ddc8897abd" x="120" y="0" width="50" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCALE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9b327487-fe23-44f3-8e85-9c6b3a9d306d" x="174" y="0" width="31" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF0_Show_PrimaryScaler}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="fe7c9bcd-7c96-482a-8a93-3fbd0cef1170" x="204" y="0" width="27" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RETURN_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="bfa01479-770c-4f7b-92b3-64a0348ec586" x="236" y="0" width="47" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF1_Show_TM}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7b142a57-845a-4e82-90f2-3ed834ebfc73" x="275" y="0" width="34" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF2_Show_CutBlock}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f78854a3-061d-4df3-8604-5b5a18ae9433" x="312" y="0" width="36" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CCF3_Show_LoadArrival}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="33085952-1557-47fa-80a0-4f2d951c289c" x="348" y="0" width="31" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOG_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="75ab0dbc-afe4-42e1-8860-4dacd930aa8b" x="384" y="0" width="33" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="607fadae-02ad-4185-86bb-404274c3761a" x="420" y="0" width="24" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SCL_RTN_VERSION_STATE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c143cda7-2ea1-45e2-b17c-98d26c958f69" x="444" y="0" width="31" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{HBS_EDIT_ERR_MESSAGE_CODE} != null && !($F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty())]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HBS_EDIT_ERR_MESSAGE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e55c5507-9925-4b66-b1e3-3009794a2f1c" x="474" y="0" width="216" height="11" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{HBS_EDIT_ERR_MESSAGE_CODE} != null && !($F{HBS_EDIT_ERR_MESSAGE_CODE}.isEmpty())]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

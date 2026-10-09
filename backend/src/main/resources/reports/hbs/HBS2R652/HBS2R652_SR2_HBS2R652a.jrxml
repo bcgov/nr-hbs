@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HBS2R652a" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b33e3ddf-4c74-4f1b-8373-6e11584c599c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Pm-?SSRETURN_DETAILDOCUMENTNUMBER" class="java.lang.String"/>
+	<parameter name="Pm-?SSRETURN_VERSIONNUMBER" class="java.lang.String"/>
+	<parameter name="ORACLE_REF_CURSOR" class="java.sql.ResultSet" isForPrompting="false"/>
+	<parameter name="LoggedInUser" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="p_report_id" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["HBS2R652a"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? "repo:" : "H:\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_EXT" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[($P{REPORT_CONTEXT} != null) ? ".jrxml" : ".jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+       STD.LOGDTL_ID
+     , STD.DETAIL_DOCUMENT_NUMBER
+     , STD.VERSION
+     , STD.SCALE_SPECIES_CODE
+     , STD.SCALE_GRADE_CODE
+     , STD.SCALE_PRODUCT_CODE
+     , STD.DTLSEG_ID
+     , STD.LOG_NUMBER
+     , STD.LENGTH
+     , STD.TOP
+     , STD.BUTT
+     , STD.NET_VOLUME
+     , STD.NMV_IND
+     , STD.DEDUCTION_COUNT
+     , STD.INPUT_SPECIES
+     , STD.INPUT_GRADE
+     , STD.ENTRY_USERID
+     , STD.ENTRY_TIMESTAMP
+     , STD.UPDATE_USERID
+     , STD.UPDATE_TIMESTAMP
+     , STDD.LOG_DEFECT_ID
+     , STDD.DEFECT_NUMBER
+     , STDD.DEFECT_TYPE
+     , STDD.VOLUME
+     , STDD.DESCRIPTOR
+FROM   SAMPLE_TALLY_DETAIL        STD
+JOIN   SAMPLE_TALLY_DETAIL_DEFECT STDD ON STDD.LOGDTL_ID = STD.LOGDTL_ID
+WHERE  STD.DETAIL_DOCUMENT_NUMBER = $P{Pm-?SSRETURN_DETAILDOCUMENTNUMBER}
+AND    STD.VERSION                = $P{Pm-?SSRETURN_VERSIONNUMBER}
+ORDER BY STD.LOG_NUMBER
+       , STDD.DEFECT_NUMBER]]>
+	</queryString>
+	<field name="LOGDTL_ID" class="java.math.BigDecimal"/>
+	<field name="DETAIL_DOCUMENT_NUMBER" class="java.lang.String"/>
+	<field name="VERSION" class="java.math.BigDecimal"/>
+	<field name="SCALE_SPECIES_CODE" class="java.lang.String"/>
+	<field name="SCALE_GRADE_CODE" class="java.lang.String"/>
+	<field name="SCALE_PRODUCT_CODE" class="java.lang.String"/>
+	<field name="DTLSEG_ID" class="java.math.BigDecimal"/>
+	<field name="LOG_NUMBER" class="java.math.BigDecimal"/>
+	<field name="LENGTH" class="java.math.BigDecimal"/>
+	<field name="TOP" class="java.math.BigDecimal"/>
+	<field name="BUTT" class="java.math.BigDecimal"/>
+	<field name="NET_VOLUME" class="java.math.BigDecimal"/>
+	<field name="NMV_IND" class="java.lang.String"/>
+	<field name="DEDUCTION_COUNT" class="java.math.BigDecimal"/>
+	<field name="INPUT_SPECIES" class="java.lang.String"/>
+	<field name="INPUT_GRADE" class="java.lang.String"/>
+	<field name="ENTRY_USERID" class="java.lang.String"/>
+	<field name="ENTRY_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="UPDATE_USERID" class="java.lang.String"/>
+	<field name="UPDATE_TIMESTAMP" class="java.sql.Timestamp"/>
+	<field name="LOG_DEFECT_ID" class="java.math.BigDecimal"/>
+	<field name="DEFECT_NUMBER" class="java.math.BigDecimal"/>
+	<field name="DEFECT_TYPE" class="java.lang.String"/>
+	<field name="VOLUME" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTOR" class="java.lang.String"/>
+	<sortField name="LOG_NUMBER"/>
+	<group name="Group 0">
+		<groupExpression><![CDATA[$F{LOG_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent"/>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Prevent"/>
+		</groupFooter>
+	</group>
+	<group name="Group 1">
+		<groupExpression><![CDATA[$F{DEFECT_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent"/>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Prevent"/>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="37" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="27873198-6a78-4ed2-a7eb-ef7d4433e945" x="0" y="1" width="84" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Log Defects: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="72ea5954-dc35-43bd-87dd-67bcd89a2649" x="3" y="14" width="52" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Log
+No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="870ffd05-23d8-4bb0-825d-6d938ea00d88" x="68" y="14" width="52" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9fb2e99f-4696-4de7-b521-3fed7daba8bf" x="138" y="14" width="52" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="144e08c4-fe35-41d3-8e9f-810ec4d8eb51" x="219" y="14" width="52" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Volume]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ae43a9b5-036b-43cc-92f6-f332852d8062" x="280" y="14" width="52" height="23" forecolor="#000000"/>
+				<textElement textAlignment="Left">
+					<font fontName="Arial" size="8" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Defect
+Description]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="12" splitType="Prevent">
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="ab66b268-c56a-41a5-b91d-bc6c0340c83c" x="3" y="0" width="51" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LOG_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement uuid="8db4d6fa-9283-4d15-a7e0-8716913bcd4e" x="68" y="0" width="51" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEFECT_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9f8900fc-2d8d-48bb-bf52-4dc799ea5479" x="139" y="0" width="50" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEFECT_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.000;-#,##0.000" isBlankWhenNull="true">
+				<reportElement uuid="6f974f0e-e5e1-40f1-a46c-407ae61934c7" x="197" y="0" width="63" height="11" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VOLUME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e39410c2-51dd-47e6-adc6-bd9433b027db" x="280" y="0" width="296" height="11" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTOR}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
