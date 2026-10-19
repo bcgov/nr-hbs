@@ -18,12 +18,14 @@ backend's `ClientApiController` proxies three calls through
 
 | HBS endpoint | Forest Client API call | Used for |
 |--------------|------------------------|----------|
-| `GET /api/v1/hbs/clients/search?term=` | `GET /api/clients/search/by?name=&acronym=` (ranked: exact acronym, or Jaro-Winkler ≥ 0.8 on the full name); an all-digit term → `GET /api/clients/findByClientNumber/{n}` (zero-padded to 8) | picker type-ahead |
+| `GET /api/v1/hbs/clients/search?term=` | `GET /api/clients/search/by?name=&acronym=` (ranked: exact acronym, or Jaro-Winkler ≥ 0.8 on the full name); an all-digit term → `GET /api/clients/findByClientNumber/{n}` (zero-padded to 8) | client field type-ahead (`ClientComboBox`) |
 | `GET /api/v1/hbs/clients/{n}` | `GET /api/clients/findByClientNumber/{n}` | org names (header, org picker) |
-| `GET /api/v1/hbs/clients/{n}/locations` | `findByClientNumber` + `GET /api/clients/{n}/locations` | picker's location table |
+| `GET /api/v1/hbs/clients/{n}/locations` | `findByClientNumber` + `GET /api/clients/{n}/locations` | filling `Loc` after a pick |
 
-Picking a location fills the client field **and** the `Loc` field after it, as
-the legacy popup did. Expired locations are tagged "Expired".
+Every `client` field is a type-ahead (`ClientComboBox`, after nr-fta's): it
+suggests clients by number, acronym or name, and a typed number that isn't
+picked is kept as-is. Picking a client with exactly one location also fills the
+`Loc` field after it; otherwise the location is entered by hand.
 
 **FOI.** An individual client's (`client_type_code = 'I'`) name and location
 name are "Not Releasable" to industry viewers other than that client — the

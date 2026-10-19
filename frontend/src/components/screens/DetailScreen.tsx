@@ -46,7 +46,7 @@ import type { DetailScreenDef, DetailSection } from '@/screens/types';
 import ActionButton from './ActionButton';
 import DownloadCell from './DownloadCell';
 import { formatValue } from './format';
-import { linkHref } from './links';
+import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
 import ScreenLayout from './ScreenLayout';
 
@@ -240,7 +240,7 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
   const actions =
     record && (editHref || screen.actions?.length || screen.reports?.length) ? (
       <>
-        {(screen.reports ?? []).map((r) => (
+        {(screen.reports ?? []).filter((r) => reportApplies(r, { ...keys, ...record })).map((r) => (
           <ReportButton key={r.reportId + r.label} report={r} source={{ ...keys, ...record }} />
         ))}
         {(screen.actions ?? []).map((a) => (

@@ -1,5 +1,5 @@
 import { Button, Loading } from '@carbon/react';
-import { DocumentPdf } from '@carbon/icons-react';
+import { DocumentDownload, DocumentPdf } from '@carbon/icons-react';
 import { useState, type FC } from 'react';
 
 import { useNotification } from '@/context/notification/useNotification';
@@ -40,7 +40,7 @@ export const ReportButton: FC<ReportButtonProps> = ({ report, source, size = 'md
   };
   return (
     <span className="export-csv">
-      <Button kind={kind} size={size} renderIcon={DocumentPdf} disabled={busy} onClick={() => void onClick()}>
+      <Button kind={kind} size={size} renderIcon={format === 'CSV' ? DocumentDownload : DocumentPdf} disabled={busy} onClick={() => void onClick()}>
         {report.label}
       </Button>
       {busy && (

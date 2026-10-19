@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.queries;
 
 import ca.bc.gov.nrs.hbs.api.query.Capability;
+import ca.bc.gov.nrs.hbs.api.query.QueryService;
 import ca.bc.gov.nrs.hbs.api.security.HbsAuthorities;
 import ca.bc.gov.nrs.hbs.api.util.RequestUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -111,10 +113,63 @@ public class StatementDocumentController {
   private record Stored(String sendTo, String copyTo, LocalDate issueDate,
       String sendToType, String copyToType, String xml) {}
 
-  private final NamedParameterJdbcTemplate jdbc;
+  /** Legacy P451/P456 offered "Generate XML" only up to Constants.SUPPRESS_LIMIT rows. */
+  static final int COMBINED_LIMIT = 200;
 
-  public StatementDocumentController(NamedParameterJdbcTemplate jdbc) {
+  private final NamedParameterJdbcTemplate jdbc;
+  private final QueryService queryService;
+
+  public StatementDocumentController(NamedParameterJdbcTemplate jdbc, QueryService queryService) {
     this.jdbc = jdbc;
+    this.queryService = queryService;
+  }
+
+  /**
+   * Search for Issued Documents "Generate XML": every retrievable statement the search lists,
+   * FOI-severed, merged into one transmission ({@link StatementTransmissionXml}).
+   */
+  @GetMapping("/export.xml")
+  @PreAuthorize(HbsAuthorities.QUERIES_VIEW)
+  @Operation(summary = "All issued documents of a search as one statement transmission XML")
+  public ResponseEntity<byte[]> combined(@RequestParam Map<String, String> criteria) {
+    Capability.QUERIES_VIEW.require();
+    String query = "issuedDocuments.search";
+    long total = queryService.count(query, criteria);
+    if (total > COMBINED_LIMIT) {
+      throw new IllegalArgumentException("The search lists " + total + " documents; the XML download is limited to "
+          + COMBINED_LIMIT + ". Please refine your search criteria.");
+    }
+    List<StatementTransmissionXml.Item> items = new ArrayList<>();
+    for (Map<String, Object> row : queryService.list(query, criteria)) {
+      if (row.get("documentXmlUrl") == null) {
+        continue; // older than seven years / no stored file
+      }
+      String type = String.valueOf(row.get("documentType")).trim();
+      String number = String.valueOf(row.get("statementNumber")).trim();
+      items.add(new StatementTransmissionXml.Item(type, applyFreedomOfInformation(load(parseType(type), number))));
+    }
+    boolean ministry = RequestUtil.isMinistryUser();
+    String email;
+    try {
+      email = RequestUtil.getCurrentJwt().getClaimAsString("email");
+    } catch (RuntimeException ex) {
+      email = null;
+    }
+    var who = new StatementTransmissionXml.Requestor(System.currentTimeMillis(),
+        java.time.LocalDateTime.now(java.time.ZoneId.of("America/Vancouver")), email,
+        ministry ? "MOF" : "Industry", ministry ? null : RequestUtil.getCurrentClientNumber());
+    String xml = StatementTransmissionXml.merge(who, items);
+    try {
+      StatementTransmissionXml.validate(xml);
+    } catch (org.xml.sax.SAXException ex) {
+      // Stored files were valid against the schema version current when issued; deliver anyway.
+      log.warn("Combined statement XML doesn't validate against V1_0h: {}", ex.getMessage());
+    }
+    return ResponseEntity.ok()
+        .contentType(MediaType.TEXT_XML)
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.attachment().filename("issued-documents.xml").build().toString())
+        .body(xml.getBytes(StandardCharsets.UTF_8));
   }
 
   @GetMapping("/{type}/{number}.{format}")

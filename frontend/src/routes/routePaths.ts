@@ -11,7 +11,6 @@ import {
   Location,
   Receipt,
   RecentlyViewed,
-  Report,
   Search,
   Settings,
   Tag,
@@ -105,14 +104,13 @@ const EXTRA_LEAVES: Partial<Record<ScreenArea, MenuLeaf[]>> = {
   ],
 };
 
-/** The section for HBS's own pages: the work-queue dashboard and the report runner. */
+/** The section for HBS's own pages: the work-queue dashboard. */
 const GENERAL: MenuSection = {
   id: 'general',
   label: 'General',
   icon: Home,
   items: [
     { id: 'Home', label: 'Home', path: '/home', icon: Home, capability: 'ANY_USER' },
-    { id: 'Reports', label: 'Reports', path: '/reports', icon: Report, capability: 'ANY_USER' },
   ],
 };
 

@@ -40,6 +40,8 @@ export type FieldType =
 export interface Option {
   value: string;
   label: string;
+  /** Offer this option only while another field holds one of these values. */
+  showWhen?: { field: string; values: string[] };
 }
 
 export interface FieldDef {
@@ -66,6 +68,12 @@ export interface FieldDef {
   readOnlyOnEdit?: boolean;
   /** Grid span 1–4 (default 1 of a 4-column grid). */
   span?: 1 | 2 | 3 | 4;
+  /**
+   * 'center' centres the field vertically in its row — for a checkbox beside
+   * inputs that carry helper text, where the default bottom alignment would
+   * line it up with the helper text instead of the inputs.
+   */
+  align?: 'center';
   /** Group heading — consecutive fields with the same group render under it. */
   group?: string;
 }
@@ -96,6 +104,11 @@ export interface LinkDef {
   label?: string;
 }
 
+export interface ReportCondition {
+  field: string;
+  values: string[];
+}
+
 /** Run a legacy Jasper report, mapping criteria/row values to report prompts. */
 export interface ReportLinkDef {
   reportId: string;
@@ -103,6 +116,11 @@ export interface ReportLinkDef {
   /** Report prompt → criteria/row key (or a literal prefixed with '='). */
   params: Record<string, string>;
   format?: 'PDF' | 'CSV';
+  /**
+   * Show only when this criteria/record field has one of these values (legacy
+   * per-type result pages); with several conditions, all must hold.
+   */
+  showWhen?: ReportCondition | ReportCondition[];
 }
 
 /** A write action (registry command) available on a screen. */
@@ -124,7 +142,7 @@ export interface ActionDef {
 interface BaseScreen {
   /** Stable id; also the URL slug under the area. */
   id: string;
-  /** Legacy screen id(s), shown in the page footer for support staff. */
+  /** Legacy screen id(s), for traceability (docs/areas/); not shown to users. */
   legacy: string;
   title: string;
   area: ScreenArea;
@@ -148,6 +166,11 @@ export interface SearchScreenDef extends BaseScreen {
   /** At least one of these criteria must be filled (legacy "enter at least one…"). */
   requireOneOf?: string[];
   reports?: ReportLinkDef[];
+  /**
+   * "Download XML" of the results: `true` = the query's legacy-schema XML (P431/P441 "Send XML");
+   * a string = another API path under /api/v1/hbs taking the same criteria (P451 "Generate XML").
+   */
+  xmlExport?: boolean | string;
   /** Header actions, e.g. "Add Scale Site Profile". */
   createLink?: LinkDef & { capability: Capability };
   /** Run the search immediately on open (lists with no mandatory criteria). */

@@ -18,7 +18,7 @@ Three engines:
 
 All 79 JCRS units are vendored into
 `backend/src/main/resources/reports/hbs/<REPORT_ID>/` together with their
-subreports, plus `_images/` (logos) and a generated `catalog.json`
+subreports, plus `_images/` (logos), `_shared/` (shared subreports) and a generated `catalog.json`
 (id, title, procedure, prompt names, subreports). Re-run the vendoring with
 `python3 backend/scripts/vendor-jcrs-reports.py`; the source is
 `hba-archive/hbs/trunk/source/jasper-server/src/main/resources/resources/JCRS/HBS`.
@@ -34,6 +34,11 @@ Changes made while vendoring:
   defaults — `HbsReportService` compiles every subreport into a per-report
   scratch dir (`hbs.reports.work-dir`, an emptyDir in OpenShift) and passes
   that dir as `SUBREPORT_DIR`, `.jasper` as `SUBREPORT_EXT`.
+- `HBS_HEADER`, a JCRS repository subreport (the one-line ministry banner) used by
+  78 reports, is vendored once to `_shared/` and compiled into every report's
+  scratch dir. Without it, fills fail with "Resource not found … HBS_HEADER.jasper".
+  It keeps the legacy wording ("Ministry of Forests, Lands, and Natural Resource
+  Operations").
 
 `HbsReportService`:
 
@@ -81,6 +86,16 @@ File-type lists (`RB_FILE_TYPE1..3`, `INVSMRY_FILETYPE1..3`) are entered bare
 `ALL` is passed through. The rules were derived from the nr-mof-db source of every
 catalogued report proc; `ReportPromptRulesTest` checks each rule names a real prompt of
 its report. A new report whose proc concatenates a prompt unquoted needs a rule there.
+
+The harvest-history reports (HBS3R431 → `HBS00001R`, HBS3R441 → `HBS3R441R`) also need
+their selection prompts filled the way the legacy screen did. `HarvestHistoryPrompts`
+handles this:
+- blank group type, detail lines or SPG groups get the screen defaults (a blank
+  `INVSMRY_GRPTYPE` leaves the generated query without a `SELECT`: ORA-00900);
+- the comma list of timber marks (or forest file ids, sent as the pseudo prompt
+  `INVSMRY_LICENCES`) is split into the ten `INVSMRY_LICMARKnn` slots;
+- `INVSMRY_LICMARKTYPE` is derived: marks 2, else licences 1, else file types 3, else
+  management unit 4, else blank. A mark type with no marks breaks the proc's `IN (…)`.
 
 ## Open items
 

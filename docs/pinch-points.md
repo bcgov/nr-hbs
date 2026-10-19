@@ -234,6 +234,19 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
 - **Plan.** Interview them; turn each procedure into a scheduled job or admin
   screen.
 
+## 19. Legacy runs on Solaris SMBFS, removed in the 2026 Q4 patch 🔴
+
+- **Evidence.** The legacy WebLogic tier on Solaris reaches the HBS files on the
+  Windows batch server (XMLinput, ProcessParam, ReportingOutput, Microfiche)
+  through SMBFS mounts, kept alive since 2024 by a MISO exception for SMBv1.
+  Oracle removes SMBFS in the 2026 Q4 Solaris patch bundle.
+- **Consequence.** After the patch, web uploads, the Processing Parameters
+  screen and alert banner, report drops and possibly invoicing (Microfiche)
+  break **in legacy, before this repo can replace it**.
+- **Plan.** An interim infrastructure fix for legacy: deferral, move the data
+  to Solaris with SMB 2/3 (reversing which side shares), or NFS. See
+  [smbfs-removal.md](smbfs-removal.md). The new app has no SMB dependency.
+
 ---
 
 See also: `docs/questions.md` (decisions needed),

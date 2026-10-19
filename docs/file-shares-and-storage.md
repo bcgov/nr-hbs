@@ -3,7 +3,13 @@
 The legacy app integrated web tier, batch and clients through 12 Windows SMB
 shares on the HBS file server. OpenShift
 pods can't mount IDIR SMB shares, and per-client `<CLIENT>$` share ACLs don't
-map to containers, so each share needs a replacement:
+map to containers, so each share needs a replacement.
+
+> **Legacy deadline.** The legacy Solaris web tier reaches these folders through
+> SMBFS mounts, and the 2026 Q4 Solaris patch removes SMBFS. Interim options for
+> keeping legacy running are in [smbfs-removal.md](smbfs-removal.md).
+
+Each share and its replacement:
 
 | Legacy share | Used for | Replacement | Status |
 |---|---|---|---|

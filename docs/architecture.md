@@ -112,7 +112,7 @@ user/timestamps/sequence ids filled server-side, in its own transaction.
 ## Frontend shape
 
 - `App.tsx` — the nr-fsp-new auth gates (bootstrap → no-role page → org picker →
-  app), then `/home`, `/reports`, `/scale-returns/submit`, `/:area` (legacy tab
+  app), then `/home`, `/scale-returns/submit`, `/:area` (legacy tab
   landing pages) and `/:area/:screenId` (every registry screen).
 - `routes/routePaths.ts` builds the SideNav from the registry: nr-fta's nav
   (one section per legacy tab, an icon per destination, an icon rail when

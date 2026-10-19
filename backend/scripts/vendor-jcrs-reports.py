@@ -8,6 +8,10 @@ DST=sys.argv[2] if len(sys.argv) > 2 else 'backend/src/main/resources/reports/hb
 os.makedirs(DST+'/_images', exist_ok=True)
 for img in ['hbs_logo','hbs_logo1.jpg','hbs_logo2.jpg','hbs_logo3.jpg']:
     shutil.copy(f'{SRC}/Images/{img}.data', f'{DST}/_images/{img}')
+# JCRS repository subreports shared by many reports (staged per report by HbsReportService).
+os.makedirs(DST+'/_shared', exist_ok=True)
+for sub in ['HBS_HEADER']:
+    shutil.copy(f'{SRC}/Jrxml/{sub}.jrxml.data', f'{DST}/_shared/{sub}.jrxml')
 catalog=[]
 for unit in sorted(glob.glob(f'{SRC}/Reports/HBS/*.rpt.xml')):
     name=os.path.basename(unit)[:-len('.rpt.xml')]

@@ -2,6 +2,9 @@
 
 ## Legacy
 
+Full walkthrough with diagrams, status codes and the active AutoMate schedule:
+[legacy-batch.md](legacy-batch.md).
+
 The legacy batch layer (`hbs-batch` + `source/batch`) ran on a Windows host
 under **AutoMate 5**. Each task ran `HBS_Bxxxx.BAT` → `BatchRunner` → a second
 JVM that called the WebLogic EJBs **remotely over T3** and shared state with

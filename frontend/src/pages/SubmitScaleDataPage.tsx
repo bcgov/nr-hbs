@@ -63,7 +63,7 @@ const SubmitScaleDataPage: FC = () => {
   return (
     <PageLayout
       title="Submit File of Detail Returns"
-      subtitle="Send an XML file of detail scale returns to HBS. Files must conform to the HBS scale data schema (HBS_Schema_V6_1b). · Legacy screen P505/P506"
+      subtitle="Send an XML file of detail scale returns to HBS. Files must conform to the HBS scale data schema (HBS_Schema_V6_1b)."
     >
       <SectionTile
         title="Detail return file"

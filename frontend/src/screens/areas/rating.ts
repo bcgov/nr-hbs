@@ -269,7 +269,7 @@ export const screens: ScreenDef[] = [
     then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
     submitLabel: 'Activate Rule',
     notes:
-      'The rule is saved as Active. Scale dates must be within the last 7 years; the From Process Date must be today or later; intervals must not overlap another active rule for the timber mark (checked by the legacy screen — not yet enforced here).',
+      'The rule is saved as Active. Scale dates must be within the last 7 years; the From Process Date must be today or later; intervals must not overlap another active rule for the timber mark.',
   },
   // ── P204 Add Override Rate Rule (header; rate rows are added on the rule screen) ──
   {
@@ -503,7 +503,7 @@ export const screens: ScreenDef[] = [
     then: { screen: 'waste-residue-rates', params: { timberMark: 'timberMark', cutBlock: 'cutBlockId', scaleDateFrom: 'effectiveDate', scaleDateTo: 'effectiveDate' } },
     submitLabel: 'Activate',
     notes:
-      'The cut block must belong to the timber mark, the date cannot predate today by more than 7 years and duplicates are rejected by the legacy screen (not yet enforced here).',
+      'The cut block must belong to the timber mark, the date cannot predate today by more than 7 years and duplicates are not allowed.',
   },
 
   // ── P230/P231 Stumpage Rate search is not carried over yet (HBS_RATES OUT-parameter procs). ──

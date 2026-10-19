@@ -29,7 +29,7 @@ stack from the repo root with `docker compose up`.
 
 ```
 src/
-├── App.tsx                 auth gates + routes (/home, /reports, /scale-returns/submit, /:area, /:area/:screenId)
+├── App.tsx                 auth gates + routes (/home, /scale-returns/submit, /:area, /:area/:screenId)
 ├── screens/
 │   ├── types.ts            ScreenDef (search / detail / form), FieldDef, ColumnDef, ActionDef …
 │   ├── registry.ts         auto-loads areas/*.ts; AREAS = the legacy tab bar
@@ -38,7 +38,7 @@ src/
 │                           ActionButton, ReportButton, DownloadCell, ScreenPage (route element)
 ├── components/             nr-fta's PageTitle, SectionTile, Tombstone, DetailTile, AsyncBoundary,
 │                           EmptyState, StatusTag, ExportCsvButton, ConfirmationModal, Layout (header + side nav)
-├── pages/                  HomePage (legacy work-queue dashboard), ReportsPage, SubmitScaleDataPage,
+├── pages/                  HomePage (legacy work-queue dashboard), SubmitScaleDataPage,
 │                           AreaLandingPage, PageLayout + NotFound (from FTA), Landing / Unauthorized /
 │                           Forbidden / OrgSelection
 ├── routes/                 access.ts (capability matrix), routePaths.ts (SideNav from the registry)

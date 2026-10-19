@@ -1,5 +1,4 @@
 import {
-  Button,
   Checkbox,
   DatePicker,
   DatePickerInput,
@@ -10,10 +9,9 @@ import {
   TextArea,
   TextInput,
 } from '@carbon/react';
-import { Search } from '@carbon/icons-react';
 import { useEffect, useState, type FC } from 'react';
 
-import ClientSearchModal from '@/components/ClientSearchModal';
+import ClientComboBox from '@/components/ClientComboBox';
 import type { CodeOption } from '@/services/common';
 import { codeList } from '@/services/screens';
 import type { FieldDef } from '@/screens/types';
@@ -60,7 +58,6 @@ export const FieldInput: FC<FieldInputProps> = ({
   const id = `${idPrefix}-${field.name}`;
   const label = field.required ? `${field.label} *` : field.label;
   const [codes, setCodes] = useState<CodeOption[] | null>(null);
-  const [clientModalOpen, setClientModalOpen] = useState(false);
 
   useEffect(() => {
     if (!field.codeList) return;
@@ -82,7 +79,8 @@ export const FieldInput: FC<FieldInputProps> = ({
     disabled: readOnly,
   };
 
-  switch (field.type ?? 'text') {
+  // A code list is a dropdown even when the definition doesn't say 'select'.
+  switch (field.type ?? (field.codeList ? 'select' : 'text')) {
     case 'date':
       return (
         <DatePicker
@@ -111,7 +109,10 @@ export const FieldInput: FC<FieldInputProps> = ({
               { value: 'N', label: 'No' },
             ]
           : (field.options ??
-            (codes ?? []).map((c) => ({ value: c.code, label: c.description ? `${c.code} - ${c.description}` : c.code })));
+            (codes ?? []).map((c) => ({
+              value: c.code,
+              label: c.label ?? (c.description ? `${c.code} - ${c.description}` : c.code),
+            })));
       return (
         <Select {...common} value={value} onChange={(e) => onChange(e.target.value)}>
           <SelectItem value="" text={field.codeList && codes === null ? 'Loading…' : emptyOption} />
@@ -125,6 +126,7 @@ export const FieldInput: FC<FieldInputProps> = ({
       return (
         <RadioButtonGroup
           legendText={label}
+          helperText={field.helperText}
           name={id}
           valueSelected={value}
           onChange={(v) => onChange(String(v ?? ''))}
@@ -157,38 +159,21 @@ export const FieldInput: FC<FieldInputProps> = ({
         />
       );
     case 'client':
-      // Legacy screens took an 8-digit client number + 2-digit location with
-      // a lookup popup; here the popup is ClientSearchModal (Forest Client
-      // API), and a picked location also fills the partner Loc field.
+      // Type-ahead over the Forest Client API (nr-fta's client field); a
+      // picked client with a single location also fills the partner Loc field.
       return (
-        <div className="hbs-field__client">
-          <TextInput
-            {...common}
-            value={value}
-            maxLength={field.maxLength ?? 8}
-            placeholder={field.placeholder ?? '8-digit client number'}
-            onChange={(e) => onChange(e.target.value.trim())}
-          />
-          {!readOnly && (
-            <Button
-              kind="ghost"
-              size="md"
-              hasIconOnly
-              renderIcon={Search}
-              iconDescription="Find client"
-              onClick={() => setClientModalOpen(true)}
-            />
-          )}
-          <ClientSearchModal
-            open={clientModalOpen}
-            onClose={() => setClientModalOpen(false)}
-            onSelect={(c) => {
-              onChange(c.clientNumber ?? '');
-              if (c.clientLocnCode) onLocationPick?.(c.clientLocnCode);
-              setClientModalOpen(false);
-            }}
-          />
-        </div>
+        <ClientComboBox
+          id={id}
+          titleText={label}
+          value={value}
+          onChange={onChange}
+          onLocationPick={onLocationPick}
+          helperText={field.helperText}
+          placeholder={field.placeholder}
+          invalid={!!invalidText}
+          invalidText={invalidText}
+          disabled={readOnly}
+        />
       );
     case 'number':
       return (

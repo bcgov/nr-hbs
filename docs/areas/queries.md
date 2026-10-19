@@ -22,12 +22,12 @@ by URL); the new app requires a logged-in MOF/CLI user for every screen. There i
 |---|---|---|---|
 | P400 Queries Menu | Queries area SideNav (no page) | — | `opq/P400.jsp` |
 | PUBLIC anonymous menu / tab bar (`/include/mainmenu_public.jsp`, `tab_public.jsp`) | not carried over | — | There is no anonymous site in the new app (FAM/BCeID login required). Public FAQ / glossary / manual links are static MOF web pages. |
-| P431 / P432 Mark Monthly Billing History (selection + report configuration) | `billing-history` (+ reports `HBS3R431` PDF and CSV) | `harvestHistory.billing` | Billing branch of `PROCEDURES/V7.01739__HBS_GET_HISTORY.sql` (same SELECT/filters as `V7.01498__HBS00001R.sql` behind `HBS3R431`); `ear/…/opq/ftas/MarkMonthlyBillingAction.java`; group/SPG/detail-line prompt codes from `ear/…/opq/ReportingFactory.java` (`getGroupTypeParam`, `getDisplaySPGParam`, `getDisplayDetailsParam`) and `opq/OpqConstants.java` |
-| P441 / P442 Mark Monthly Scaling History | `scaling-history` (+ report `HBS3R441`) | `harvestHistory.scaling` | Scaling branch of `HBS_GET_HISTORY` (same as `V7.01570__HBS3R441R.sql`) |
+| P431 / P432 Mark Monthly Billing History (selection + report configuration) | `billing-history` (+ reports `HBS3R431` PDF and CSV, + Download XML) | `harvestHistory.billing` | Billing branch of `PROCEDURES/V7.01739__HBS_GET_HISTORY.sql` (same SELECT/filters as `V7.01498__HBS00001R.sql` behind `HBS3R431`); `ear/…/opq/ftas/MarkMonthlyBillingAction.java`; group/SPG/detail-line prompt codes from `ear/…/opq/ReportingFactory.java` (`getGroupTypeParam`, `getDisplaySPGParam`, `getDisplayDetailsParam`) and `opq/OpqConstants.java` |
+| P441 / P442 Mark Monthly Scaling History | `scaling-history` (+ report `HBS3R441`, + Download XML) | `harvestHistory.scaling` | Scaling branch of `HBS_GET_HISTORY` (same as `V7.01570__HBS3R441R.sql`) |
 | P493 / P494 Harvest Report XML Delivery Address + Confirmation | not carried over | — | Replaced: the history list is exportable (search export / CSV) and the PDF downloads directly; no e-mail drop-directory delivery. See "Legacy logic not yet ported" for the XML history file. |
 | P493 / P494 generic Report Delivery Address / Confirmation (`opq/emailReport.jsp`, `confirmed.jsp`) | not carried over | — | Every report now streams directly from the in-process Jasper engine (`HbsReportController`); no e-mailed/queued reports. |
 | P449 Search for A Single Issued Document | `issued-document` | `issuedDocuments.search` (`statementNumber`) | `HBS3R450_*` procs (below); 7-year/2003-11-01 rule from `ear/…/opq/P450Action.java` |
-| P450 Search for Issued Documents | `issued-documents` (document-type radio) | `issuedDocuments.search` | `PROCEDURES/V7.01572__HBS3R450_PS.sql`, `V7.01574__HBS3R450_WS.sql`, `V7.01571__HBS3R450_CS.sql`, `V7.01573__HBS3R450_RS.sql` (UNION ALL of the four), called by `ear-ejb/…/ivs/TransactionStatementManagerBean.getSearchIssuedDocumentStatement` |
+| P450 Search for Issued Documents | `issued-documents` (document-type radio; Print / Print Client Register for that type; Download XML) | `issuedDocuments.search` | `PROCEDURES/V7.01572__HBS3R450_PS.sql`, `V7.01574__HBS3R450_WS.sql`, `V7.01571__HBS3R450_CS.sql`, `V7.01573__HBS3R450_RS.sql` (UNION ALL of the four), called by `ear-ejb/…/ivs/TransactionStatementManagerBean.getSearchIssuedDocumentStatement` |
 | P451 / P461 List of Issued Piece / Weight Scale Invoices | `issued-documents` results (`documentType` PSI / WSI); Print = `HBS4R452` / `HBS4R462`, Print Client Register = `HBS3R451` / `HBS3R461` | `issuedDocuments.search` | `opq/P451.jsp` columns |
 | P456 / P466 / P471 / P476 List of Issued Volume / Compiled Sample / Ratio Statements | `issued-documents` results (PSV / WSV / CSS / RS); Print `HBS4R452`/`HBS4R462`/`HBS4R472`/`HBS4R477`, Register `HBS3R451`/`HBS3R461`/`HBS3R471`/`HBS3R476` | `issuedDocuments.search` | `opq/P456.jsp` columns (Total Weight = `SAMPLE_SCALE_SUMMARY.NET_WEIGHT` for CSS) |
 | P474 Statement/Invoice Does Not Exist / Unavailable | not carried over as a page | — | Replaced by the empty-result state of `issued-document` and by the 404 / 410 responses of `StatementDocumentController` ("Statement Does Not Exist" / "Statement cannot be retrieved as it is older than seven years"). |
@@ -38,7 +38,7 @@ by URL); the new app requires a logged-in MOF/CLI user for every screen. There i
 | P421 Billing Summary Selection ("List of Invoices and Volume Statements") | `billing-summary` (View PDF Report `HBS3R421` piece / `HBS3R422` weight) | `billingSummary.search` | `PROCEDURES/V7.01567__HBS3R421.sql`, `HBS3R422`, `FUNCTIONS/…HBS_BILLINGSMRYRPT_WHERECLAUSE.sql`; `ear/…/opq/P421Action.java` |
 | P422 Billing Summary Report Configuration | not carried over | — | Non-functional orphan mock-up (no action, nothing links to it). |
 | P441.jsp / P442.jsp (old mock-ups with the same ids) | not carried over | — | Obsolete JavaScript-only mock-ups, superseded by the invoiceSummary "scaling" flow (now `scaling-history`). |
-| P401 Configure Scale Site Summary Report | `scale-site-summary` (8 report variants `HBS2R401/402/403Group{DistScale,ScaleTM,ScalePop}`) | `scaleSiteSummary.search` | Summary-return branch of `PROCEDURES/V7.01527__HBS2R401.sql`, `V7.01528__HBS2R402.sql`, `V7.01529__HBS2R403.sql`; `ear/…/opq/dac/P401Action.java` |
+| P401 Configure Scale Site Summary Report | `scale-site-summary` (Group By radio + Return Type pick one of 8 units `HBS2R401/402/403Group{DistScale,ScaleTM,ScalePop}` behind a single Download PDF) | `scaleSiteSummary.search` | Summary-return branch of `PROCEDURES/V7.01527__HBS2R401.sql`, `V7.01528__HBS2R402.sql`, `V7.01529__HBS2R403.sql`; `ear/…/opq/dac/P401Action.java` |
 | P403 Configure Aged Unbilled Scale Report | `aged-unbilled-scale` (`HBS2R411` piece / `HBS2R412` weight) | `agedUnbilled.search` | `PROCEDURES/V7.01530__HBS2R411.sql`, `V7.01531__HBS2R412.sql`; `ear/…/opq/dac/P403Action.java` |
 | P490 Cut to Cruise Comparison Report | `cut-to-cruise` (Print Report `HBS3R490`) | `cutToCruise.search` | `PROCEDURES/V7.01581__HBS3R490.sql`; `ear/…/opq/P490Action.java` |
 | P480 Search for Timber Mark | `timber-mark-search` | `timberMarks.search` | `PROCEDURES/HBS3R481` + `FUNCTIONS/V10.00802__HBS_3R481_CONDITIONAL.sql` |
@@ -49,6 +49,33 @@ by URL); the new app requires a logged-in MOF/CLI user for every screen. There i
 | `opq/confirmation.jsp` | not carried over | — | Dead (posts to an undefined action). |
 | `opq/P494.jsp` audit wrapper | — | — | Belongs to Scale Control / audit (P902/P972). |
 | Client Profile link (P300) / Stumpage Rate Search (P230) / Stratum Advisor (P850) | other areas | — | Profiles, Rating and Stratum Planner areas. |
+
+**Issued Documents "Download XML" (legacy P451/P456 "Generate XML").** `GET /api/v1/hbs/statements/export.xml`
+with the search criteria (`StatementTransmissionXml`):
+- **Format:** every listed statement's stored XML, with private client details hidden (FOI-severed)
+  as on the single-statement download, merged into one `hbs-transmission`
+  (`HBS_Transmission_Schema_V1_0h`): one `hbs-batch` per document type, a request header and
+  the FOIPP fine print.
+- **Row limit:** at most 200 rows, legacy's `SUPPRESS_LIMIT`. Statements older than seven years are
+  left out.
+- **Validation:** the result is checked against V1_0h, and a mismatch is only logged, since older
+  stored files follow the schema version current when they were issued.
+- **Not ported:** legacy's "Generate PDF" (FOP rendering) waits on the statement PDF port.
+
+**Download XML (legacy "Send XML").** `GET /api/v1/hbs/queries/{harvestHistory.billing|harvestHistory.scaling}/export/xml`
+(`HarvestHistoryXmlService`):
+- **Format:** the same document legacy e-mailed, `HBS_Billing_History_Request_Schema_v3` /
+  `HBS_Scaling_History_Request_Schema_v3` (namespace `gov.bc.ca/forests/hbs/v2`, vendored in
+  `backend/src/main/resources/xml/history/`). Every file is validated against the schema
+  before download.
+- **Header:** repeats the criteria in legacy wording ("All", "All Land", "Interior Forest
+  Regions", …).
+- **Privacy:** names hidden for privacy (FOI-severed) read "CLIENT NAME NOT RELEASABLE" /
+  "CLIENT LOCATION NAME NOT RELEASABLE".
+- **Row limit:** 5,000 or more rows are refused, as legacy did.
+- **Deliberate differences from legacy:** a 24-hour `datetime-created` (legacy wrote 12-hour
+  without AM/PM), rows in screen order (legacy had none), no `xsi:schemaLocation`, and a
+  download instead of an e-mail.
 
 ## Deliberate differences from the legacy app
 

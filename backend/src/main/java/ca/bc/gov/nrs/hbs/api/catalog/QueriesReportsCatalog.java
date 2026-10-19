@@ -148,11 +148,15 @@ public class QueriesReportsCatalog implements QueryCatalog {
                    DECODE(mbc.mgmt_unit_type, 'F', 'Woodlot', 'T', 'Tree Farm Licence',
                           'U', 'Timber Supply Area', 'V', 'Timber Supply Block') AS mgmt_unit_type_description,
                    mbc.mgmt_unit_id,
+                   fc.client_type_code, cltc.expanded_result AS client_type_description,
                    fc.client_number, %s, cl.client_locn_code, %s,
                    orgdist.org_unit_code AS district_scaled_code, orgdist.org_unit_name AS district_scaled_name,
                    orgregn.org_unit_code AS region_scaled_code, orgregn.org_unit_name AS region_scaled_name,
                    ss.scale_site_id_nmbr AS scale_site, ss.site_name,
-                   fcs.client_number AS site_owner_client_number, %s
+                   fcs.client_type_code AS site_owner_client_type_code,
+                   cltcs.expanded_result AS site_owner_client_type_description,
+                   fcs.client_number AS site_owner_client_number, %s,
+                   ss.owner_cli_locn_cd AS site_owner_client_locn_code, %s
               FROM scaling_history hh
               JOIN mark_billed_cli mbc ON mbc.timber_mark = hh.timber_mark
               LEFT JOIN org_unit dist ON dist.org_unit_no = mbc.forest_district
@@ -170,10 +174,17 @@ public class QueriesReportsCatalog implements QueryCatalog {
               LEFT JOIN org_unit orgdist ON orgdist.org_unit_no = ss.org_unit_no
               LEFT JOIN org_unit orgregn ON orgregn.org_unit_no = orgdist.rollup_region_no
               JOIN v_client_public fcs ON fcs.client_number = ss.owner_cli_number
+              LEFT JOIN client_location cls ON cls.client_number = ss.owner_cli_number
+                                           AND cls.client_locn_code = ss.owner_cli_locn_cd
+              LEFT JOIN code_list_table cltc ON cltc.column_name = 'CLIENT_TYPE_CODE'
+                                            AND cltc.code_argument = fc.client_type_code
+              LEFT JOIN code_list_table cltcs ON cltcs.column_name = 'CLIENT_TYPE_CODE'
+                                             AND cltcs.code_argument = fcs.client_type_code
              WHERE 1=1""".formatted(
                 sever("fc", "fc.client_name", "client_name"),
                 sever("fc", "cl.client_locn_name", "client_locn_name"),
-                sever("fcs", "fcs.client_name", "site_owner_client_name")))
+                sever("fcs", "fcs.client_name", "site_owner_client_name"),
+                sever("fcs", "cls.client_locn_name", "site_owner_client_locn_name")))
         .filter(QueryFilter.required("scalingFrom", "AND hh.scaling_period >= TRUNC(:scalingFrom, 'MM')", Type.DATE))
         .filter(QueryFilter.required("scalingTo",
             "AND hh.scaling_period < ADD_MONTHS(TRUNC(:scalingTo, 'MM'), 1)", Type.DATE))

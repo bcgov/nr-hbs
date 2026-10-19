@@ -147,15 +147,25 @@ const ISSUED_DOC_REPORT_PARAMS = {
   RB_ORDER_BY: '=0',
 };
 
+/**
+ * Legacy results pages (P451/P456) had two buttons, "Print" and "Print Client Register",
+ * running the pair of reports for the document type searched.
+ */
+const issuedDocReports = (types: string[], print: string, register: string): ReportLinkDef[] => [
+  { reportId: print, label: 'Print', params: ISSUED_DOC_REPORT_PARAMS, showWhen: { field: 'documentType', values: types } },
+  {
+    reportId: register,
+    label: 'Print Client Register',
+    params: ISSUED_DOC_REPORT_PARAMS,
+    showWhen: { field: 'documentType', values: types },
+  },
+];
+
 const ISSUED_DOC_REPORTS: ReportLinkDef[] = [
-  { reportId: 'HBS4R452', label: 'Print (Piece Scale)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS4R462', label: 'Print (Weight Scale)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS4R472', label: 'Print (Compiled Sample)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS4R477', label: 'Print (Ratio)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS3R451', label: 'Print Client Register (Piece Scale)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS3R461', label: 'Print Client Register (Weight Scale)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS3R471', label: 'Print Client Register (Compiled Sample)', params: ISSUED_DOC_REPORT_PARAMS },
-  { reportId: 'HBS3R476', label: 'Print Client Register (Ratio)', params: ISSUED_DOC_REPORT_PARAMS },
+  ...issuedDocReports(['PSI', 'PSV'], 'HBS4R452', 'HBS3R451'),
+  ...issuedDocReports(['WSI', 'WSV'], 'HBS4R462', 'HBS3R461'),
+  ...issuedDocReports(['CSS'], 'HBS4R472', 'HBS3R471'),
+  ...issuedDocReports(['RS'], 'HBS4R477', 'HBS3R476'),
 ];
 
 // ── Harvest history (P431 / P441) ───────────────────────────────────────────
@@ -204,8 +214,11 @@ const historyReportParams = (from: string, to: string): Record<string, string> =
   INVSMRY_REGDIST: 'regionDistrict',
   INVSMRY_CLIENTNO: 'clientNumber',
   INVSMRY_CLIENTLOC: 'clientLocation',
+  // The backend splits these into the 10 LICMARK slots and derives INVSMRY_LICMARKTYPE
+  // (HarvestHistoryPrompts): marks, else licences, else file types, else mgmt unit.
   INVSMRY_LICMARK01: 'timberMarks',
-  INVSMRY_LICMARKTYPE: '=2',
+  INVSMRY_LICENCES: 'forestFileId',
+  INVSMRY_FILETYPE1: 'fileType',
   INVSMRY_SPECIES: 'species',
   INVSMRY_PRODUCT: 'product',
   INVSMRY_GRADE: 'grade',
@@ -253,6 +266,20 @@ const siteSummaryParams = (groupBy: string): Record<string, string> => ({
   RB_GROUP_BY: `=${groupBy}`,
 });
 
+/**
+ * P401's one "View PDF Report": the Jasper unit is picked by Return Type
+ * (2R401 piece / 2R402 weight / 2R403 sample) and the Group By radio.
+ */
+const siteSummaryReport = (reportId: string, returnType: string, groupBy: string): ReportLinkDef => ({
+  reportId,
+  label: 'Download PDF',
+  params: siteSummaryParams(groupBy),
+  showWhen: [
+    { field: 'returnType', values: [returnType] },
+    { field: 'groupBy', values: [groupBy] },
+  ],
+});
+
 // ── Screens ────────────────────────────────────────────────────────────────
 
 export const screens: ScreenDef[] = [
@@ -268,6 +295,7 @@ export const screens: ScreenDef[] = [
       'In addition to the Month Billed Interval, please specify one or more of the following: Region/District Harvested, Mark Holder, File Type, Mgmt Unit Type, Forest File ID, or Timber Mark.',
     capability: 'QUERIES_VIEW',
     query: 'harvestHistory.billing',
+    xmlExport: true,
     criteria: [
       { name: 'billingFrom', label: 'Month Billed Interval (up to 12 months) - From', type: 'date', required: true, group: 'Month Billed Interval' },
       { name: 'billingTo', label: 'To', type: 'date', required: true, group: 'Month Billed Interval' },
@@ -285,8 +313,8 @@ export const screens: ScreenDef[] = [
       ...HISTORY_HOLDER_COLUMNS,
     ],
     reports: [
-      { reportId: 'HBS3R431', label: 'Send PDF Report', params: historyReportParams('billingFrom', 'billingTo') },
-      { reportId: 'HBS3R431', label: 'Data File (CSV)', format: 'CSV', params: historyReportParams('billingFrom', 'billingTo') },
+      { reportId: 'HBS3R431', label: 'Download PDF', params: historyReportParams('billingFrom', 'billingTo') },
+      { reportId: 'HBS3R431', label: 'Download CSV', format: 'CSV', params: historyReportParams('billingFrom', 'billingTo') },
     ],
   },
 
@@ -302,6 +330,7 @@ export const screens: ScreenDef[] = [
       'In addition to the Month Scaled Interval, please specify one or more of the following: Region/District Harvested, Mark Holder, File Type, Mgmt Unit Type, Forest File ID, Timber Mark, Region/District Scaled, or Scale Site.',
     capability: 'QUERIES_VIEW',
     query: 'harvestHistory.scaling',
+    xmlExport: true,
     criteria: [
       { name: 'scalingFrom', label: 'Month Scaled Interval (up to 12 months) - From', type: 'date', required: true, group: 'Month Scaled Interval' },
       { name: 'scalingTo', label: 'To', type: 'date', required: true, group: 'Month Scaled Interval' },
@@ -334,7 +363,7 @@ export const screens: ScreenDef[] = [
     reports: [
       {
         reportId: 'HBS3R441',
-        label: 'Send PDF Report',
+        label: 'Download PDF',
         params: {
           ...historyReportParams('scalingFrom', 'scalingTo'),
           INVSMRY_REGDISTSCALED: 'regionScaled',
@@ -354,7 +383,6 @@ export const screens: ScreenDef[] = [
     navLabel: 'Single Invoice / Statement',
     description: 'Enter the statement number of the document you would like to view.',
     capability: 'QUERIES_VIEW',
-    notes: 'Statements older than seven years (or issued before 2003-11-01) cannot be retrieved.',
     query: 'issuedDocuments.search',
     criteria: [
       { name: 'statementNumber', label: 'Statement Number', required: true, upper: true, maxLength: 8, group: 'Statement Selection' },
@@ -374,15 +402,16 @@ export const screens: ScreenDef[] = [
     capability: 'QUERIES_VIEW',
     notes: 'Please enter at least one date range. Statements older than seven years cannot be retrieved.',
     query: 'issuedDocuments.search',
+    // P451/P456 "Generate XML": the listed statements merged into one transmission (≤ 200).
+    xmlExport: 'statements/export.xml',
     criteria: [
       {
         name: 'documentType',
         label: 'Document Type',
-        type: 'radio',
+        type: 'select',
         options: DOCUMENT_TYPES,
         defaultValue: 'PSI',
         required: true,
-        span: 4,
         group: 'General Criteria',
       },
       { name: 'statementNumber', label: 'Issued Document Number', upper: true, maxLength: 8, group: 'General Criteria' },
@@ -421,6 +450,7 @@ export const screens: ScreenDef[] = [
     criteria: [
       { name: 'clientNumber', label: 'Client Number', type: 'client' },
       { name: 'clientLocation', label: 'Client Location', maxLength: 2, helperText: 'Blank for All Locations' },
+      { name: 'recent', label: 'Recently Issued (last 30 days)', type: 'checkbox', align: 'center' },
       { name: 'fromDate', label: 'From Date', type: 'date', group: 'Transmissions Between ...' },
       { name: 'toDate', label: 'To Date', type: 'date', group: 'Transmissions Between ...' },
       {
@@ -433,7 +463,6 @@ export const screens: ScreenDef[] = [
         ],
         helperText: 'Blank for Both',
       },
-      { name: 'recent', label: 'Recently Issued (last 30 days)', type: 'checkbox' },
     ],
     requireOneOf: ['fromDate', 'recent'],
     columns: [
@@ -578,7 +607,21 @@ export const screens: ScreenDef[] = [
     notes: 'The list shows the active summary-return versions selected; the PDF reports group and total them (Piece Scale cannot be grouped by Scale Site and Population).',
     query: 'scaleSiteSummary.search',
     criteria: [
-      { name: 'returnType', label: 'Return Type', type: 'radio', required: true, defaultValue: 'P', options: [...SCALE_TYPES, { value: 'S', label: 'Sample Scale' }], span: 2, group: 'General Criteria' },
+      { name: 'returnType', label: 'Return Type', type: 'select', required: true, defaultValue: 'P', options: [...SCALE_TYPES, { value: 'S', label: 'Sample Scale' }], group: 'Report Configuration' },
+      {
+        name: 'groupBy',
+        label: 'Group By',
+        type: 'select',
+        required: true,
+        defaultValue: 'DISTRICTSCALESITE',
+        options: [
+          { value: 'DISTRICTSCALESITE', label: 'District and Scale Site' },
+          { value: 'SCALESITETIMBERMARK', label: 'Scale Site and Timber Mark' },
+          // No piece-scale (HBS2R401) report groups by population.
+          { value: 'SCALESITEPOPULATION', label: 'Scale Site and Population', showWhen: { field: 'returnType', values: ['W', 'S'] } },
+        ],
+        group: 'Report Configuration',
+      },
       { name: 'versionStatus', label: 'Version Status', codeList: 'codes.versionStates', group: 'General Criteria' },
       { name: 'scaleDateFrom', label: 'Scale Date From', type: 'date', required: true, group: 'General Criteria' },
       { name: 'scaleDateTo', label: 'Scale Date To', type: 'date', required: true, group: 'General Criteria' },
@@ -623,18 +666,14 @@ export const screens: ScreenDef[] = [
     ],
     rowLink: SDN_LINK,
     reports: [
-      { reportId: 'HBS2R401GroupDistScale', label: 'Piece - District and Scale Site', params: siteSummaryParams('DISTRICTSCALESITE') },
-      { reportId: 'HBS2R401GroupScaleTM', label: 'Piece - Scale Site and Timber Mark', params: siteSummaryParams('SCALESITETIMBERMARK') },
-      { reportId: 'HBS2R402GroupDistScale', label: 'Weight - District and Scale Site', params: siteSummaryParams('DISTRICTSCALESITE') },
-      { reportId: 'HBS2R402GroupScaleTM', label: 'Weight - Scale Site and Timber Mark', params: siteSummaryParams('SCALESITETIMBERMARK') },
-      { reportId: 'HBS2R402GroupScalePop', label: 'Weight - Scale Site and Population', params: siteSummaryParams('SCALESITEPOPULATION') },
-      {
-        reportId: 'HBS2R403GroupDistScale',
-        label: 'Sample - District and Scale Site',
-        params: { ...siteSummaryParams('DISTRICTSCALESITE') },
-      },
-      { reportId: 'HBS2R403GroupScaleTM', label: 'Sample - Scale Site and Timber Mark', params: siteSummaryParams('SCALESITETIMBERMARK') },
-      { reportId: 'HBS2R403GroupScalePop', label: 'Sample - Scale Site and Population', params: siteSummaryParams('SCALESITEPOPULATION') },
+      siteSummaryReport('HBS2R401GroupDistScale', 'P', 'DISTRICTSCALESITE'),
+      siteSummaryReport('HBS2R401GroupScaleTM', 'P', 'SCALESITETIMBERMARK'),
+      siteSummaryReport('HBS2R402GroupDistScale', 'W', 'DISTRICTSCALESITE'),
+      siteSummaryReport('HBS2R402GroupScaleTM', 'W', 'SCALESITETIMBERMARK'),
+      siteSummaryReport('HBS2R402GroupScalePop', 'W', 'SCALESITEPOPULATION'),
+      siteSummaryReport('HBS2R403GroupDistScale', 'S', 'DISTRICTSCALESITE'),
+      siteSummaryReport('HBS2R403GroupScaleTM', 'S', 'SCALESITETIMBERMARK'),
+      siteSummaryReport('HBS2R403GroupScalePop', 'S', 'SCALESITEPOPULATION'),
     ],
   },
 

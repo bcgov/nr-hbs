@@ -2,6 +2,7 @@ package ca.bc.gov.nrs.hbs.api.controller.v1;
 
 import ca.bc.gov.nrs.hbs.api.query.CommandDefinition;
 import ca.bc.gov.nrs.hbs.api.query.CommandService;
+import ca.bc.gov.nrs.hbs.api.query.HarvestHistoryXmlService;
 import ca.bc.gov.nrs.hbs.api.query.QueryRegistry;
 import ca.bc.gov.nrs.hbs.api.query.QueryService;
 import ca.bc.gov.nrs.hbs.api.security.HbsAuthorities;
@@ -51,11 +52,14 @@ public class QueryController {
   private final QueryService queryService;
   private final CommandService commandService;
   private final QueryRegistry registry;
+  private final HarvestHistoryXmlService historyXml;
 
-  public QueryController(QueryService queryService, CommandService commandService, QueryRegistry registry) {
+  public QueryController(QueryService queryService, CommandService commandService, QueryRegistry registry,
+      HarvestHistoryXmlService historyXml) {
     this.queryService = queryService;
     this.commandService = commandService;
     this.registry = registry;
+    this.historyXml = historyXml;
   }
 
   @GetMapping("/queries/{queryId}")
@@ -94,6 +98,18 @@ public class QueryController {
             ContentDisposition.attachment().filename(queryId + ".csv").build().toString())
         .contentType(new MediaType("text", "csv"))
         .body(csv);
+  }
+
+  @GetMapping(value = "/queries/{queryId}/export/xml")
+  @PreAuthorize(HbsAuthorities.ANY_USER)
+  @Operation(summary = "Legacy-schema XML download (Mark Monthly Billing / Scaling History \"Send XML\")")
+  public ResponseEntity<byte[]> exportXml(@PathVariable String queryId, @RequestParam Map<String, String> params) {
+    byte[] xml = historyXml.export(queryId, criteria(params)).getBytes(StandardCharsets.UTF_8);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.attachment().filename(queryId + ".xml").build().toString())
+        .contentType(MediaType.APPLICATION_XML)
+        .body(xml);
   }
 
   @GetMapping("/commands")
