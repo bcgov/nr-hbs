@@ -117,7 +117,7 @@ export const screens: ScreenDef[] = [
     criteria: [
       { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6 },
       { name: 'cutBlock', label: 'Cut Block', maxLength: 10 },
-      { name: 'clientNumber', label: 'Client', maxLength: 8 },
+      { name: 'clientNumber', label: 'Client', type: 'client', maxLength: 8 },
       { name: 'licence', label: 'Licence', upper: true, maxLength: 10 },
       { name: 'district', label: 'District', type: 'select', codeList: 'codes.orgUnits' },
     ],

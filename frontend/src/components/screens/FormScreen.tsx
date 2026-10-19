@@ -130,7 +130,7 @@ export const FormScreen: FC<{ screen: FormScreenDef }> = ({ screen }) => {
           lowContrast
           hideCloseButton
           title="Saving isn't available yet"
-          subtitle="This screen's save logic is still being ported from the legacy system, or you don't have permission to save it."
+          subtitle="This screen can't be saved yet, or you don't have permission to save it."
         />
       )}
       <AsyncBoundary

@@ -18,7 +18,6 @@ export interface PageDef {
 
 export const PAGES = {
   home: { path: '/home', heading: 'Harvest Billing System', navId: 'Home' },
-  reports: { path: '/reports', heading: 'Reports', navId: 'Reports' },
   queries: { path: '/queries', heading: 'Queries' },
   scaleReturns: { path: '/scale-returns', heading: 'Scale Returns' },
   stratumPlanner: { path: '/stratum-planner', heading: 'Stratum Planner' },

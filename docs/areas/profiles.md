@@ -42,7 +42,7 @@ Legacy paths below are relative to `hba-archive/hbs/trunk/source/ear/`:
 | P380 / P381 | Search for / List of Cruise Based Billing Profiles | `cruise-based-profiles` | `profiles.cruiseBased.search` | `DDL/PROCEDURES/V7.01566__HBS3R380.sql`. The REF-CURSOR SELECT is ported; no Jasper report exists for it. |
 | P385 | View Cruise Based Billing Profile | `cruise-based-profile` | `profiles.cruiseBased.detail`, `profiles.cruiseBased.ratios` | `V/P385Action` (APP_WORKSHEET, MARK_BILLED_CLI, TIMBER_MARK, `findCruiseBasedSpGrRatiosByCriteria`) |
 | P383 | Update Cruise Based Billing Profile | `cruise-based-ratios` (grid + row Delete), `cruise-based-ratio-add`, `cruise-based-ratio-update` | `profiles.cruiseBased.ratios`, `profiles.cruiseBased.ratioRecord`, `profiles.cruiseBased.ratio.create` / `.update` / `.delete` → `HBS_CREATE_` / `HBS_STORE_` / `HBS_REMOVE_CB_SP_GRD_RATIO` | `V/P383Action`. The legacy screen deleted every row and re-inserted them on Save. The new screens edit one row at a time. |
-| P801 / P802 | Client Lookup popup | replaced | – | The `client` field type opens the shared ClientSearchModal (nr-forest-client-api — [forest-client-integration.md](../forest-client-integration.md)); picking a location also fills the `Loc` field. |
+| P801 / P802 | Client Lookup popup | replaced | – | The `client` field type is a type-ahead, `ClientComboBox` (nr-forest-client-api — [forest-client-integration.md](../forest-client-integration.md)); picking a client with one location also fills the `Loc` field. |
 
 ## Access (fixes of legacy defects)
 

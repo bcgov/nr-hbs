@@ -64,6 +64,11 @@ public class HbsReportService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HbsReportService.class);
   private static final String ROOT = "reports/hbs/";
+  /**
+   * JCRS repository subreports shared by many reports (78 use {@code HBS_HEADER}),
+   * vendored once under {@code _shared/} and staged beside every report.
+   */
+  private static final List<String> SHARED_SUBREPORTS = List.of("HBS_HEADER");
   private static final List<String> IMAGES =
       List.of("hbs_logo", "hbs_logo1.jpg", "hbs_logo2.jpg", "hbs_logo3.jpg");
   /** Legacy reports capped the rows a prompt-driven run could return. */
@@ -161,6 +166,8 @@ public class HbsReportService {
         params.put(name, safePrompt(def, name, in.getOrDefault(name, "")));
       }
     }
+    HarvestHistoryPrompts.apply(def.id(), params, Map.of(HarvestHistoryPrompts.LICENCES,
+        safePrompt(def, HarvestHistoryPrompts.LICENCES, in.getOrDefault(HarvestHistoryPrompts.LICENCES, ""))));
     Map<String, String> prompts = new HashMap<>();
     params.forEach((k, v) -> prompts.put(k, v instanceof String str ? str : null));
     ReportPromptRules.check(def.id(), prompts);
@@ -193,6 +200,11 @@ public class HbsReportService {
       for (String sub : def.subreports()) {
         try (InputStream in = new ClassPathResource(folder + sub + ".jrxml").getInputStream()) {
           JRSaver.saveObject(JasperCompileManager.compileReport(in), dir.resolve(sub + ".jasper").toFile());
+        }
+      }
+      for (String shared : SHARED_SUBREPORTS) {
+        try (InputStream in = new ClassPathResource(ROOT + "_shared/" + shared + ".jrxml").getInputStream()) {
+          JRSaver.saveObject(JasperCompileManager.compileReport(in), dir.resolve(shared + ".jasper").toFile());
         }
       }
       for (String image : IMAGES) {

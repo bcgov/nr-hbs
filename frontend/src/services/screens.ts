@@ -51,6 +51,12 @@ export function exportQuery(queryId: string, criteria: Criteria) {
   );
 }
 
+/** Legacy-schema XML of a history search (Mark Monthly Billing / Scaling "Send XML"). */
+export function exportQueryXml(queryId: string, criteria: Criteria, path?: string) {
+  const url = path ? `${HBS_API}/${path}` : `${HBS_API}/queries/${encodeURIComponent(queryId)}/export/xml`;
+  return getBlob(`${url}${toQuery(criteria)}`, 'XML download');
+}
+
 export function runCommand(commandId: string, body: Record<string, unknown>): Promise<Row> {
   return sendJson<Row>('POST', `${HBS_API}/commands/${encodeURIComponent(commandId)}`, body, 'Save');
 }
@@ -91,7 +97,11 @@ export function codeList(queryId: string): Promise<CodeOption[]> {
   let p = codeListCache.get(queryId);
   if (!p) {
     p = listQuery(queryId).then((rows) =>
-      rows.map((r) => ({ code: String(r.code ?? ''), description: String(r.description ?? r.code ?? '') })),
+      rows.map((r) => ({
+        code: String(r.code ?? ''),
+        description: String(r.description ?? r.code ?? ''),
+        ...(r.label != null ? { label: String(r.label) } : {}),
+      })),
     );
     p.catch(() => codeListCache.delete(queryId));
     codeListCache.set(queryId, p);
@@ -100,18 +110,6 @@ export function codeList(queryId: string): Promise<CodeOption[]> {
 }
 
 // ── Reports (legacy Jasper units) ───────────────────────────────────────
-
-export interface ReportDefinition {
-  id: string;
-  title: string;
-  procedure: string | null;
-  parameters: string[];
-  subreports: string[];
-}
-
-export function listReports(): Promise<ReportDefinition[]> {
-  return getJson<ReportDefinition[]>(`${HBS_API}/reports`, 'Report list');
-}
 
 export function runReport(reportId: string, parameters: Record<string, string>, format: 'PDF' | 'CSV' = 'PDF') {
   return getBlob(`${HBS_API}/reports/${encodeURIComponent(reportId)}`, 'Report', {

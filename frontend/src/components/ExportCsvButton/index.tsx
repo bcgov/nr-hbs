@@ -14,6 +14,10 @@ interface ExportCsvButtonProps {
   fallbackName: string;
   /** Disabled while a search is in flight, or when there is nothing to export. */
   disabled?: boolean;
+  /** Button text (default "Export results to CSV"). */
+  label?: string;
+  /** Spinner text while the file is prepared. */
+  busyText?: string;
 }
 
 /**
@@ -24,7 +28,13 @@ interface ExportCsvButtonProps {
  * duration, and the button stays disabled until the file arrives — a second
  * click would run the whole query again.
  */
-const ExportCsvButton: FC<ExportCsvButtonProps> = ({ onExport, fallbackName, disabled }) => {
+const ExportCsvButton: FC<ExportCsvButtonProps> = ({
+  onExport,
+  fallbackName,
+  disabled,
+  label = 'Export results to CSV',
+  busyText = 'Preparing CSV export',
+}) => {
   const [exporting, setExporting] = useState(false);
   const { display } = useNotification();
 
@@ -54,11 +64,11 @@ const ExportCsvButton: FC<ExportCsvButtonProps> = ({ onExport, fallbackName, dis
         disabled={disabled || exporting}
         onClick={() => void run()}
       >
-        Export results to CSV
+        {label}
       </Button>
       {exporting && (
         <span className="export-csv__spinner" role="status" aria-live="polite">
-          <Loading small withOverlay={false} description="Preparing CSV export" />
+          <Loading small withOverlay={false} description={busyText} />
         </span>
       )}
     </span>

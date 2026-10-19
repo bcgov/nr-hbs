@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useEffect, type FC } from 'react';
 
 import type { FieldDef } from '@/screens/types';
 
@@ -32,6 +32,21 @@ const spanClass = (span: FieldDef['span']): string | undefined => {
   }
 };
 
+/** A client type-ahead is at least two columns wide, so its "number — name" suggestions fit. */
+const effectiveSpan = (f: FieldDef): FieldDef['span'] =>
+  f.type === 'client' && (f.span ?? 1) < 2 ? 2 : f.span;
+
+/** The field with only the options its `showWhen` allows for the current values. */
+const withAvailableOptions = (f: FieldDef, values: Record<string, string>): FieldDef =>
+  f.options?.some((o) => o.showWhen)
+    ? {
+        ...f,
+        options: f.options.filter(
+          (o) => !o.showWhen || o.showWhen.values.includes(values[o.showWhen.field] ?? ''),
+        ),
+      }
+    : f;
+
 /**
  * The location field paired with a client field: the field right after it,
  * when that is a 2-character "Loc…" code (every legacy client fieldset is
@@ -59,6 +74,20 @@ export const FieldGrid: FC<FieldGridProps> = ({
   readOnly,
   mode = 'criteria',
 }) => {
+  // A dependent choice that is no longer offered (e.g. a grouping the newly
+  // picked return type has no report for) falls back to the field's default,
+  // or its first remaining option.
+  useEffect(() => {
+    fields.forEach((f) => {
+      const available = withAvailableOptions(f, values).options;
+      const current = values[f.name] ?? '';
+      if (!available || available === f.options || !current) return;
+      if (available.some((o) => o.value === current)) return;
+      const fallback = available.find((o) => o.value === f.defaultValue) ?? available[0];
+      onChange(f.name, fallback?.value ?? '');
+    });
+  }, [fields, values, onChange]);
+
   let group: string | undefined;
   return (
     <div className="fsp-search__field-grid">
@@ -76,9 +105,9 @@ export const FieldGrid: FC<FieldGridProps> = ({
           }
         }
         cells.push(
-          <div key={f.name} className={['hbs-field-grid__cell', spanClass(f.span)].filter(Boolean).join(' ')}>
+          <div key={f.name} className={['hbs-field-grid__cell', spanClass(effectiveSpan(f)), f.align === 'center' && 'hbs-field-grid__center'].filter(Boolean).join(' ')}>
             <FieldInput
-              field={f}
+              field={withAvailableOptions(f, values)}
               value={values[f.name] ?? ''}
               onChange={(v) => onChange(f.name, v)}
               idPrefix={idPrefix}

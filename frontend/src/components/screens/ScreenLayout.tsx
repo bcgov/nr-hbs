@@ -19,9 +19,8 @@ interface ScreenLayoutProps {
 
 /**
  * The page frame for a registry screen: nr-fta's PageLayout (title, subtitle,
- * actions level with the title, a "Back to …" link above it), plus the legacy
- * screen's notes banner. The legacy P-number ends the subtitle, for support
- * staff matching a call to the old screen.
+ * actions level with the title, a "Back to …" link above it), plus the
+ * screen's notes banner.
  *
  * The back link returns to wherever the screen was opened from (a search's
  * results, Home's work queues …), carried in router state. A record or form
@@ -35,8 +34,7 @@ export const ScreenLayout: FC<ScreenLayoutProps> = ({ screen, actions, backDisab
   const back: NavOrigin | null =
     origin ?? (screen.kind === 'search' || !area ? null : { path: `/${area.id}`, label: area.label });
 
-  const legacy = `Legacy screen ${screen.legacy}`;
-  const subtitle = screen.description ? `${screen.description} · ${legacy}` : legacy;
+  const subtitle = screen.description;
 
   const backLink = back ? (
     backDisabled ? (

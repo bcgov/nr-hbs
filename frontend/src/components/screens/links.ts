@@ -23,3 +23,13 @@ export function reportParams(report: ReportLinkDef, source: Record<string, unkno
   }
   return out;
 }
+
+/** Whether a report button applies to the current criteria / record (see ReportLinkDef.showWhen). */
+export function reportApplies(report: ReportLinkDef, source: Record<string, unknown>): boolean {
+  if (!report.showWhen) return true;
+  const conditions = Array.isArray(report.showWhen) ? report.showWhen : [report.showWhen];
+  return conditions.every(({ field, values }) => {
+    const v = source[field];
+    return v !== undefined && v !== null && values.includes(String(v));
+  });
+}

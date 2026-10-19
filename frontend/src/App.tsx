@@ -13,7 +13,6 @@ import LandingPage from './pages/LandingPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import OrgSelectionPage from './pages/OrgSelectionPage';
 import HomePage from './pages/HomePage';
-import ReportsPage from './pages/ReportsPage';
 import SubmitScaleDataPage from './pages/SubmitScaleDataPage';
 import AreaLandingPage from './pages/AreaLandingPage';
 import AuthCallback from './pages/AuthCallback';
@@ -64,7 +63,6 @@ export default function App() {
 
           {/* Bespoke pages (custom interaction beyond search/detail/form). */}
           <Route path="/scale-returns/submit" element={withLayout(<SubmitScaleDataPage />)} />
-          <Route path="/reports" element={withLayout(<ReportsPage />)} />
 
           {/* Legacy tab landing pages (P400, P002, P850 …) and every
               registry screen: /:area/:screenId. */}

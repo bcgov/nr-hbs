@@ -14,6 +14,8 @@ export const HBS_API = '/v1/hbs';
 export interface CodeOption {
   code: string;
   description: string;
+  /** Display text when the list supplies its own (e.g. an org unit's name alone). */
+  label?: string;
 }
 
 // Mirrors backend ca.bc.gov.nrs.hbs.api.struct.v1.PageableResponse.
@@ -109,8 +111,20 @@ export async function getBlob(
   });
   if (!res.ok) await failWith(res, label);
   const disposition = res.headers.get('Content-Disposition') ?? '';
-  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
-  return { blob: await res.blob(), filename: match ? decodeURIComponent(match[1]) : null };
+  return { blob: await res.blob(), filename: dispositionFilename(disposition) };
+}
+
+/**
+ * Filename from a Content-Disposition header. Prefers RFC 5987 `filename*=UTF-8''…`:
+ * Spring's `ContentDisposition.filename(name, UTF_8)` also sends a MIME-encoded
+ * `filename="=?UTF-8?Q?…?="`, which (read first) came out as `HBS3R431.pdf_=`.
+ */
+export function dispositionFilename(disposition: string): string | null {
+  const extended = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(disposition);
+  if (extended) return decodeURIComponent(extended[1].trim().replace(/^"|"$/g, ''));
+  const plain = /filename\s*=\s*"?([^";]+)"?/i.exec(disposition);
+  if (!plain || plain[1].startsWith('=?')) return null;
+  return plain[1].trim();
 }
 
 // ── Users (nr-user-lookup-api pass-through) ────────────────────────────

@@ -12,8 +12,11 @@ Start with the [root README](../README.md). Then:
 | [database.md](database.md) | write SQL or call procs against the shared `THE` schema |
 | [legacy-logic-to-port.md](legacy-logic-to-port.md) | pick up the remaining business-logic port |
 | [batch-jobs.md](batch-jobs.md) | work on scheduled jobs |
+| [legacy-batch.md](legacy-batch.md) | understand how the legacy AutoMate/EJB batch worked (diagrams, statuses, schedule) |
 | [reports.md](reports.md) | work on the Jasper reports |
 | [file-shares-and-storage.md](file-shares-and-storage.md) | deal with files (uploads, archives, delivery) |
+| [smbfs-removal.md](smbfs-removal.md) | prepare for the 2026 Q4 Solaris patch that breaks legacy's SMBFS mounts (interim options) |
+| [smbfs-option-nfs.md](smbfs-option-nfs.md) / [smbfs-option-nas.md](smbfs-option-nas.md) | run the NFS-from-Windows or shared-NAS fix for the SMBFS removal |
 | [virus-scanning.md](virus-scanning.md) | configure ClamAV |
 | [user-lookup-integration.md](user-lookup-integration.md) | configure nr-user-lookup-api |
 | [forest-client-integration.md](forest-client-integration.md) | configure nr-forest-client-api (client picker) |

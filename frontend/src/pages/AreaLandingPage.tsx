@@ -32,7 +32,7 @@ const AreaLandingPage: FC = () => {
   const items = getMenuSections(user).find((s) => s.id === def.id)?.items ?? [];
 
   return (
-    <PageLayout title={def.label} subtitle={`${def.description} · Legacy menu ${def.legacy}`}>
+    <PageLayout title={def.label} subtitle={def.description}>
       <SectionTile title="Screens" icon={AREA_ICONS[def.id]}>
         {items.length === 0 && (
           <EmptyState

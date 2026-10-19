@@ -25,14 +25,14 @@ import { useScopedUser } from '@/context/org/useOrg';
 import { useSessionState, type LastSearch } from '@/hooks/useSessionState';
 import { originState, useHereAsOrigin } from '@/lib/navOrigin';
 import { can } from '@/routes/access';
-import { exportQuery, runQuery, type Row } from '@/services/screens';
+import { exportQuery, exportQueryXml, runQuery, type Row } from '@/services/screens';
 import type { ColumnDef, SearchScreenDef } from '@/screens/types';
 
 import ActionButton from './ActionButton';
 import DownloadCell from './DownloadCell';
 import FieldGrid from './FieldGrid';
 import { formatValue } from './format';
-import { linkHref } from './links';
+import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
 import ScreenLayout from './ScreenLayout';
 
@@ -185,6 +185,16 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen.id, searchParams]);
 
+  // Report prompts fall back to the criteria defaults (e.g. "Group output by")
+  // when a field was left or restored blank; the legacy procs can't run without them.
+  const reportSource = useMemo(() => {
+    const out: Criteria = { ...defaults };
+    Object.entries(searched ?? form).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && String(v) !== '') out[k] = v;
+    });
+    return out;
+  }, [defaults, searched, form]);
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!validate(form)) return;
@@ -281,9 +291,23 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                     {total.toLocaleString()} {total === 1 ? 'result' : 'results'} found
                   </span>
                   <span className="hbs-search__results-actions">
-                    {(screen.reports ?? []).map((r) => (
-                      <ReportButton key={r.reportId + r.label} report={r} source={searched ?? form} size="sm" kind="ghost" />
+                    {(screen.reports ?? []).filter((r) => reportApplies(r, reportSource)).map((r) => (
+                      <ReportButton key={r.reportId + r.label} report={r} source={reportSource} size="sm" kind="ghost" />
                     ))}
+                    {screen.xmlExport && (
+                      <ExportCsvButton
+                        onExport={() =>
+                          exportQueryXml(
+                            screen.query,
+                            searched ?? form,
+                            typeof screen.xmlExport === 'string' ? screen.xmlExport : undefined,
+                          )
+                        }
+                        fallbackName={`${screen.query}.xml`}
+                        label="Download XML"
+                        busyText="Preparing XML download"
+                      />
+                    )}
                     <ExportCsvButton
                       onExport={() => exportQuery(screen.query, searched ?? form)}
                       fallbackName={`${screen.id}.csv`}

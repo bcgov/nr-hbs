@@ -249,7 +249,10 @@ public class QueriesCatalog implements QueryCatalog {
             .sql("""
                 SELECT ddt.transmission_id, ddt.client_number, ddt.client_locn_code, cl.client_locn_name,
                        ddt.hbs_delivery_method_code, dmc.description AS delivery_method,
-                       ddt.file_name, ddt.pdf_file_name, ddt.creation_date, ddt.sent_date,
+                       -- file names only: the stored values carry the legacy server path
+                       REGEXP_SUBSTR(ddt.file_name, '[^/\\]+$') AS file_name,
+                       REGEXP_SUBSTR(ddt.pdf_file_name, '[^/\\]+$') AS pdf_file_name,
+                       ddt.creation_date, ddt.sent_date,
                        ddt.recipient_type,
                        DECODE(ddt.recipient_type, 'SEND_TO', 'Send To', 'COPY_TO', 'Copy To', ddt.recipient_type)
                          AS recipient_type_description,

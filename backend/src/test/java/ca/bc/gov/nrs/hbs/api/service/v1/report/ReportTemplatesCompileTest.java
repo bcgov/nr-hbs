@@ -40,4 +40,13 @@ class ReportTemplatesCompileTest {
     }
     assertThat(failures).as("reports that failed to compile").isEmpty();
   }
+
+  @Test
+  void sharedSubreportsExistAndCompile() throws Exception {
+    // HBS_HEADER is a JCRS repository subreport used by 78 reports; HbsReportService
+    // stages it beside every report (missing, fills failed with "Resource not found").
+    try (InputStream in = new ClassPathResource("reports/hbs/_shared/HBS_HEADER.jrxml").getInputStream()) {
+      assertThat(JasperCompileManager.compileReport(in).getName()).isEqualTo("HBS_HEADER");
+    }
+  }
 }

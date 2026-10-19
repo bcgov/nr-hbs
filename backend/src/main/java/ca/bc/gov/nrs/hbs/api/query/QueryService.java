@@ -83,6 +83,14 @@ public class QueryService {
     return rows.get(0);
   }
 
+  /** Number of rows a search matches (uncapped). */
+  public long count(String queryId, Map<String, String> params) {
+    QueryDefinition q = authorized(queryId);
+    Built built = build(q, params);
+    Long total = jdbc.queryForObject("SELECT COUNT(*) FROM (" + built.sql + ")", built.params, Long.class);
+    return total == null ? 0 : total;
+  }
+
   /** CSV export of a search (the legacy screens' "Export"/"Download" buttons). */
   public String exportCsv(String queryId, Map<String, String> params) {
     List<Map<String, Object>> rows = list(queryId, params);

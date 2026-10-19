@@ -55,7 +55,9 @@ public class CodesCatalog implements QueryCatalog {
         QueryDefinition.builder("codes.orgUnits")
             .legacy("hbs2:orgUnitList")
             .capability(Capability.ANY_USER)
+            // label: the legacy orgUnits tag showed the name alone; org_unit_no is a surrogate key.
             .sql("SELECT TO_CHAR(org_unit_no) AS code, org_unit_code || ' - ' || org_unit_name AS description,"
+                + " org_unit_name AS label,"
                 + " org_level_code AS org_level FROM org_unit"
                 + " WHERE org_level_code IN ('R','D') AND SYSDATE BETWEEN effective_date AND expiry_date")
             .orderBy("org_level_code DESC, org_unit_name")

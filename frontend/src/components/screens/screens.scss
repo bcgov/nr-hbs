@@ -25,21 +25,14 @@
 }
 
 // A checkbox has no label row above it; drop it to the inputs' baseline.
-.fsp-search__field-grid .hbs-field-grid__cell:has(> .cds--checkbox-wrapper, > .cds--form-item.cds--checkbox-wrapper) {
+.fsp-search__field-grid .hbs-field-grid__cell:not(.hbs-field-grid__center):has(> .cds--checkbox-wrapper, > .cds--form-item.cds--checkbox-wrapper) {
   align-self: end;
   padding-block-end: 0.5rem;
 }
 
-// Client number + lookup button on one line, the input taking the width.
-.hbs-field__client {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.25rem;
-
-  > :first-child {
-    flex: 1;
-    min-inline-size: 0;
-  }
+// A field centred in its row (FieldDef.align = 'center').
+.fsp-search__field-grid .hbs-field-grid__center {
+  align-self: center;
 }
 
 // Report buttons beside the CSV export in a search's results banner.
