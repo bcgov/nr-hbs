@@ -22,17 +22,32 @@ const MARK_HOLDER_FREQUENCIES = [
   { value: 'MTH', label: 'Monthly' },
 ];
 
+const POPULATION_FREQUENCIES = [
+  { value: 'MTH', label: 'Monthly' },
+  { value: 'BWK', label: 'Bi-Weekly' },
+  { value: 'DLY', label: 'Daily' },
+];
+
 const DELIVERY_METHODS = [
   { value: 'P', label: 'Print' },
   { value: 'E', label: 'E-mail' },
   { value: 'F', label: 'FTP' },
 ];
 
-/** Audit columns the STORE procs overwrite — re-sent unchanged on update. */
+/**
+ * Audit columns, shown read-only. The update workflows re-read the row
+ * server-side; `updateTimestamp` is sent back as the optimistic lock (the save
+ * is refused when someone — or a legacy batch job — changed the record since
+ * it was loaded).
+ */
 const AUDIT_FIELDS: FieldDef[] = [
   { name: 'entryUserid', label: 'Entered By', readOnlyOnEdit: true, group: 'Audit' },
   { name: 'entryTimestamp', label: 'Entered On', type: 'date', readOnlyOnEdit: true, group: 'Audit' },
+  { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Audit' },
 ];
+
+/** The lock value only (screens that show no other audit field). */
+const LOCK_FIELD: FieldDef = { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Audit' };
 
 const SCALE_SITE_COLUMNS: ColumnDef[] = [
   { key: 'scaleSiteId', header: 'Scale Site', sortable: true },
@@ -244,7 +259,8 @@ export const screens: ScreenDef[] = [
     ],
     then: { screen: 'scale-site-profiles', params: { scaleSiteId: 'scaleSiteId' } },
     submitLabel: 'Submit',
-    notes: 'Expiry date cannot be before the effective date or overlap the next profile for the same site, client and return type.',
+    notes:
+      'Expiry date cannot be before the effective date or overlap the next profile for the same site, client and return type. The scale site must be in one of your associated districts.',
   },
   {
     kind: 'form',
@@ -267,7 +283,7 @@ export const screens: ScreenDef[] = [
     then: { screen: 'scale-site-profiles', params: { scaleSiteId: 'scaleSiteId' } },
     submitLabel: 'Submit',
     notes:
-      'Client Number and Location must be blank when inserting a detail record and are required (a trading partner) for a summary record.',
+      'Client Number and Location must be blank when inserting a detail record and are required (a trading partner) for a summary record. The scale site must be in one of your associated districts; the effective date cannot fall inside an existing profile and the expiry date must end before the next one.',
   },
 
   // ------------------------------------------------------------ P330 – P333
@@ -288,6 +304,12 @@ export const screens: ScreenDef[] = [
     requireOneOf: ['populationNumber', 'clientNumber'],
     columns: POPULATION_COLUMNS,
     rowLink: { screen: 'population-profile', params: { popprofId: 'popprofId' } },
+    createLink: {
+      screen: 'population-profile-add',
+      params: { populationNumber: 'populationNumber' },
+      label: 'Add',
+      capability: 'SAMPLING_ADMIN',
+    },
     reports: [
       {
         reportId: 'HBS3R331',
@@ -328,20 +350,84 @@ export const screens: ScreenDef[] = [
         ],
       },
     ],
+    editLink: {
+      screen: 'population-profile-update',
+      params: { popprofId: 'popprofId' },
+      label: 'Update',
+      capability: 'SAMPLING_ADMIN',
+    },
     actions: [
       {
         id: 'delete',
         label: 'Delete',
         command: 'profiles.population.delete',
         capability: 'SAMPLING_ADMIN',
-        params: { popprofId: 'popprofId' },
+        params: { popprofId: 'popprofId', updateTimestamp: 'updateTimestamp' },
         confirm: 'Delete this population profile?',
         danger: true,
         then: { screen: 'population-profiles', params: { populationNumber: 'populationNumber' } },
       },
     ],
+  },
+  {
+    kind: 'form',
+    id: 'population-profile-update',
+    legacy: 'P332',
+    area: 'profiles',
+    title: 'Update Population Profile',
+    nav: false,
+    capability: 'SAMPLING_ADMIN',
+    command: 'profiles.population.update',
+    loadQuery: 'profiles.population.record',
+    keys: ['popprofId'],
+    fields: [
+      { name: 'populationNumber', label: 'Population', readOnlyOnEdit: true },
+      { name: 'samplingYear', label: 'Sampling Year', readOnlyOnEdit: true },
+      { name: 'effectiveDate', label: 'Effective Date', type: 'date', readOnlyOnEdit: true },
+      {
+        name: 'expiryDate',
+        label: 'Expiry Date',
+        type: 'date',
+        required: true,
+        helperText: 'Last day of a month, not before the ratio computation period end',
+      },
+      { name: 'frequency', label: 'Frequency', type: 'select', options: POPULATION_FREQUENCIES, readOnlyOnEdit: true },
+      { name: 'lastRatioStmtDate', label: 'Ratio Computation Period Start', type: 'date', readOnlyOnEdit: true },
+      { name: 'nextRatioStmtDate', label: 'Ratio Computation Period End', type: 'date', readOnlyOnEdit: true },
+      { name: 'popprofId', label: 'Profile ID', readOnlyOnEdit: true, group: 'Audit' },
+      LOCK_FIELD,
+    ],
+    then: { screen: 'population-profile', params: { popprofId: 'popprofId' } },
+    submitLabel: 'Save',
     notes:
-      'Changing the expiry date and adding population profiles are not yet available in the new system (the ratio statement schedule must be computed server-side).',
+      'Only the expiry date can be changed. It must be the last day of a month, on or after the end of the current ratio computation period, and must not overlap another profile of the population.',
+  },
+  {
+    kind: 'form',
+    id: 'population-profile-add',
+    legacy: 'P333',
+    area: 'profiles',
+    title: 'Add Population Profile',
+    nav: false,
+    capability: 'SAMPLING_ADMIN',
+    command: 'profiles.population.create',
+    fields: [
+      { name: 'populationNumber', label: 'Population', maxLength: 4, required: true },
+      { name: 'samplingYear', label: 'Sampling Year', maxLength: 4, required: true },
+      {
+        name: 'effectiveDate',
+        label: 'Effective Date',
+        type: 'date',
+        required: true,
+        helperText: 'First day of a future month (2000–2099)',
+      },
+      { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true, helperText: 'Last day of a month' },
+      { name: 'frequency', label: 'Frequency', type: 'select', options: POPULATION_FREQUENCIES, defaultValue: 'MTH', required: true },
+    ],
+    then: { screen: 'population-profile', params: { popprofId: 'popprofId' } },
+    submitLabel: 'Save',
+    notes:
+      'The first ratio computation period ends on the last day of the effective month (Monthly), the 15th (Bi-Weekly) or the effective day (Daily). Profiles of the same population and year cannot overlap.',
   },
 
   // ------------------------------------------------------------ P340 – P344
@@ -418,7 +504,7 @@ export const screens: ScreenDef[] = [
         label: 'Delete',
         command: 'profiles.markHolders.delete',
         capability: 'PROFILE_BILLING_ADMIN',
-        params: { mhprofId: 'mhprofId' },
+        params: { mhprofId: 'mhprofId', updateTimestamp: 'updateTimestamp' },
         confirm: 'Are you sure you want to delete this Mark Holder Profile?',
         danger: true,
         then: {
@@ -496,7 +582,7 @@ export const screens: ScreenDef[] = [
     ],
     rowLink: { screen: 'scaler-profile', params: { licenceNumber: 'licenceNumber' } },
     notes:
-      'Requesting or replacing a scaler authentication key is not available in the new system yet; contact your District Scaling Supervisor.',
+      'To issue or replace a scaler authentication key, use Profiles › Request Authentication Key. Scalers without an active Scaler Profile link should contact their District Scaling Supervisor.',
   },
   {
     kind: 'search',
@@ -510,6 +596,7 @@ export const screens: ScreenDef[] = [
     criteria: [
       { name: 'expiryDate', label: 'Active Scalers with AKs Expiring Before', type: 'date', required: true },
       { name: 'orgUnitNo', label: 'In Org Unit', codeList: 'codes.orgUnits' },
+      { name: 'inMyOrgUnit', label: 'In my Org Unit', type: 'checkbox', align: 'center' },
     ],
     columns: [
       { key: 'licenceNumber', header: 'Scaler License', sortable: true },
@@ -534,6 +621,17 @@ export const screens: ScreenDef[] = [
     capability: 'SCALER_PROFILE_EDIT',
     query: 'profiles.scalers.detail',
     keys: ['licenceNumber'],
+    // P361 "Edit Authentication Key" → P362 Submit / P363 (the bespoke key request page, which shows the new
+    // key once); P002 offered "Download HBS Public Key" beside the Scaler Profile link.
+    extraLinks: [
+      {
+        path: '/profiles/scaler-key-request',
+        params: { licenceNumber: 'licenceNumber' },
+        label: 'Edit Authentication Key',
+        capability: 'SCALER_PROFILE_EDIT',
+      },
+      { path: '/scale-returns/public-key', params: {}, label: 'Download HBS Public Key', capability: 'ANY_USER' },
+    ],
     sections: [
       {
         title: 'Scaler',
@@ -562,7 +660,7 @@ export const screens: ScreenDef[] = [
       },
     ],
     notes:
-      'Requesting a new authentication key (legacy P362 Submit / P363 confirmation) is not yet available in the new system.',
+      'Edit Authentication Key requests a new key for this scaler (legacy P362 Submit / P363 confirmation). Keys are shown masked here; the new key is shown once, when it is issued.',
   },
 
   // ------------------------------------------------------------ P370 – P374
@@ -742,7 +840,10 @@ export const screens: ScreenDef[] = [
         fields: [
           { key: 'timberMark', label: 'Timber Mark' },
           { key: 'cuttingPermitId', label: 'Cutting Permit' },
+          { key: 'saleMethodCode', label: 'Sale Method' },
+          { key: 'saleMethodDescription', label: 'Sale Method Description' },
           { key: 'markStatus', label: 'Status' },
+          { key: 'markStatusDesc', label: 'Status Description' },
           { key: 'catastrophicInd', label: 'Catastrophic', format: 'yesno' },
           { key: 'adminOrg', label: 'Admin Org' },
           { key: 'ttlMerchntblArea', label: 'Total FTA Merchantable Area (Ha)', format: 'number' },

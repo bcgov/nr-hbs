@@ -1,4 +1,4 @@
-import type { ColumnDef, FieldDef, LinkDef, Option, ReportLinkDef, ScreenDef } from '../types';
+import type { ActionDef, ColumnDef, FieldDef, LinkDef, Option, ReportLinkDef, ScreenDef } from '../types';
 
 /**
  * Scale Returns — Detail (legacy dac/detail): detail scale return searches
@@ -164,10 +164,115 @@ const LIST_REPORTS: ReportLinkDef[] = [
   },
 ];
 
+/**
+ * P551 / P601 / P651 "Generate PDF" (P046Action GEN_PDF → ReportingFactory2.createDetailScaleReportDocd):
+ * the delivery copy of every listed return with its logs (HBS2R552docd / 602docd / 652docd).
+ * The user type and job number prompts are filled by the backend; MINREC / MAXREC are left blank (all rows).
+ */
+const DELIVERY_REPORTS: ReportLinkDef[] = [
+  {
+    reportId: 'HBS2R552docd',
+    label: 'Generate PDF',
+    showWhen: { field: 'returnType', values: ['P'] },
+    params: {
+      PSVERSIONSTATUSCODE: 'status',
+      PSEVENTTYPE: 'eventType',
+      PSSCALEDDATEFROM: 'scaleDateFrom',
+      PSSCALEDDATETO: 'scaleDateTo',
+      PSTIMBERMARK: 'timberMark',
+      PSSCALESITE: 'scaleSite',
+      PSLICENCENUMBER: 'scalerLicence',
+      PSDISTRICTSCALED: 'siteOrgUnit',
+      PSDISTRICTHARVESTED: 'markOrgUnit',
+      PSACTIVEVERSIONINDICATOR: 'activeOnly',
+      PSORDERBY: '=0',
+    },
+  },
+  {
+    reportId: 'HBS2R602docd',
+    label: 'Generate PDF',
+    showWhen: { field: 'returnType', values: ['W'] },
+    params: {
+      WSRETURN_DISTRICTSCALED: 'siteOrgUnit',
+      WSRETURN_DISTRICTHARVESTED: 'markOrgUnit',
+      WSRETURN_TIMBERMARK: 'timberMark',
+      WSRETURN_SCALESITE: 'scaleSite',
+      WSRETURN_LICENCENUMBER: 'scalerLicence',
+      WSRETURN_POPULATION: 'population',
+      WSRETURN_STRATUM: 'stratum',
+      WSRETURN_SAMPLINGYEAR: 'samplingYear',
+      WSRETURN_SCALEDDATEFROM: 'scaleDateFrom',
+      WSRETURN_SCALEDDATETO: 'scaleDateTo',
+      WSRETURN_VERSIONSTATUSCODE: 'status',
+      WSRETURN_EVENTTYPE: 'eventType',
+      WSRETURN_ACTIVEVERSIONIND: 'activeOnly',
+      WSRETURN_ORDERBY: '=0',
+    },
+  },
+  {
+    reportId: 'HBS2R652docd',
+    label: 'Generate PDF',
+    showWhen: { field: 'returnType', values: ['S'] },
+    params: {
+      SSRETURN_DISTRICTSCALED: 'siteOrgUnit',
+      SSRETURN_DISTRICTHARVESTED: 'markOrgUnit',
+      SSRETURN_TIMBERMARK: 'timberMark',
+      SSRETURN_SCALESITE: 'scaleSite',
+      SSRETURN_LICENCENUMBER: 'scalerLicence',
+      SSRETURN_POPULATION: 'population',
+      SSRETURN_STRATUM: 'stratum',
+      SSRETURN_SAMPLINGYEAR: 'samplingYear',
+      SSRETURN_SCALEDDATEFROM: 'scaleDateFrom',
+      SSRETURN_SCALEDDATETO: 'scaleDateTo',
+      SSRETURN_VERSIONSTATUSCODE: 'status',
+      SSRETURN_EVENTTYPE: 'eventType',
+      SSRETURN_ACTIVEVERSIONIND: 'activeOnly',
+      SSRETURN_ORDERBY: '=0',
+    },
+  },
+];
+
 const SITE_CRITERIA: FieldDef[] = [
   { name: 'scaleSite', label: 'Single Site', maxLength: 4, upper: true, group: 'Scale Site' },
   { name: 'siteOrgUnit', label: 'Sites in Region/District', type: 'select', codeList: 'codes.orgUnits', group: 'Scale Site' },
 ];
+
+/** P046 "Associated Sites" / "Sites in Associated Districts" (HBS2R551 PSR_SearchBySites on the user id). */
+const SITE_SCOPE_OPTIONS = [
+  { value: 'ASSOCIATED_SITES', label: 'Associated Sites' },
+  { value: 'ASSOCIATED_DISTRICTS', label: 'Sites in Associated Districts' },
+];
+
+const SITE_SCOPE: FieldDef = {
+  name: 'scope',
+  label: 'Data Domain',
+  type: 'select',
+  options: SITE_SCOPE_OPTIONS,
+  group: 'Scale Site',
+};
+
+/**
+ * Home work queues (P046Action.setSearchCriteriaForHome, BT 3268 / BT 7126): scale admins see
+ * sites in their associated districts, site admins their associated sites, scalers the returns of
+ * their own licence; with both roles, the union.
+ */
+const WORKBENCH_SCOPE: FieldDef = {
+  ...SITE_SCOPE,
+  options: [
+    ...SITE_SCOPE_OPTIONS,
+    { value: 'OWN_LICENCE', label: 'My Scaler Licence' },
+    { value: 'MOF_DUAL', label: 'Sites in Associated Districts and My Scaler Licence' },
+    { value: 'CLIENT_DUAL', label: 'Associated Sites and My Scaler Licence' },
+  ],
+  roleDefaults: [
+    { roles: ['HBS_SCALE_ADMIN'], unlessRoles: ['HBS_MOF_SCALER'], value: 'ASSOCIATED_DISTRICTS' },
+    { roles: ['HBS_MOF_SCALER'], unlessRoles: ['HBS_SCALE_ADMIN'], value: 'OWN_LICENCE' },
+    { roles: ['HBS_SCALE_ADMIN'], value: 'MOF_DUAL' },
+    { roles: ['HBS_CLI_SITE_ADMIN'], unlessRoles: ['HBS_CLI_SCALER'], value: 'ASSOCIATED_SITES' },
+    { roles: ['HBS_CLI_SCALER'], unlessRoles: ['HBS_CLI_SITE_ADMIN'], value: 'OWN_LICENCE' },
+    { roles: ['HBS_CLI_SITE_ADMIN'], value: 'CLIENT_DUAL' },
+  ],
+};
 
 /** P046 — Search for Detail Scale Data. */
 const GENERAL_CRITERIA: FieldDef[] = [
@@ -189,6 +294,7 @@ const GENERAL_CRITERIA: FieldDef[] = [
   { name: 'receivedDateFrom', label: 'Received Date From', type: 'date', group: 'Range of Dates' },
   { name: 'receivedDateTo', label: 'Received Date To', type: 'date', group: 'Range of Dates' },
   ...SITE_CRITERIA,
+  SITE_SCOPE,
   { name: 'population', label: 'Pop', maxLength: 4, upper: true, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
   { name: 'stratum', label: 'Strat', maxLength: 2, upper: true, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
   { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
@@ -205,6 +311,13 @@ const GENERAL_CRITERIA: FieldDef[] = [
   { name: 'timberMark', label: 'Single Mark', maxLength: 6, upper: true, group: 'Timber Mark' },
   { name: 'cutBlock', label: 'Cut Block', maxLength: 10, upper: true, helperText: 'Use * as wildcard.', group: 'Timber Mark' },
   { name: 'markOrgUnit', label: 'Marks in Region/District', type: 'select', codeList: 'codes.orgUnits', group: 'Timber Mark' },
+  {
+    name: 'markScope',
+    label: 'Marks in Associated Districts',
+    type: 'select',
+    options: [{ value: 'ASSOCIATED_DISTRICTS', label: 'Yes' }],
+    group: 'Timber Mark',
+  },
   { name: 'scalerLicence', label: 'Primary Scaler Licence', maxLength: 4, upper: true, group: 'Primary Scaler Licence' },
   { name: 'returnNumberFrom', label: 'Return Number From', type: 'number', maxLength: 4, group: 'Range of Numbers' },
   { name: 'returnNumberTo', label: 'Return Number To', type: 'number', maxLength: 4, group: 'Range of Numbers' },
@@ -225,14 +338,131 @@ const WORKBENCH_COMMON: FieldDef[] = [
   { name: 'status', label: 'Version Status', type: 'select', options: VERSION_STATUSES },
   { name: 'days', label: 'Scale date within the last (days)', type: 'number', defaultValue: '30', maxLength: 4 },
   ...SITE_CRITERIA,
+  WORKBENCH_SCOPE,
   { name: 'scalerLicence', label: 'Primary Scaler Licence', maxLength: 4, upper: true },
 ];
 
 const WORKBENCH_NOTES =
-  'Legacy work queues were limited to the user\'s associated sites / districts or own scaler licence. ' +
-  'Industry users are limited to returns of their client; ministry users can narrow with Scale Site or Region/District.';
+  'Work queues start limited to your associated sites / districts and, for scalers, your own scaler licence ' +
+  '(Data Domain). Industry users only see returns of their client.';
 
 const yesNo = 'yesno' as const;
+
+/**
+ * Workflow buttons of the detail pages (Buttons.jsp → backend detailreturns
+ * commands). `showWhen` mirrors FunctionsComparator.isFieldAvailable on the
+ * version status / document state; the backend re-checks the full rule
+ * (roles, site / scaler / district authority) and refuses otherwise.
+ */
+const KEYS = { ddn: 'ddn', version: 'version', updateTimestamp: 'updateTimestamp' };
+const ACTIVE = { field: 'activeInd', values: ['Y'] };
+const DETAIL_ACTIONS: ActionDef[] = [
+  {
+    id: 'release',
+    label: 'Release',
+    command: 'detailReturns.release',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['INC', 'HLD'] }, ACTIVE],
+    confirm: 'Release this scale return? It is edited again and becomes Ready or In Error.',
+  },
+  {
+    id: 'reEdit',
+    label: 'Re-Edit',
+    command: 'detailReturns.reEdit',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['RDY', 'ERR', 'FAL', 'NTI'] }, { field: 'returnState', values: ['OIP', 'RCP', 'RNP'] }],
+    confirm: 'Run the edits on this scale return again?',
+  },
+  {
+    id: 'hold',
+    label: 'Hold',
+    command: 'detailReturns.hold',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['RDY', 'ERR', 'FAL', 'NTI'] }, ACTIVE],
+    confirm: 'Hold this scale return? A new held version is created for editing.',
+    then: { screen: 'detail-entry', params: { ddn: 'ddn', version: 'version' } },
+  },
+  {
+    id: 'cancel',
+    label: 'Cancel',
+    command: 'detailReturns.cancel',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['ISS'] }, { field: 'returnState', values: ['OCM', 'RNC', 'RCC'] }, ACTIVE],
+    confirm: 'Cancel this issued scale return? The cancellation needs approval.',
+    danger: true,
+  },
+  {
+    id: 'cancelReplaceChanges',
+    label: 'Cancel and Replace with Changes',
+    command: 'detailReturns.cancelReplaceChanges',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['ISS'] }, { field: 'returnState', values: ['OCM', 'RNC', 'RCC'] }, ACTIVE],
+    confirm: 'Cancel this issued scale return and create a new version to replace it?',
+    then: { screen: 'detail-entry', params: { ddn: 'ddn', version: 'version' } },
+  },
+  {
+    id: 'replaceChanges',
+    label: 'Replace with Changes',
+    command: 'detailReturns.replaceChanges',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['CAN'] }, ACTIVE],
+    confirm: 'Create a new version to replace this cancelled scale return?',
+    then: { screen: 'detail-entry', params: { ddn: 'ddn', version: 'version' } },
+  },
+  {
+    id: 'replaceNoChanges',
+    label: 'Replace without Changes',
+    command: 'detailReturns.replaceNoChanges',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: [{ field: 'status', values: ['CAN'] }, ACTIVE],
+    confirm: 'Replace this cancelled scale return without changes?',
+  },
+  {
+    id: 'approve',
+    label: 'Approve Change',
+    command: 'detailReturns.approve',
+    capability: 'DETAIL_RETURN_APPROVE',
+    params: KEYS,
+    showWhen: { field: 'status', values: ['AWP'] },
+    confirm: 'Approve the requested change?',
+  },
+  {
+    id: 'reject',
+    label: 'Reject Change',
+    command: 'detailReturns.reject',
+    capability: 'DETAIL_RETURN_APPROVE',
+    params: KEYS,
+    showWhen: { field: 'status', values: ['AWP'] },
+    confirm: 'Reject the requested change?',
+    danger: true,
+  },
+  {
+    id: 'clearSignatureFailure',
+    label: 'Clear Digital Signature Failure',
+    command: 'detailReturns.clearSignatureFailure',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: { field: 'status', values: ['DSF'] },
+    confirm: 'Clear the digital signature failure and release this scale return?',
+  },
+  {
+    id: 'discard',
+    label: 'Discard',
+    command: 'detailReturns.discard',
+    capability: 'DETAIL_RETURN_EDIT',
+    params: KEYS,
+    showWhen: { field: 'status', values: ['RDY', 'ERR', 'HLD', 'FAL', 'DSF', 'ACC', 'INC', 'AWP'] },
+    confirm: 'Discard this version of the scale return?',
+    danger: true,
+  },
+];
 
 export const screens: ScreenDef[] = [
   {
@@ -249,9 +479,11 @@ export const screens: ScreenDef[] = [
     requireOneOf: ['scaleDateFrom', 'receivedDateFrom'],
     columns: RESULT_COLUMNS,
     rowLink: TO_RETURN,
-    reports: LIST_REPORTS,
+    reports: [...LIST_REPORTS, ...DELIVERY_REPORTS],
+    createLink: { screen: 'detail-entry', params: {}, label: 'Add Detail Scale Data', capability: 'DETAIL_RETURN_EDIT' },
     notes:
-      'Only active versions will be returned unless "Only active versions" is No. Returns older than seven years are not available online.',
+      'Only active versions will be returned unless "Only active versions" is No. Returns older than seven years are not available online. ' +
+      'Bulk requests (P560A): Scale Returns › Bulk Request for Detail Scale Returns (/scale-returns/detail-bulk).',
   },
   {
     kind: 'search',
@@ -373,9 +605,15 @@ export const screens: ScreenDef[] = [
     query: 'detailReturns.version',
     keys: ['ddn', 'version'],
     notes:
-      'Fields that do not apply to this return type are shown as —. Data entry and workflow actions ' +
-      '(Save, Release, Hold, Re-Edit, Discard, Cancel, Replace, Approve/Reject Change, Clear Digital Signature Failure) ' +
-      'are not yet available in this application.',
+      'Fields that do not apply to this return type are shown as —. Use "Edit / Log Details" to change the return, ' +
+      'its log details and defects, or to change its event type; workflow buttons appear for the states that allow them.',
+    actions: DETAIL_ACTIONS,
+    editLink: {
+      screen: 'detail-entry',
+      params: { ddn: 'ddn', version: 'version' },
+      label: 'Edit / Log Details',
+      capability: 'DETAIL_RETURN_EDIT',
+    },
     sections: [
       {
         title: 'Version Information',
@@ -517,6 +755,7 @@ export const screens: ScreenDef[] = [
             { key: 'txnTypeDesc', header: 'Type' },
             { key: 'dateSummarized', header: 'Date Summarized', format: 'date' },
             { key: 'sdn', header: 'SDN' },
+            { key: 'dateIssued', header: 'Date Issued', format: 'date' },
             { key: 'volume', header: 'Volume', format: 'volume' },
             { key: 'value', header: 'Value', format: 'money' },
           ],
@@ -543,26 +782,31 @@ export const screens: ScreenDef[] = [
       {
         reportId: 'HBS2R552',
         label: 'Print Log Tally (HBS2R552)',
+        fileName: 'Log Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { PSRETURN_DETAILDOCUMENTNUMBER: 'ddn', PSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R602',
         label: 'Print Weigh Slip (HBS2R602)',
+        fileName: 'Weigh Slip {ddn} v{version} {timberMark} {scaleDate}',
         params: { WSRETURN_DETAILDOCUMENTNUMBER: 'ddn', WSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R652',
         label: 'Print Sample Tally (HBS2R652)',
+        fileName: 'Sample Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { SSRETURN_DETAILDOCUMENTNUMBER: 'ddn', SSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS3R755',
         label: 'Print SFP Tally (HBS3R755)',
+        fileName: 'SFP Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { PSRETURN_DETAILDOCUMENTNUMBER: 'ddn', PSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R702',
         label: 'Print Ledger Entry (HBS2R702)',
+        fileName: 'Ledger Entry {ddn} v{version} {timberMark} {scaleDate}',
         params: { LEDGERDTL_DOCUMENTNUMBER: 'ddn', LEDGERDTL_VERSIONNUMBER: 'version', LEDGERDTL_LEDGERTYPE: 'docType' },
       },
     ],

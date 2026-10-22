@@ -183,6 +183,28 @@
       <artifactId>jaxb-runtime</artifactId>
       <version>4.0.5</version>
     </dependency>
+    <!--
+      Statement / invoice PDFs. The legacy app rendered the stored statement
+      XML through XSL-FO with Apache FOP 0.20.5 (HbsStatementPdfFactory); the
+      same stylesheets (src/main/resources/xsl/<version>/) run on FOP 2.x.
+      commons-logging is provided by Spring's spring-jcl; xml-apis duplicates
+      the JDK's java.xml module.
+    -->
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop-core</artifactId>
+      <version>2.12</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
     <!-- Test -->
     <dependency>

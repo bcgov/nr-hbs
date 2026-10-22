@@ -2,6 +2,7 @@ import { Loading } from '@carbon/react';
 import { useEffect, useRef, type FC } from 'react';
 
 import { useAuth } from '@/context/auth/useAuth';
+import { peekReturnTo } from '@/routes/returnTo';
 
 /**
  * Where Keycloak returns the browser after a successful sign-in.
@@ -49,7 +50,8 @@ const AuthCallback: FC = () => {
         await completeLogin();
         // `replace`, not `assign`: the callback URL carries a spent
         // authorization code, so it must not be left in history for Back.
-        window.location.replace(`${import.meta.env.BASE_URL || '/'}home`);
+        // A StatementDelivery link followed before sign-in resumes here (routes/returnTo).
+        window.location.replace(peekReturnTo() ?? `${import.meta.env.BASE_URL || '/'}home`);
       } catch (error) {
         // A spent or tampered callback is not something the user can act on —
         // send them back to the sign-in screen rather than showing an error

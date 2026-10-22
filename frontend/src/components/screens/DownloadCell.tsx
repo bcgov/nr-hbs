@@ -3,16 +3,18 @@ import { Download } from '@carbon/icons-react';
 import { useState, type FC } from 'react';
 
 import { useNotification } from '@/context/notification/useNotification';
-import { getBlob } from '@/services/common';
 import { triggerBrowserDownload } from '@/utils/download';
 
+import { useScreenApi } from './screenApi';
+
 /**
- * Authenticated file download for a 'download' column — a plain <a href>
- * would not carry the Keycloak bearer token. The backend returns API paths
+ * File download for a 'download' column — a plain <a href> would not carry
+ * the Keycloak bearer token (the public area's ScreenApi fetches without one). The backend returns API paths
  * (/api/v1/hbs/...); apiFetch prepends the /api base, so strip it here.
  */
 export const DownloadCell: FC<{ url: unknown; label?: string }> = ({ url, label }) => {
   const { display } = useNotification();
+  const api = useScreenApi();
   const [busy, setBusy] = useState(false);
   if (typeof url !== 'string' || !url) return <>—</>;
   const path = url.replace(/^\/api(?=\/)/, '');
@@ -21,7 +23,7 @@ export const DownloadCell: FC<{ url: unknown; label?: string }> = ({ url, label 
     e.stopPropagation();
     setBusy(true);
     try {
-      const { blob, filename } = await getBlob(path, 'Download');
+      const { blob, filename } = await api.download(path, 'Download');
       triggerBrowserDownload(blob, filename ?? path.split('/').pop() ?? 'download');
     } catch (err) {
       display({ kind: 'error', title: 'Download failed', subtitle: (err as Error).message, timeout: 6000 });

@@ -118,6 +118,16 @@ public class ApiError implements Serializable {
   }
 
   /**
+   * Add a business-rule failure from a ported workflow.
+   *
+   * @param field   the request field it concerns (may be null)
+   * @param message the legacy message text
+   */
+  public void addWorkflowError(String field, String message) {
+    addValidationError("request", field, null, message);
+  }
+
+  /**
    * Add validation error.
    *
    * @param object  the object

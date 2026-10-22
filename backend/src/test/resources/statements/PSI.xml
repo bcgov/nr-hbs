@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hbs-transmission xmlns="gov.bc.ca/forests/hbs/statement/v1" transmission-id="1" batch-count="1" date-created="2026-09-15" time-created="10:15:00">
+  <hbs-batch batch-type-code="PSI" document-count="1">
+    <piece-scale-invoices>
+      <piece-scale-invoice>
+        <header>
+          <statement-number>1000001</statement-number>
+          <issue-date>2026-09-03</issue-date>
+          <debit-credit-indicator>DR</debit-credit-indicator>
+          <scale-method>P</scale-method>
+          <transaction-type>ORG</transaction-type>
+          <invoice-to>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </invoice-to>
+          <copy-to>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </copy-to>
+          <timber-mark>TIMBER</timber-mark>
+          <license>LICENSE</license>
+          <cutting-permit>CUT</cutting-permit>
+          <region-harvested org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <region-scaled org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <district-harvested org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <district-scaled org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <scale-period start="2026-09-14" end="2026-09-15"/>
+          <scale-site id="ID" name="WESTERN FOREST PRODUCTS INC"/>
+          <summary-doc-number>586</summary-doc-number>
+          <summary-type>Generated</summary-type>
+          <return-category code="CO" description="Primary Scale"/>
+          <kind-of-charge>KIND OF CHARGE</kind-of-charge>
+          <statement-cycle> </statement-cycle>
+          <deck-id>A</deck-id>
+          <cut-block>CUT BLOCK</cut-block>
+          <prev-statement-number>1000007</prev-statement-number>
+          <scaler name="WESTERN FOREST PRODUCTS INC" license="XXXX"/>
+          <related-statement-number>1000001</related-statement-number>
+          <invoice-amount>1626.72</invoice-amount>
+          <total-volume>1633.109</total-volume>
+          <return-number>RETU</return-number>
+        </header>
+        <segregation-details>
+          <segregation-detail stumpage-rate="1647.83" value="1654.20" piece-scale-method="L" piece-scale-method-description="PIECE SCALE METHOD DESCRIPTION" pieces="820" net-volume="1682.368" beachcomb-mark="BEACHC" no-mark-visible-indicator="A" avoidable-indicator="A" scaled-before-indicator="A" bonus-bid-amount="1717.53" dev-levy-amount="1724.90" silviculture-levy-amount="1731.27" reserve-amount="1738.64" species="SPECIES" species-code="SP" product="PRODUCT" product-code="PR" grade="GRADE" grade-code="G"/>
+          <segregation-totals pieces="1028" volume="1794.960" value="1801.97"/>
+        </segregation-details>
+        <detail-documents>
+          <detail-document scale-date="2026-09-27" scaler-license="XXXX" return-number="RETU" load-arrival-number="LOAD ARRIV" LDS-number="LDS NUMBER" log-count="1132" volume="1850.256" value="1857.93" DDN="DDN" DV="95" transaction-sequence="9"/>
+          <detail-totals log-count="1210" volume="1892.478" value="1899.15"/>
+        </detail-documents>
+        <notations>
+          <notation number="99" type="ABC">Rates as per appraisal effective 2026-09-01.</notation>
+        </notations>
+        <fine-print>Payment is due within 30 days of the issue date. Interest is charged on overdue accounts.</fine-print>
+      </piece-scale-invoice>
+    </piece-scale-invoices>
+  </hbs-batch>
+</hbs-transmission>

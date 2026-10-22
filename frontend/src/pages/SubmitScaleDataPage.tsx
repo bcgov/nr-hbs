@@ -23,9 +23,11 @@ interface SubmissionResult {
 /**
  * P505 / P506 — Submit File of Detail Returns. Uploads one XML file of detail
  * scale data (log tallies, weigh slips, sample tallies, ledgers, SFP); the
- * backend virus-scans it, validates it against HBS_Schema_V6_1b, records the
- * transmission and queues it for the intake batch. Processing is asynchronous
- * — progress is visible on "Search for Detail Scale Transmissions".
+ * backend virus-scans it, validates it against HBS_Schema_V6_1b and records
+ * the transmission (Receiving / Success). The app's unpack job (B1012 port)
+ * then unpacks it within minutes — Unpacking / Success, or Unpacking / Failed
+ * with the format error — and the legacy batch edits it. As in the legacy
+ * P032 screen, the outcome is shown on the transmission's detail screen.
  */
 const SubmitScaleDataPage: FC = () => {
   const user = useScopedUser();
@@ -106,9 +108,17 @@ const SubmitScaleDataPage: FC = () => {
           lowContrast
           hideCloseButton
           title="Detail return file received"
-          subtitle={`${result.fileName} was received as transmission ${result.transmissionId}. It will be unpacked and edited by the next intake run.`}
+          subtitle={`${result.fileName} was received as transmission ${result.transmissionId}. It is unpacked within a few minutes, then edited by the next batch run; its step, status and any format errors appear on the transmission.`}
           className="hbs-screen__notes"
         >
+          <Button
+            kind="ghost"
+            size="sm"
+            renderIcon={ArrowRight}
+            onClick={() => navigate(`/scale-returns/xml-transmission-detail?transmissionId=${result.transmissionId}`)}
+          >
+            View transmission {result.transmissionId}
+          </Button>
           <Button
             kind="ghost"
             size="sm"

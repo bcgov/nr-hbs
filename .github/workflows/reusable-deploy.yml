@@ -200,6 +200,7 @@ jobs:
             -p MAX_REPLICAS="${{ inputs.backend_replicas }}"
             -p KEYCLOAK_ISSUER_URI="${{ vars.KEYCLOAK_ISSUER_URI }}"
             -p KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
+            -p KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID="${{ vars.KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID }}"
             -p USER_LOOKUP_BASE_URL="$USER_LOOKUP_BASE_URL"
             -p USER_LOOKUP_TOKEN_URL="$USER_LOOKUP_TOKEN_URL"
             -p USER_LOOKUP_CLIENT_ID="${{ steps.keycloak_sa.outputs.client_id }}"

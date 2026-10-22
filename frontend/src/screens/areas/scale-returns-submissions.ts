@@ -59,6 +59,37 @@ const RETURN_TYPES = [
   { value: 'ALL', label: 'All' },
 ];
 
+/**
+ * "Associated Sites" / "Sites in Associated Districts" and "Input User ID =
+ * me", defaulted per role as P032Action.setDefaultSearchCriteria and
+ * P024Action did (HBS_SCALE_ADMIN → districts; CLI_SITE_ADMIN → sites;
+ * MOF_SCALER / DTL_DATA_ENT / CLI_SCALER → own input user id).
+ */
+const siteScope = (group: string): FieldDef => ({
+  name: 'siteScope',
+  label: 'Sites',
+  type: 'select',
+  options: [
+    { value: 'ASSOCIATED_SITES', label: 'Associated Sites' },
+    { value: 'ASSOCIATED_DISTRICTS', label: 'Sites in Associated Districts' },
+  ],
+  roleDefaults: [
+    { roles: ['HBS_SCALE_ADMIN'], value: 'ASSOCIATED_DISTRICTS' },
+    { roles: ['HBS_CLI_SITE_ADMIN'], value: 'ASSOCIATED_SITES' },
+  ],
+  group,
+});
+const inputUserScope: FieldDef = {
+  name: 'inputUserScope',
+  label: 'Only my submissions (Input User ID = me)',
+  type: 'checkbox',
+  roleDefaults: [
+    { roles: ['HBS_MOF_SCALER', 'HBS_DTL_DATA_ENT'], unlessRoles: ['HBS_SCALE_ADMIN'], value: 'Y' },
+    { roles: ['HBS_CLI_SCALER'], unlessRoles: ['HBS_CLI_SITE_ADMIN'], value: 'Y' },
+  ],
+  group: 'Submitter',
+};
+
 // ── P280 / P283 batch slip fields ─────────────────────────────────────────
 
 const slipFields: FieldDef[] = [
@@ -80,22 +111,8 @@ const slipFields: FieldDef[] = [
   { name: 'paperBatchComment', label: 'Instruction/notes', type: 'textarea', maxLength: 255, span: 4 },
 ];
 
-/** Every HBS_STORE_HBS_PAPER_BATCH argument, taken from the P283 record. */
-const slipStoreParams: Record<string, string> = {
-  batchId: 'batchId',
-  scaleSiteNo: 'scaleSiteNo',
-  dtlDocBatchId: 'dtlDocBatchId',
-  returnType: 'returnType',
-  scaledFrom: 'scaledFrom',
-  scaledTo: 'scaledTo',
-  documentCount: 'documentCount',
-  hdqSentDate: 'hdqSentDate',
-  senderUserid: 'senderUserid',
-  paperBatchComment: 'paperBatchComment',
-  orgUnitNo: 'orgUnitNo',
-  entryUserid: 'entryUserid',
-  entryTimestamp: 'entryTimestamp',
-};
+/** P283 Cancel / Confirm: the server re-reads the slip; only its key and lock go back. */
+const slipStoreParams: Record<string, string> = { batchId: 'batchId', updateTimestamp: 'updateTimestamp' };
 
 export const screens: ScreenDef[] = [
   {
@@ -140,6 +157,8 @@ export const screens: ScreenDef[] = [
       { name: 'clientNumber', label: 'XML Transmission Creator', type: 'client', maxLength: 8, group: 'Submitter' },
       { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Submitter' },
       { name: 'inputUserId', label: 'Input User ID', upper: true, maxLength: 30, group: 'Submitter' },
+      inputUserScope,
+      siteScope('Scale Site'),
     ],
     requireOneOf: ['transmissionId', 'receivedFrom'],
     columns: transmissionColumns,
@@ -260,6 +279,8 @@ export const screens: ScreenDef[] = [
       { name: 'clientNumber', label: 'XML Transmission Creator', type: 'client', maxLength: 8, group: 'Submitter' },
       { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Submitter' },
       { name: 'inputUserId', label: 'Input User ID', upper: true, maxLength: 30, group: 'Submitter' },
+      inputUserScope,
+      siteScope('Scale Site'),
       {
         name: 'batchType',
         label: 'Batches',
@@ -421,6 +442,8 @@ export const screens: ScreenDef[] = [
         label: 'Cancel',
         command: 'batchSlip.cancel',
         capability: 'BATCH_SLIP_EDIT',
+        // BatchSlipCommands.Cancel: Pending slips only.
+        showWhen: { field: 'statusCode', values: ['PND'] },
         params: slipStoreParams,
         confirm: 'Cancel this batch slip? Its status becomes Cleared and it can no longer be updated. (Pending batch slips only.)',
         danger: true,
@@ -430,9 +453,11 @@ export const screens: ScreenDef[] = [
         label: 'Confirm',
         command: 'batchSlip.confirm',
         capability: 'BATCH_SLIP_EDIT',
+        // BatchSlipCommands.Confirm: Pending with documents received; a count mismatch stays a server message.
+        showWhen: { field: 'confirmAllowed', values: ['Y'] },
         params: slipStoreParams,
         confirm:
-          'Mark this batch slip Matched? Only confirm a Pending slip whose Documents Received equals its Document Count.',
+          'Mark this batch slip Matched? Only a Pending slip whose Documents Received equals its Document Count can be confirmed.',
       },
     ],
     sections: [
@@ -490,6 +515,7 @@ export const screens: ScreenDef[] = [
       { name: 'entryTimestamp', label: 'Batch Slip Creation Date', type: 'date', readOnlyOnEdit: true },
       { name: 'dtlDocBatchId', label: 'Matched Detail Batch Id', readOnlyOnEdit: true },
       { name: 'returnType', label: 'Return Type', readOnlyOnEdit: true },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true },
       ...slipFields,
     ],
     then: { screen: 'batch-slip', params: { batchId: 'batchId' } },

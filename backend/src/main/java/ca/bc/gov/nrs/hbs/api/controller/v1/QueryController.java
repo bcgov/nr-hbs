@@ -116,9 +116,14 @@ public class QueryController {
   @PreAuthorize(HbsAuthorities.ANY_USER)
   @Operation(summary = "Ids of the registered commands the caller may run")
   public List<String> availableCommands() {
-    return registry.allCommands().stream()
-        .filter(c -> c.capability().isGranted())
-        .map(CommandDefinition::id)
+    return java.util.stream.Stream.concat(
+            registry.allCommands().stream()
+                .filter(c -> c.capability().isGranted())
+                .map(CommandDefinition::id),
+            registry.allWorkflows().stream()
+                .filter(w -> w.capability().isGranted())
+                .map(ca.bc.gov.nrs.hbs.api.workflow.WorkflowCommand::id))
+        .sorted()
         .toList();
   }
 

@@ -37,6 +37,18 @@ class TokenValidatorsTest {
   }
 
   @Test
+  void authorizedParty_acceptsTheBridgeServiceAccountWithServiceRolesOnly() {
+    var v = new AuthorizedPartyValidator("hbs-client", List.of("hbs-bridge", " "));
+    assertThat(v.validate(token("hbs-bridge", List.of("HBS_LEGACY_BRIDGE"))).hasErrors()).isFalse();
+    assertThat(v.validate(token("hbs-bridge", List.of("HBS_LEGACY_BRIDGE", "HBS_PROD_CTL"))).hasErrors()).isTrue();
+    assertThat(v.validate(token("hbs-bridge", List.of())).hasErrors()).isTrue();
+    assertThat(v.validate(token("other", List.of("HBS_LEGACY_BRIDGE"))).hasErrors()).isTrue();
+    // without configuration no service account is accepted
+    assertThat(new AuthorizedPartyValidator("hbs-client").validate(token("hbs-bridge", List.of("HBS_LEGACY_BRIDGE")))
+        .hasErrors()).isTrue();
+  }
+
+  @Test
   void roleValidator_requiresAnHbsRole() {
     var v = new HbsRoleValidator();
     assertThat(v.validate(token("c", List.of("HBS_CLI_USER_FOREST_CLIENT-00012345"))).hasErrors()).isFalse();

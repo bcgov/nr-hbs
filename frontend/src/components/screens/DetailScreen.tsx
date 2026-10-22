@@ -40,15 +40,17 @@ import { useScopedUser } from '@/context/org/useOrg';
 import { useLazyTabs } from '@/hooks/useLazyTabs';
 import { originState, useHereAsOrigin } from '@/lib/navOrigin';
 import { can } from '@/routes/access';
-import { listQuery, oneQuery, type Row } from '@/services/screens';
+import { runCommand, type Row } from '@/services/screens';
 import type { DetailScreenDef, DetailSection } from '@/screens/types';
 
 import ActionButton from './ActionButton';
+import { BulkActionBar, SelectCell, rowSelectable, useBulkActions } from './BulkActions';
 import DownloadCell from './DownloadCell';
 import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
 import ScreenLayout from './ScreenLayout';
+import { useScreenApi } from './screenApi';
 
 type Field = NonNullable<DetailSection['fields']>[number];
 
@@ -87,12 +89,17 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
   origin,
 }) => {
   const navigate = useNavigate();
+  const api = useScreenApi();
   const table = section.table!;
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState<string | undefined>();
   const [attempt, setAttempt] = useState(0);
+  const bulk = useBulkActions(table.bulkActions);
+  const hasBulk = bulk.length > 0;
+  const [selected, setSelected] = useState<Set<number>>(new Set());
 
   useEffect(() => {
+    setSelected(new Set());
     const params: Record<string, string> = {};
     for (const [p, key] of Object.entries(table.params)) {
       const v = key.startsWith('=') ? key.slice(1) : record[key];
@@ -101,79 +108,120 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
     let cancelled = false;
     setError(undefined);
     setRows(null);
-    listQuery(table.query, params)
+    api.listQuery(table.query, params)
       .then((r) => !cancelled && setRows(r))
       .catch((e) => !cancelled && setError((e as Error).message));
     return () => {
       cancelled = true;
     };
-  }, [record, table.params, table.query, attempt]);
+  }, [api, record, table.params, table.query, attempt]);
+
+  const selectableIdx = (rows ?? []).map((r, i) => (rowSelectable(bulk, r) ? i : -1)).filter((i) => i >= 0);
 
   return (
-    <AsyncBoundary
-      loading={rows === null && !error}
-      error={error}
-      onRetry={() => setAttempt((n) => n + 1)}
-      loadingText={`Loading ${section.title.toLowerCase()}…`}
-    >
-      {rows && rows.length === 0 ? (
-        <EmptyState title={`No ${section.title.toLowerCase()}`} body="There is nothing recorded here for this record." />
-      ) : rows ? (
-        <div className="bordered-table">
-          <TableContainer>
-            <Table size="md" useZebraStyles>
-              <TableHead>
-                <TableRow>
-                  {table.columns.map((c) => (
-                    <TableHeader key={c.key}>{c.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((r, i) => {
-                  const href = table.rowLink ? linkHref(table.rowLink, r) : null;
-                  const open = () => href && navigate(href, { state: originState(origin) });
-                  return (
-                    <TableRow
-                      key={i}
-                      className={href ? 'fsp-search__row--selectable' : undefined}
-                      onClick={href ? open : undefined}
-                      onKeyDown={
-                        href
-                          ? (e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                open();
+    <>
+      {hasBulk && (
+        <BulkActionBar
+          actions={bulk}
+          selected={[...selected].map((i) => rows?.[i]).filter((r): r is Row => !!r)}
+          source={record}
+          onDone={() => setAttempt((n) => n + 1)}
+        />
+      )}
+      <AsyncBoundary
+        loading={rows === null && !error}
+        error={error}
+        onRetry={() => setAttempt((n) => n + 1)}
+        loadingText={`Loading ${section.title.toLowerCase()}…`}
+      >
+        {rows && rows.length === 0 ? (
+          <EmptyState title={`No ${section.title.toLowerCase()}`} body="There is nothing recorded here for this record." />
+        ) : rows ? (
+          <div className="bordered-table">
+            <TableContainer>
+              <Table size="md" useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {hasBulk && (
+                      <TableHeader>
+                        <SelectCell
+                          id={`${section.title}-select-all`}
+                          label="Select all rows"
+                          checked={selectableIdx.length > 0 && selectableIdx.every((i) => selected.has(i))}
+                          disabled={selectableIdx.length === 0}
+                          onChange={(on) => setSelected(on ? new Set(selectableIdx) : new Set())}
+                        />
+                      </TableHeader>
+                    )}
+                    {table.columns.map((c) => (
+                      <TableHeader key={c.key}>{c.header}</TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((r, i) => {
+                    const href = table.rowLink ? linkHref(table.rowLink, r, api.screenHref) : null;
+                    const open = () => href && navigate(href, { state: originState(origin) });
+                    return (
+                      <TableRow
+                        key={i}
+                        className={href ? 'fsp-search__row--selectable' : undefined}
+                        onClick={href ? open : undefined}
+                        onKeyDown={
+                          href
+                            ? (e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  open();
+                                }
                               }
-                            }
-                          : undefined
-                      }
-                      tabIndex={href ? 0 : undefined}
-                      role={href ? 'link' : undefined}
-                    >
-                      {table.columns.map((c) => (
-                        <TableCell
-                          key={c.key}
-                          className={c.format === 'date' || c.format === 'datetime' ? 'fsp-search__cell--nowrap' : undefined}
-                        >
-                          {c.format === 'download' ? (
-                            <DownloadCell url={r[c.key]} />
-                          ) : c.format === 'status' && r[c.key] ? (
-                            <StatusTag status={String(r[c.key])} />
-                          ) : (
-                            formatValue(r[c.key], c.format)
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      ) : null}
-    </AsyncBoundary>
+                            : undefined
+                        }
+                        tabIndex={href ? 0 : undefined}
+                        role={href ? 'link' : undefined}
+                      >
+                        {hasBulk && (
+                          <TableCell onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                            <SelectCell
+                              id={`${section.title}-select-${i}`}
+                              label={`Select row ${i + 1}`}
+                              checked={selected.has(i)}
+                              disabled={!rowSelectable(bulk, r)}
+                              onChange={(on) =>
+                                setSelected((cur) => {
+                                  const next = new Set(cur);
+                                  if (on) next.add(i);
+                                  else next.delete(i);
+                                  return next;
+                                })
+                              }
+                            />
+                          </TableCell>
+                        )}
+                        {table.columns.map((c) => (
+                          <TableCell
+                            key={c.key}
+                            className={c.format === 'date' || c.format === 'datetime' ? 'fsp-search__cell--nowrap' : undefined}
+                          >
+                            {c.format === 'download' ? (
+                              <DownloadCell url={r[c.key]} />
+                            ) : c.format === 'status' && r[c.key] ? (
+                              <StatusTag status={String(r[c.key])} />
+                            ) : (
+                              formatValue(r[c.key], c.format)
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        ) : null}
+      </AsyncBoundary>
+    </>
   );
 };
 
@@ -194,6 +242,7 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
   const [record, setRecord] = useState<Row | null>(null);
   const [error, setError] = useState<string | undefined>();
   const here = useHereAsOrigin(screen.title);
+  const api = useScreenApi();
 
   const keyString = searchParams.toString();
   const keys = useMemo(() => {
@@ -210,15 +259,37 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
     if (missing.length > 0) return;
     setError(undefined);
     setRecord(null);
-    oneQuery(screen.query, keys)
+    api.oneQuery(screen.query, keys)
       .then(setRecord)
       .catch((e) => setError((e as Error).message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screen.query, keys]);
+  }, [api, screen.query, keys]);
 
   useEffect(() => {
     reload();
   }, [reload]);
+
+  // Backend-decided action availability (legacy button-visibility tags).
+  const [available, setAvailable] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    const def = screen.actionsAvailable;
+    if (!def || !record) {
+      setAvailable(null);
+      return;
+    }
+    let cancelled = false;
+    const body: Record<string, unknown> = {};
+    for (const [arg, key] of Object.entries(def.params)) {
+      body[arg] = key.startsWith('=') ? key.slice(1) : record[key];
+    }
+    runCommand(def.command, body)
+      .then((r) => !cancelled && setAvailable(new Set((r[def.key] as string[]) ?? [])))
+      .catch(() => !cancelled && setAvailable(new Set()));
+    return () => {
+      cancelled = true;
+    };
+  }, [screen.actionsAvailable, record]);
+  const offered = (id?: string) => !screen.actionsAvailable || !id || (available?.has(id) ?? false);
 
   const fieldSections = screen.sections.filter((s) => s.fields?.length);
   const tableSections = screen.sections.filter((s) => s.table);
@@ -236,16 +307,37 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
   }, [fieldSections, record, screen.keys]);
 
   const editHref =
-    record && screen.editLink && can(user, screen.editLink.capability) ? linkHref(screen.editLink, record) : null;
+    record && screen.editLink && can(user, screen.editLink.capability) && offered(screen.actionsAvailable?.editAction)
+      ? linkHref(screen.editLink, record, api.screenHref)
+      : null;
+  const extraLinks = (screen.extraLinks ?? []).filter((l) => record && can(user, l.capability) && offered(l.requiresAction));
+  const shownActions = (screen.actions ?? []).filter((a) => offered(a.id));
   const actions =
-    record && (editHref || screen.actions?.length || screen.reports?.length) ? (
+    record && (editHref || shownActions.length || extraLinks.length || screen.reports?.length) ? (
       <>
         {(screen.reports ?? []).filter((r) => reportApplies(r, { ...keys, ...record })).map((r) => (
           <ReportButton key={r.reportId + r.label} report={r} source={{ ...keys, ...record }} />
         ))}
-        {(screen.actions ?? []).map((a) => (
+        {shownActions.map((a) => (
           <ActionButton key={a.id} action={a} record={record} onDone={reload} />
         ))}
+        {extraLinks.map((l) => {
+          const qs = new URLSearchParams();
+          for (const [param, key] of Object.entries(l.params)) {
+            const v = key.startsWith('=') ? key.slice(1) : record?.[key];
+            if (v !== undefined && v !== null && String(v) !== '') qs.set(param, String(v));
+          }
+          return (
+            <Button
+              key={l.label}
+              size="md"
+              kind="tertiary"
+              onClick={() => navigate(`${l.path}?${qs.toString()}`, { state: originState(here) })}
+            >
+              {l.label}
+            </Button>
+          );
+        })}
         {editHref && (
           <Button size="md" renderIcon={Edit} onClick={() => navigate(editHref, { state: originState(here) })}>
             {screen.editLink?.label ?? 'Edit'}

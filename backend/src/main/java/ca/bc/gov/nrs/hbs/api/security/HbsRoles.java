@@ -65,6 +65,14 @@ public final class HbsRoles {
   public static final String SPC_SFTWR_VNDR = "HBS_SPC_SFTWR_VNDR";
   public static final String SPC_SUBM_AGNT = "HBS_SPC_SUBM_AGNT";
 
+  // ── Service accounts (client-credentials tokens, no person) ───────
+  /**
+   * The legacy share bridge on the Windows batch host: reads the processing
+   * parameters for the legacy ProcessParam files. Accepted only on
+   * {@code /api/v1/hbs/integrations/legacy/**} (HbsApiResourceApplication).
+   */
+  public static final String LEGACY_BRIDGE = "HBS_LEGACY_BRIDGE";
+
   /**
    * Every canonical role.
    */
@@ -74,7 +82,8 @@ public final class HbsRoles {
       SPC_SFTWR_VNDR, SPC_SUBM_AGNT, SPC_ADMIN, SPC_USER,
       DISABLED_BYPASS, SUMM_DATA_CORR, SUMM_DATA_CTL, INV_CORR_APP, DTL_DATA_ENT,
       SCALE_ADMIN, RATE_ADMIN, BILL_ADMIN, SUPER_MGR, SMP_ADMIN, WRA_ADMIN,
-      HELP_DESK, PROD_CTL, MOF_SCALER, MOF_ADMIN, MOF_USER, MOF_MGR
+      HELP_DESK, PROD_CTL, MOF_SCALER, MOF_ADMIN, MOF_USER, MOF_MGR,
+      LEGACY_BRIDGE
   );
 
   /** Ministry (IDIR) roles — never client-scoped. */
@@ -94,6 +103,9 @@ public final class HbsRoles {
   public static final Set<String> SPECIAL = Set.of(
       SPC_USER, SPC_ADMIN, SPC_SFTWR_VNDR, SPC_SUBM_AGNT
   );
+
+  /** Service-account roles: neither ministry nor client-scoped (legacy user type PUB). */
+  public static final Set<String> SERVICE = Set.of(LEGACY_BRIDGE);
 
   private HbsRoles() {}
 

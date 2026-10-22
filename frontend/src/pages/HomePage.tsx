@@ -89,6 +89,47 @@ const ANOMALY_LINKS: HomeRow[] = [
   },
 ];
 
+/**
+ * P911 actionType=homepage (BT 1887): a "Recent Anomalies" link searches the
+ * window of the type's last anomaly assessment — From = the last
+ * HBS_ANOMALY_BATCH_EVENT.TO_SCALE_DATE − 30 days (Constants.WORKBENCH_DATE_RANGE),
+ * To = that date. Anomaly type → SCALE_CONTROL_TYPE_CODE as ScaleControlCatalog
+ * ANOMALY_TYPE_FILTER maps it.
+ */
+const ANOMALY_CONTROL_TYPE: Record<string, string> = {
+  SCALING: 'S',
+  WEIGHING: 'W',
+  ARRIVAL: 'A',
+  ARR_DEP: 'X',
+  DEP_ARR: 'D',
+  WEIGH_SAMPLE: 'Y',
+  WEIGH_RED: 'Z',
+  RED_WEIGH: 'R',
+};
+const WORKBENCH_DATE_RANGE_DAYS = 30;
+
+type AnomalyWindows = Record<string, { scaleDateFrom: string; scaleDateTo: string }>;
+
+const toAnomalyWindows = (rows: Record<string, unknown>[]): AnomalyWindows => {
+  const windows: AnomalyWindows = {};
+  for (const row of rows) {
+    const code = row.scaleControlTypeCode ? String(row.scaleControlTypeCode) : '';
+    const to = row.toDate ? String(row.toDate).slice(0, 10) : '';
+    if (!code || !/^\d{4}-\d{2}-\d{2}$/.test(to)) continue;
+    const from = new Date(`${to}T00:00:00Z`);
+    from.setUTCDate(from.getUTCDate() - WORKBENCH_DATE_RANGE_DAYS);
+    windows[code] = { scaleDateFrom: from.toISOString().slice(0, 10), scaleDateTo: to };
+  }
+  return windows;
+};
+
+/** The link's params, with the last assessment window for a scale-anomalies link. */
+const withAnomalyWindow = (link: HomeLink, windows: AnomalyWindows): HomeLink => {
+  if (link.screen !== 'scale-anomalies' || !link.params?.anomalyType) return link;
+  const window = windows[ANOMALY_CONTROL_TYPE[link.params.anomalyType] ?? ''];
+  return window ? { ...link, params: { ...link.params, ...window } } : link;
+};
+
 const planLinks = (extra: Record<string, string>): HomeLink[] => [
   { label: 'Active', screen: 'sampling-plans', params: { ...extra, planStatus: 'ACT', currentYear: 'Y' } },
   { label: 'Awaiting Approval', screen: 'sampling-plans', params: { ...extra, planStatus: 'AWP' } },
@@ -256,6 +297,7 @@ const HomePage: FC = () => {
   const { user: authUser } = useAuth();
   const roles = (user?.roles ?? []) as string[];
   const [alertText, setAlertText] = useState<string | null>(null);
+  const [anomalyWindows, setAnomalyWindows] = useState<AnomalyWindows>({});
   const firstName = authUser?.firstName || authUser?.displayName || 'there';
 
   // The legacy alert banner (ProcessParam share file) — now a DB-backed
@@ -266,12 +308,23 @@ const HomePage: FC = () => {
       .catch(() => setAlertText(null));
   }, []);
 
+  const showsAnomalies = hasAny(roles, ['HBS_SCALE_ADMIN', 'HBS_CLI_SITE_ADMIN']);
+  useEffect(() => {
+    if (!showsAnomalies) return;
+    listQuery('scaleControl.anomalyWindows.list')
+      .then((rows) => setAnomalyWindows(toAnomalyWindows(rows as Record<string, unknown>[])))
+      .catch(() => setAnomalyWindows({}));
+  }, [showsAnomalies]);
+
   const blocks = BLOCKS.filter((b) => hasAny(roles, b.roles))
     .map((b) => ({
       ...b,
       rows: b.rows
         .filter((r) => hasAny(roles, r.roles))
-        .map((r) => ({ ...r, links: r.links.filter((l) => hasAny(roles, l.roles)) }))
+        .map((r) => ({
+          ...r,
+          links: r.links.filter((l) => hasAny(roles, l.roles)).map((l) => withAnomalyWindow(l, anomalyWindows)),
+        }))
         .filter((r) => r.links.length > 0),
     }))
     .filter((b) => b.rows.length > 0);

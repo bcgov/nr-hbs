@@ -9,9 +9,11 @@ The legacy pages are under `hbs-web/src/main/webapp/dac/detail` (JSP), `hbs-view
 | Backend | `backend/src/main/java/ca/bc/gov/nrs/hbs/api/catalog/DetailReturnsSql.java`: the shared SQL (a UNION ALL of the 6 version tables, the document view, the client fence and the union of all edit-error tables) |
 | Backend | `backend/.../catalog/DetailReturnsCatalog.java`: `detailReturns.search` and the `codes.detailReturns.*` lists |
 | Backend | `backend/.../catalog/DetailReturnsViewCatalog.java`: `detailReturns.version`, `.versions`, `.errors`, `.logs`, `.log`, `.logDefects`, `.segregations`, `.transactions` |
-| Frontend | `frontend/src/screens/areas/scale-returns-detail.ts` |
+| Backend | `backend/.../detailreturns/` — workflows, state machine, store, validators, commands (`command/DetailCommands`, `BulkCommand`, `DetailEntryController`) |
+| Frontend | `frontend/src/screens/areas/scale-returns-detail.ts` (workflow buttons on `detail-return`) |
+| Frontend | `frontend/src/pages/detail/DetailEntryPage.tsx` (P004, P550–P760 entry + log/defect grid), `DetailBulkPage.tsx` (P560A), `detailEntryFields.ts` |
 
-The area adds no commands. See "Writes" below for the reason.
+Writes are ported workflow commands (`ca.bc.gov.nrs.hbs.api.detailreturns`, see "Ported" below); the entry page reads `GET /api/v1/hbs/detail-returns/{ddn}/versions/{version}`.
 
 ## Design notes
 
@@ -63,18 +65,18 @@ The area adds no commands. See "Writes" below for the reason.
 | P756 SFP Log Details (view) | `detail-return` "Log Details" (stack/bundle columns: Piece Count; the stack dimensions are in the query) | `detailReturns.logs` | SFP_LOG_DETAIL |
 | P702 View Arrival / Departure Ledger Entry | `detail-return` ("Ledger" section); print HBS2R702 | `detailReturns.version` | SCL_SITE_ARRIVAL_LEDGER / SCL_SITE_DEPARTURE_LEDGER |
 | P674 Detail Document Unavailable | **replaced** by the 7-year retention filter in the search | — | `DacValidator.compareForYearLimit` |
-| P004 Add Detail Scale Data (menu) | **not carried over yet**. Every target (P550, P600, P650, P700, P750) is Java data entry, not a single proc (see below) | — | — |
-| P550 / P553 Add / Update Piece Scale | **not carried over** (legacy logic 1, 2) | — | — |
-| P558 / P559 Update Log Details / Log Defects | **not carried over** (legacy logic 3) | — | — |
-| P600 / P603 Add / Update Weight Scale | **not carried over** (legacy logic 1, 2) | — | — |
-| P650 / P653, P658 / P659 Sample tally add / update / logs / defects | **not carried over** (legacy logic 1, 2, 3) | — | — |
-| P700 / P703 Add / Update Arrival or Departure Ledger Entry | **not carried over** (legacy logic 1, 2) | — | — |
-| P750 / P753 / P758 SFP add / update / log details | **not carried over**: DEV/TEST-only in production (`hbs3:showInEnvironment`). P758 Save was broken (ClassCastException in P558Action) | — | — |
-| P562 / P554A, P612 / P604A, P662 / P654A Event Change Selection / Confirm | **not carried over** (legacy logic 5). The change mutates the in-session form only and is persisted by Save | — | — |
-| P554 / P604 / P654 / P754 Confirm <action> (Cancel, Cancel and Replace with Changes, Replace with/without Changes, Discard, Approve Change, Reject Change, Clear Digital Signature Failure, Release of RCP/CWC) | **not carried over** (legacy logic 4). P754 buttons were DEV/TEST-only | — | — |
+| P004 Add Detail Scale Data (menu) | `/scale-returns/detail-entry` (no `ddn`: choose return type and event), "Add Detail Scale Data" on `detail-search` | `detailReturns.add` | `$V/dac/detail/LogTallyActionHandler` ADD, `P600Action.addDetailDocument`, `P650Action`, `P700Action`, `P750Action` |
+| P550 / P553 Add / Update Piece Scale | `/scale-returns/detail-entry` (header + log lines) | `detailReturns.add`, `.save`, `.release` | `workflow/Add`, `Save`, `Release`; `P552Form` |
+| P558 / P559 Update Log Details / Log Defects | `/scale-returns/detail-entry` "Log Details" grid; defects open under each log (max 9) | `detailReturns.save` (`logs`) | `P558Action`, `P559Action`, `LogDefectHelper.calculateVolume`, `LogUtil.netVolume` |
+| P600 / P603 Add / Update Weight Scale | `/scale-returns/detail-entry` | `detailReturns.add`, `.save`, `.release` | `P600Action`, `P600Form` |
+| P650 / P653, P658 / P659 Sample tally add / update / logs / defects | `/scale-returns/detail-entry` | `detailReturns.add`, `.save` | `P650Action`, `P658Action`, `P659Action` |
+| P700 / P703 Add / Update Arrival or Departure Ledger Entry | `/scale-returns/detail-entry` | `detailReturns.add` (DDN ARL/DEP + SCL_SITE_LEDGER_SEQ), `.save`, `.release`, `.discard` | `P700Action.composeARL/DPL` |
+| P750 / P753 / P758 SFP add / update / log details | `/scale-returns/detail-entry` (return type "Special Forest Product Tally"). Legacy showed these only in DEV/TEST; the new app offers them to DETAIL_RETURN_EDIT (business question below) | `detailReturns.add`, `.save` | `P750Action`, `SFPDetailParser` |
+| P562 / P554A, P612 / P604A, P662 / P654A Event Change Selection / Confirm | "Change Event Type" on the entry page | `detailReturns.changeEvent` (clears the fields, then Save) | `P554AAction`, `P604AAction.revampScaleReturn`, `P654AAction` |
+| P554 / P604 / P654 / P754 Confirm <action> | confirmation modals on `detail-return` and the entry page | `detailReturns.cancel`, `.cancelReplaceChanges`, `.replaceChanges`, `.replaceNoChanges`, `.discard`, `.approve`, `.reject`, `.clearSignatureFailure`, `.release` | `workflow/*`, `WorkflowManagerBean` |
 | P560 Confirm Approval of Digital Signature | **not carried over**. It was unreachable (P554 is shown first) and its function is legacy logic 4 (`clearSignatureFailure`) | — | — |
-| P560A / P554B / P561 Bulk Request Selection / Confirm / Selection List | **not carried over** (legacy logic 6) | — | — |
-| Correction approval flow (HBS_INV_CORR_APP) | the queue is ported: `detail-workbench?status=AWP`. Approve/Reject is **not carried over** (legacy logic 4) | `detailReturns.search` | — |
+| P560A / P554B / P561 Bulk Request Selection / Confirm / Selection List | `/scale-returns/detail-bulk` | `detailReturns.bulk` | `P570Action.performBulkAction`, `applyAuthorizationCheck`, `doUpdateAction` |
+| Correction approval flow (HBS_INV_CORR_APP) | queue `detail-workbench?status=AWP`; Approve/Reject Change buttons on `detail-return` | `detailReturns.search`, `detailReturns.approve`, `.reject` | `workflow/Approve`, `Reject` |
 | P554S001–P554S012 confirmation prototypes | **not carried over**: static mock-ups with no actions | — | — |
 | P290 / P291 / P292 Pre-Registered LDS Numbers | **not carried over**: dead 2002 mock-up with no table or action. The real LDS registry (HBS3R976/982) belongs to Scale Control | — | — |
 | P745 / P746 / P747 / P748 Search for Ledger Entries | **not carried over**: dead mock-ups, superseded by P046 → P701, which is now `detail-search` with Return Type Arrival/Departure Ledgers | — | — |
@@ -95,82 +97,116 @@ The area adds no commands. See "Writes" below for the reason.
 - `codes.detailReturns.sfpScaleTypes` (HBS_SFP_SCALE_TYPE_CODE)
 - `codes.detailReturns.editErrors` (HBS_EDIT_ERR_MESSAGE_CODE)
 
-## Writes: why there are no commands
+## Ported (work package 4, `ca.bc.gov.nrs.hbs.api.detailreturns`)
 
-The brief allowed a command only where the legacy action was a single table-API proc call. None of the detail screens qualify. Every write goes through `DetailScaleDocumentHelper` (`$V/dac/detail/DetailScaleDocumentHelper.java`), then the EJB `WorkflowManagerBean` (`$E/dac/detail/control/workflow/*`), then `StateManagerBean` (`$E/dac/detail/control/state/*`) and `DetailManagerBean` (`$E/dac/detail/DetailManagerBean.java`, about 13K LOC). Each step validates, recomputes and touches 2 to 6 tables through several `HBS_CREATE_/STORE_/REMOVE_*` procs. Exposing any one of those procs alone would write a half-transition: a version state without its document state, its errors or its sibling version. The UI therefore offers none of them, and `detail-return` explains this in its notes banner.
+Status: **built — needs TEST regression** (docs/coexistence.md). Every workflow
+runs in the command's single transaction, so none of the intermediate states the
+legacy app autocommitted between proc calls is visible to B1021/B1031/B19xx.
 
-## Legacy logic not yet ported (to implement as a `ca.bc.gov.nrs.hbs.api.detailreturns` service)
+| Legacy | New class | Command id / endpoint |
+|---|---|---|
+| `$E/dac/detail/control/VersionState`, `DocumentState` | `state/VersionState`, `state/DocumentState` (guards + legacy `IllegalStateException` texts) | — |
+| `$E/dac/detail/control/state/*` (`StateManagerBean`) | `state/StateManager` | — |
+| `workflow/Add` + `DetailManagerBean.createAndStoreDetailScaleDocumentAndVersion` | `DetailWorkflow.add`, `store/DetailStore.createDocumentAndVersion` | `detailReturns.add` |
+| `workflow/Save` | `DetailWorkflow.save` | `detailReturns.save` |
+| `workflow/Release` + `WorkflowManagerBean.release/processHeld/processReplacementVersionPending/process` | `DetailWorkflow.release`, `releaseCommand`, `processReplacementVersionPending`, `process` | `detailReturns.release`, `detailReturns.reEdit` (BT-5790) |
+| `WorkflowManagerBean.clearSignatureFailure` | `DetailWorkflow.clearSignatureFailure` | `detailReturns.clearSignatureFailure` |
+| `workflow/Hold` + `WorkflowDocumentFactory.hold/newVersion` | `DetailWorkflow.hold`, `newVersion` (next version, new DTL_DOC_SEQ BT 5298, fresh log/defect ids, `updateDetailScaleDocumentAndInsertVersion` original-flag swap) | `detailReturns.hold` |
+| `workflow/Discard` | `DetailWorkflow.discard` | `detailReturns.discard` |
+| `workflow/Cancel` | `DetailWorkflow.cancel` | `detailReturns.cancel` |
+| `workflow/ReplaceWithChanges` + `WorkflowDocumentFactory.replace` | `DetailWorkflow.replaceWithChanges` | `detailReturns.cancelReplaceChanges`, `detailReturns.replaceChanges` |
+| `workflow/ReplaceWithNoChanges` | `DetailWorkflow.replaceWithNoChanges` | `detailReturns.replaceNoChanges` |
+| `workflow/Approve` / `Reject` | `DetailWorkflow.approve` / `reject` | `detailReturns.approve` / `detailReturns.reject` |
+| `P554AAction`, `P604AAction`, `P654AAction` | `EventChange` | `detailReturns.changeEvent` |
+| `P570Action` (bulk) | `command/BulkCommand` (one savepoint per row: PROCESSED / NOTPROCESSED / ERROR) | `detailReturns.bulk` |
+| `P840Action.bulkRequestCommonAction` (P842–P844, billing screen) | `command/FieldScaledDeckBulkCommand` + `FieldScaledDeckReturns` (cancel / hold → FS flag N → release on this workflow) | `billing.fieldScaledDecks.bulk` (see [billing-and-admin.md](billing-and-admin.md)) |
+| `WorkflowManagerBean.reset` → `processReplacementVersionPending(ddn, document, user)` | `DetailWorkflow.processReplacementVersionPendingAfterReset` (called by the summary-return discard of a failed generated summary, `summaryreturns.generated.DetailDocumentReset`) | — |
+| `KeyGenerator*`, `P700Action` ledger DDN | `KeyGenerator` (epoch-ms arithmetic in Pacific time, as legacy) | — |
+| `LogUtil.netVolume`, `calculateTotalNetVolume`, `LogDefectHelper.calculateVolume` | `LogVolume`, `DetailPayload.applyLogs` | — |
+| `DetailManagerBean` persistence (finders, `updateDetailScaleDocumentAndChildren`, `removeErrors`, `saveDetailScaleDocumentErrors`, `LogTallyDAO.updateLogs` sync, `createAudit`) | `store/DetailStore`, `store/JdbcDetailRows`, `store/DetailAuditTrail` (HBS_AUDIT + HBS_SCALE_RETURN_AUDIT) | — |
+| `DetailScaleDocumentValidator` + `LogTallyCommonValidator`, `LogTallyValidator`, `SFPTallyValidator`, `WeighSlipValidator`, `SampleLogTallyValidator`, `ArrivalLedgerValidator`, `DepartureLedgerValidator`, `ScaledLogXrefValidator`, `PopStratYearParser`, `RateManagerBean.hasRate` | `validation/*` (edit errors stored in the type's error tables, RDY/ERR/NTI decided from them) | — |
+| `CrossReferenceEdit`, `HbsEditError` codes | `validation/CrossReferenceEdit`, `validation/HbsEditError` (generated) | — |
+| Struts validation.xml / form `validate()` / log-detail parsers / `HBSValidator` | `validation/form/DetailFormValidator` (400 with the legacy messages) | all entry commands |
+| `FunctionsComparator`, `Buttons.jsp` + `IsScaleSiteAssociatedWithOrgUnitTag`, `isDetailDocumentEditable` | `DetailAuthority` (+ `UserDomains`: site/district data domains, scaler keys) | every command; `GET /detail-returns/{ddn}/versions/{v}` lists the caller's actions |
+| `PSDetailDocumentFields`, `WSDetailDocumentFields`, `SSDetailDocumentFields`, `SPSFields`, `LedgerFields` | `FieldAvailability` (generated) + `getCheckboxValue` defaults in `DetailPayload` | `GET /detail-returns/fields` |
 
-1. **Add (P550, P600, P650, P700, P750)**: `$E/dac/detail/control/workflow/Add.java`.
-   - Generate the DDN:
-     - `KeyGeneratorLogTally` / `KeyGeneratorSampleLogTally` / `KeyGeneratorSpecialForestProduct`: licence(4) + return number(4) + a 5-character base-36 count of minutes since the base date, then scrambled.
-     - `KeyGeneratorWeighSlip`: site(4) + the last 6 characters of the weigh slip number + base-36 days.
-     - Ledgers: `ARL` / `DEP` + a 10-digit `UniqueId('SCL_SITE_LEDGER')`.
-   - If the DDN already exists, reject with `error.duplicate.ddn`.
-   - Run `DetailScaleDocumentValidator.getValidator(doc).copyInputFieldsAndValidate()`.
-   - Call `DetailManagerBean.createAndStoreDetailScaleDocumentAndVersion`, which runs:
-     - `HBS_CREATE_DTL_SCL_DOCUMENT` (state OIP)
-     - then `HBS_CREATE_LOG_TALLY` / `_WEIGH_SLIP` / `_SAMPLE_LOG_TALLY` / `_SFP_TALLY` / `_SCL_SITE_ARR_LEDGER` / `_DEPARTURE_LEDGER` (version 1, INC, active)
-     - then the `*_ERROR` rows.
-   - Struts-level checks, which also need porting:
-     - validation.xml forms P552Form, P600Form, P650Form, P700Form, P752Form
-     - the `HBSValidator` cross-references: scaleSiteAndUser, licenceAndUser, scaleSiteProfile, timbermarkCrossRef, popStratYear
-2. **Save (P553, P603, P653, P700/P703 update)**: `workflow/Save.java`.
-   - Run the validator: `copyInputFieldsAndValidate`, `fieldDeckIdValidate`, `validateEventOrScaleDate`.
-   - For tallies, run `LogTallyCommon.calculateTotalNetVolume()`.
-   - Then `removeErrors`, `updateDetailScaleDocumentVersion` (`HBS_STORE_<version table>` + `HBS_STORE_DTL_SCL_DOCUMENT`) and `saveDetailScaleDocumentErrors`.
-   - Optimistic locking is done through `UPDATE_TIMESTAMP` (`StaleStateException` → "Your changes were not saved because the scale return has been updated by another process.").
-   - Edit eligibility comes from `DetailScaleDocumentHelper.isDetailDocumentEditable`:
-     - INC with HBS_DTL_DATA_ENT or SPC_SUBM_AGNT; or
-     - INC/HLD with site authority (CLI_SITE_ADMIN site domain / HBS_SCALE_ADMIN district domain) or with a scaler-licence match (primary / secondary / signing / original check scale).
-3. **Log details / defects (P558/P559, P658/P659, P758)**:
-   - Parsers: `P558Action`, `P659Action`, `LogDetailParser` / `SampleDetailParser`.
-   - Volume: `LogUtil.netVolume` per log, which must be in 0..999.999. `LogDefectHelper.calculateVolume` handles at most 9 defects with unique numbers.
-   - Persistence:
-     - `HBS_CREATE/STORE/REMOVE_LOG_TALLY_DETAIL` and `_LOG_TALLY_DTL_DEF`
-     - `_SAMPLE_TALLY_DETAIL` and `_SMPL_TALLY_DTL_DEF`
-     - `_SFP_LOG_DETAIL`
-   - Then the whole-document Save in item 2. Audit diffs come from `diffLogs`.
-4. **State changes on one document (the P554, P604, P654 and P754 confirmations)**: `$E/dac/detail/control/workflow/`. The rules live in `$E/dac/detail/control/VersionState.java` and `DocumentState.java`.
-   - `Release.java` (283 LOC): validate and change state (RDY/ERR/NTI/DSF). CWC/INC goes to AWP. Sets the DTL_DOC_SEQ on corrections.
-   - `Hold.java`: on RNP with ERR/RDY/NTI, `cancel`, otherwise `supercede`. Then `WorkflowDocumentFactory.hold` copies the version to a new HLD version, re-validates it and stores it.
-   - `Discard.java` (169 LOC):
-     - always: `discard`, then `removeErrors`
-     - OIP with a PNV replacement: inactivate the discarded version, `process` and `release` the replacement
-     - CWC: reject the invoiced version
-     - RCP: release the PNV, or reject the latest cancelled version
-   - `Cancel.java`: `StateManager.cancel`. ISS goes to AWP and the document to CIP.
-   - `ReplaceWithChanges.java`: `replaceWithChanges`, then `WorkflowDocumentFactory.replace`, which creates a new INC version.
-   - `ReplaceWithNoChanges.java`: `replaceWithNoChanges`, which sets AWP and the document to CWR/RNP.
-   - `Approve.java`:
-     - always: `approve`
-     - CWC: also approve the invoiced version
-     - RCP / CWR / RNP: then run `Release`
-     - the legacy UI also saved afterwards (BT10068)
-     - Authority: HBS_INV_CORR_APP + district authority over the timber mark, or over the previous invoiced version's mark for CWC/RCP.
-   - `Reject.java`:
-     - always: `reject`
-     - CWC: re-activate the invoiced version
-     - RCP: re-activate the latest superseded or cancelled version, unless a PNV exists
-   - `clearSignatureFailure`: in `WorkflowManagerBean` / `StateManagerBean` (`process`). Needs HBS_SCALE_ADMIN + scale-site authority.
-   - Button availability (which button shows for which document state and version status, and who may use it): `$V/dac/detail/FunctionsComparator` + `DetailDocumentFunctionsTag` + `hbs3:isScaleSiteAssociatedWithOrgUnit`. The matrix is summarised in section 04, "Buttons.jsp".
-   - The "proposed transactions" shown on the confirmation pages: `FetchDetailConfirmationDataTag` (faux cancel/replace transactions).
-5. **Event type change (P562/P554A, P612/P604A, P662/P654A)**: `$V/dac/detail/P554AAction.java`, `P604AAction.java`, `P654AAction.java`. These clear fields per target event type (matrices in section 04), then Save as in item 2.
-6. **Bulk requests (P560A/P554B/P561)**: `$V/dac/detail/P570Action.java`.
-   - The search is re-filtered by status per action (also hard-coded in HBS2R551 `PSR_VersionStatusCode` = 'RELEASE', 'HOLD', 'CANCEL', and so on).
-   - `applyAuthorizationCheck` runs per row.
-   - `doUpdateAction` applies the optional field update (scale site, scale date, timber mark or PSY from→to) with re-validation, then calls the item 4 commands per selected row, then Save or Release.
-7. **Data-domain search scopes.** The legacy "Associated Sites", "Sites in Associated Districts", "Marks in Associated Districts" and "own scaler licence" scopes (Home work queues `mofscalerscaledata`, `mofdualrolesscaledata`, `clientdualrolesscaledata`) join the following on the legacy user id (`PSR_UserId`):
-   - HBS_USER_SITE_DATA_DOMAIN
-   - HBS_USER_DIST_DATA_DOMAIN (mark district)
-   - HBS_SCALER_AUTH_KEY + QUANT_LICENSE
+`StringUtil.empty` semantics: legacy `StringUtil.empty(s)` does **not** trim
+(`keepWhitespace = true`), so a one-space value (the log product / ungraded
+grade, the `" "` the change-event actions put into an input field) is not empty;
+only `StringUtil.empty(s, false)` trims. `Row.empty` and `DetailValidator.empty`
+follow the first, `Row.blank` / `DetailValidator.blank` the second, used only
+where legacy trimmed (`WeighSlipValidator` input PSY and the two population
+checks, `DetailScaleDocumentValidator.findStratum` BT 11263 →
+`WeighSampleSupport.findStratum`). `DetailAuthority` (tags, `DacHelper`) does
+not trim. `DetailPayload` takes text as posted, like the Struts forms and
+parsers: only "" becomes null, whitespace is kept, and only the fields a legacy
+form setter trimmed are trimmed (P552 original DDN / red-tag site, P600 cut
+block / mark / site / PSY, P650 red-tag site / mark / site, every ledger field
+(P700, BT 14035), the field scale deck); log and sample tally lines get product
+" " and an empty grade " " (`LogDetailParser` / `SampleDetailParser` /
+`getScaleGradeCode`), SFP lines an empty product " " (`getScaleProductCode`).
+Number and date fields still treat blank as null.
 
-   `QueryService` binds no user id, so these scopes are not applied. Industry users are still fenced by client, and ministry work queues show all districts unless the user narrows them. Fix: add a `:hbsUserId` viewer bind to `QueryService`, then add the filters `associatedSites` / `associatedDistricts` / `ownLicence`.
-8. **Document delivery** ("Generate XML" / "Generate PDF" on P551): `DocumentDeliveryManager.generateScaleDataReport`.
-9. **Transaction History "Date Issued"**: an invoice lookup through the summary return's latest transaction (`InvoiceHelper.findInvoice` or `ForestTally.processedHdbsDt`). It is not in `detailReturns.transactions`.
+Locking: the SPA sends the version's `updateTimestamp`; `DetailStore` also
+re-reads the document state (legacy `StaleStateException`) and the version's
+state/active/UPDATE_TIMESTAMP before every store. Refusals are 409 with the
+legacy `error.unable.tosave.doc` text. Industry callers are fenced to returns of
+their client (site owner, mark holder, stratum owner, scaler licence client).
+
+Known legacy behaviour kept (each commented in code): the RCP/PND release branch
+is unreachable; `FunctionsComparator` never used the signing licence; `Reject`
+under RCP with a pending replacement failed (now refused, whole transaction
+rolled back); `Release` of a locked check scale finds its original by DDN only
+(by licence + return number stays in B1021).
+
+Not ported (out of scope): signature validation of submitted versions
+(`validateSignature`, work package 2), the batch-only transitions
+(`Process`/`Reset`/`Reconcile` commands of B1021/B1031/B2031).
+
+DDL: none (no procs were missing). A unique "one active version" index was
+considered and withdrawn — legacy and this port briefly hold two active
+versions inside one workflow (`process`: AWP stored before the previous
+invoiced version is deactivated) and legacy autocommits each call, so it would
+break legacy batch; `docs/db/active-version-duplicates.sql` monitors instead.
+
+## Ported (leftovers package)
+
+1. **Data-domain search scopes** — `detailReturns.search` filters `scope` and `markScope` (HBS2R551
+   `PSR_SearchBySites` / `PSR_SearchByMarks` on `:hbsUserId`): `ASSOCIATED_SITES` (HBS_USER_SITE_DATA_DOMAIN),
+   `ASSOCIATED_DISTRICTS` (HBS_USER_DIST_DATA_DOMAIN on the site's district), `OWN_LICENCE` (the primary
+   licence is one of the user's QUANT_LICENSEs, scale date inside the HBS_SCALER_AUTH_KEY period —
+   `mofscalerscaledata`), `MOF_DUAL` / `CLIENT_DUAL` (district / site domain UNION own licence —
+   `mofdualrolesscaledata` / `clientdualrolesscaledata`, BT 3268), `markScope=ASSOCIATED_DISTRICTS` (mark
+   district). P046 offers "Data Domain" (associated sites / districts) and "Marks in Associated Districts"; the
+   Home work queues (`detail-workbench`, `detail-error-categories`) default the scope by role as
+   `P046Action.setSearchCriteriaForHome` / `setCriteriaForErrorcategory` did (scale admin → districts, MOF
+   scaler → own licence, both → union; site admin → sites, CLI scaler → own licence, both → union).
+2. **Document delivery "Generate PDF"** (P551/P601/P651, `P046Action` GEN_PDF →
+   `ReportingFactory2.createDetailScaleReportDocd`): report buttons `HBS2R552docd` / `HBS2R602docd` /
+   `HBS2R652docd` on `detail-search` (per return type, criteria mapped as `getDetail*ScaleReportParametersDocd`).
+3. **Transaction History "Date Issued"** — `detailReturns.transactions` column `dateIssued`
+   (`DetailScaleTransactionsTag.createDisplayTransaction`): the latest transaction of the summary version —
+   piece / weight: its FOREST_INVOICE date (`InvoiceHelper.findInvoice(number, "N")`); sample: the compiled
+   sample statement's issue date (BT13916). The SRTS `ForestTally.processedHdbsDt` fallback is not carried
+   over: neither SRTS_TALLY_NUMBER nor FOREST_TALLY exists in nr-mof-db.
+4. **P650 `replacementInd`** (`HBSValidator.validateReplacementIndicator`) — `DetailFormValidator` now takes a
+   `Context` (document state + previous version's CHECK_REPLACES_ORIGINAL_IND and state, built by
+   `DetailCommandSupport.formContext` as `findPreviousDocumentAndVersion` did): on a sample-tally Save,
+   un-ticking "replaces original" is refused ("Replacement indicator cannot be unchecked.") when the previous
+   version replaced the original, unless the document is OIP or that version is RDY / ERR.
+
+## Legacy logic not yet ported
+
+1. **Document delivery "Generate XML"** (P551, `DocumentDeliveryManager.generateScaleDataReport` →
+   `dac/detail/xml/XMLScaleDataFactory`, `LogTallyXMLCreator` / `WeighSlipXMLCreator` / `SampleTallyXMLCreator`,
+   ~1,600 lines of Castor mapping): the listed returns re-serialised as a scale-data submission file. Not built in
+   this package (size); the PDF delivery copy and the CSV export cover the read use. Needs the submission XML
+   model of `intake/xml` turned into a writer.
+2. The list reports (`HBS2R551/601/651/701`) do not pass the new scope to `PSR_SEARCHBYSITES` (the report link
+   cannot translate `ASSOCIATED_SITES` → `associatedsites`); the on-screen list is scoped.
 
 ## Open questions for the business
 
 - Should industry users keep seeing returns for which they are only the mark holder or stratum owner (the legacy view rule), or only their sites and licences (the legacy Home rule)?
-- Must SFP online entry ever be enabled? It was DEV/TEST-only.
+- Must SFP online entry ever be enabled? It was DEV/TEST-only in legacy; the new entry page offers it (hide the type in `detailEntryFields.ts` DOC_TYPES if not).
 - Are the P290–P292 pre-registered LDS ranges wanted? There is no table for them today.

@@ -23,6 +23,10 @@ const CAPABILITIES = {
     'HBS_CLI_SCALER', 'HBS_CLI_SITE_ADMIN', 'HBS_CLI_CRUISE_ADMIN', 'HBS_SPC_SUBM_AGNT',
   ],
   SUMMARY_RETURN_ADMIN: ['HBS_BILL_ADMIN'],
+  // Summary-return workflow (work package 3) — mirrors Capability.java.
+  SUMMARY_RETURN_CONTROL: ['HBS_SUMM_DATA_CTL', 'HBS_SUMM_DATA_CORR'],
+  SUMMARY_RETURN_CORRECT: ['HBS_SUMM_DATA_CORR', 'HBS_BILL_ADMIN'],
+  SUMMARY_RATE_CORRECTION_APPROVE: ['HBS_INV_CORR_APP'],
   DETAIL_RETURN_EDIT: [
     'HBS_DTL_DATA_ENT', 'HBS_SCALE_ADMIN', 'HBS_MOF_SCALER', 'HBS_CLI_SCALER', 'HBS_CLI_SITE_ADMIN',
   ],
@@ -49,6 +53,8 @@ const CAPABILITIES = {
   FINAL_BILL_ADMIN: ['HBS_BILL_ADMIN', 'HBS_SUPER_MGR'],
   FIELD_SCALED_DECKS: ['HBS_BILL_ADMIN', 'HBS_SCALE_ADMIN', 'HBS_SUPER_MGR'],
   BILLING_FORCE: ['HBS_SUPER_MGR'],
+  /** P829/P830 Generate and Hold / Release (legacy rolePresent HBS_BILL_ADMIN, MOF_MGR). */
+  FINAL_BILL_GENERATE: ['HBS_BILL_ADMIN', 'HBS_MOF_MGR'],
 
   PROFILES_VIEW: ['HBS_MOF_USER', 'HBS_CLI_USER'],
   SCALE_SITE_ADMIN: ['HBS_SCALE_ADMIN'],
@@ -63,6 +69,9 @@ const CAPABILITIES = {
 
   USER_ADMIN: ['HBS_MOF_ADMIN', 'HBS_MOF_MGR', 'HBS_CLI_ADMIN', 'HBS_SPC_ADMIN'],
   CACHE_ADMIN: ['HBS_PROD_CTL'],
+
+  /** Legacy share-bridge service account: /integrations/legacy/** only (no screen). */
+  LEGACY_BRIDGE: ['HBS_LEGACY_BRIDGE'],
 } as const satisfies Record<string, readonly ROLE_TYPE[]>;
 
 export type Capability = keyof typeof CAPABILITIES;

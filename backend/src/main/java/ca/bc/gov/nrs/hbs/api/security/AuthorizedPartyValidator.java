@@ -1,5 +1,8 @@
 package ca.bc.gov.nrs.hbs.api.security;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -13,20 +16,36 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * many applications whose tokens are all signed by the same issuer and JWKS, so
  * signature + issuer alone only prove the realm minted the token, not that it
  * was meant for HBS. The expected client id is required configuration.
+ *
+ * <p>Service accounts: a client-credentials token is issued to the service
+ * account's own CSS client, so its {@code azp} is not HBS's. The configured
+ * service-account client ids ({@code hbs.keycloak.legacy-bridge-client-id})
+ * are accepted <em>only</em> when every HBS role on the token is a service
+ * role ({@link HbsRoles#SERVICE}); the filter chain then confines such tokens
+ * to their endpoints ({@link LegacyBridgeAccess}).
  */
 public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AuthorizedPartyValidator.class);
 
   private final String expectedClientId;
+  private final Set<String> serviceAccountClientIds;
 
   public AuthorizedPartyValidator(String expectedClientId) {
+    this(expectedClientId, List.of());
+  }
+
+  public AuthorizedPartyValidator(String expectedClientId, Collection<String> serviceAccountClientIds) {
     if (expectedClientId == null || expectedClientId.isBlank()) {
       throw new IllegalStateException(
           "hbs.keycloak.client-id (KEYCLOAK_CLIENT_ID) must be set — a blank value "
               + "would accept every token the realm signs, for any client");
     }
     this.expectedClientId = expectedClientId;
+    this.serviceAccountClientIds = serviceAccountClientIds.stream()
+        .filter(id -> id != null && !id.isBlank())
+        .map(String::trim)
+        .collect(java.util.stream.Collectors.toUnmodifiableSet());
   }
 
   @Override
@@ -34,6 +53,15 @@ public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
     String azp = token.getClaimAsString(TokenRoles.CLAIM_AZP);
     if (expectedClientId.equals(azp)) {
       return OAuth2TokenValidatorResult.success();
+    }
+    if (azp != null && serviceAccountClientIds.contains(azp)) {
+      Set<String> roles = TokenRoles.hbsRolesFrom(token);
+      if (!roles.isEmpty() && HbsRoles.SERVICE.containsAll(roles)) {
+        return OAuth2TokenValidatorResult.success();
+      }
+      LOG.warn("Rejected a service-account token for client '{}' carrying non-service roles {}.", azp, roles);
+      return OAuth2TokenValidatorResult.failure(
+          new OAuth2Error("invalid_token", "This service account may only carry service roles.", null));
     }
     LOG.warn("Rejected a token issued to client '{}'; this API accepts only '{}'.", azp, expectedClientId);
     return OAuth2TokenValidatorResult.failure(

@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.hbs.api;
 
+import ca.bc.gov.nrs.hbs.api.security.HbsRoles;
+import ca.bc.gov.nrs.hbs.api.security.LegacyBridgeAccess;
 import lombok.val;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -79,7 +81,11 @@ public class HbsApiResourceApplication {
                       .requestMatchers("/v3/api-docs/**",
                               "/actuator/health", "/actuator/prometheus",
                               "/swagger-ui/**").permitAll()
-                      .anyRequest().authenticated()
+                      // The legacy share bridge's service account (role
+                      // HBS_LEGACY_BRIDGE, client-credentials token) may call
+                      // only its integration endpoints, and only it may.
+                      .requestMatchers(LegacyBridgeAccess.PATHS).hasRole(HbsRoles.LEGACY_BRIDGE)
+                      .anyRequest().access(LegacyBridgeAccess.authenticatedPerson())
               )
               .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
               .oauth2ResourceServer(oauth2 -> oauth2

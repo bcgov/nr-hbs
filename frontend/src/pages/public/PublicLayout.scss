@@ -1,0 +1,34 @@
+// Public (anonymous) area — no side nav, so the content starts at the left edge.
+.hbs-public .hbs-public__content {
+  margin-left: 0;
+}
+
+.hbs-public__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hbs-public__access p,
+.hbs-public__access li {
+  max-width: 48rem;
+  line-height: 1.5;
+}
+
+.hbs-public__access ol,
+.hbs-public__access ul {
+  margin: 0.5rem 0 1rem 1.5rem;
+}
+
+.hbs-public__access ol {
+  list-style: decimal;
+}
+
+.hbs-public__access ul {
+  list-style: disc;
+}
+
+.hbs-public__access h3 {
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}

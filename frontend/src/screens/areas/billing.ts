@@ -1,4 +1,6 @@
-import type { ActionDef, ColumnDef, FieldDef, ScreenDef } from '../types';
+import type { ROLE_TYPE } from '@/context/auth/types';
+
+import type { ActionDef, BulkActionDef, ColumnDef, FieldDef, ScreenDef } from '../types';
 
 /**
  * Billing area — legacy Billing tab (P800, /ivs/*).
@@ -49,19 +51,45 @@ const forceSummarizationAction = (label: string): ActionDef => ({
   label,
   command: 'billing.markHolderProfile.forceSummarizationDate',
   capability: 'BILLING_FORCE',
-  confirm: 'Set the next summarization date of this Mark Holder Profile to the force date?',
-  params: {
-    mhprofId: 'mhprofId',
-    clientNumber: 'clientNumber',
-    clientLocnCode: 'clientLocnCode',
-    hbsReturnTypeCode: 'hbsReturnTypeCode',
-    hbsFrequencyTypeCode: 'hbsFrequencyTypeCode',
-    forcedSummarizationDate: 'forceDate',
-    effectiveDate: 'effectiveDate',
-    expiryDate: 'expiryDate',
-    entryUserid: 'entryUserid',
-    entryTimestamp: 'entryTimestamp',
-  },
+  confirm:
+    'Set the next summarization date of this Mark Holder Profile to the force date? ' +
+    'Monthly profiles: within 28 days from today; Bi-Weekly: 14; Daily: 1.',
+  params: { mhprofId: 'mhprofId', forceDate: 'forceDate', updateTimestamp: 'updateTimestamp' },
+});
+
+/** P811/P813 "For All Client With Custom Mark Holder Profile" / "Client Location" — the legacy bulk Save. */
+const forceAllForm = (id: string, legacy: string, returnType: 'P' | 'W', title: string): ScreenDef => ({
+  kind: 'form',
+  id,
+  legacy,
+  area: 'billing',
+  nav: false,
+  title,
+  capability: 'BILLING_FORCE',
+  command: 'billing.forceSummarization.force',
+  submitLabel: title,
+  notes:
+    '"For All Client With Custom Mark Holder Profile" also forces the default Mark Holder Profile. ' +
+    'Monthly ≤ 28 days, Bi-Weekly ≤ 14, Daily ≤ 1 day from today.',
+  fields: [
+    { name: 'returnType', label: 'Return Type', type: 'select', options: [{ value: returnType, label: returnType === 'P' ? 'Piece Scale Tally' : 'Weight Slip' }], defaultValue: returnType, required: true, readOnlyOnEdit: true },
+    { name: 'frequency', label: 'Frequency', type: 'select', options: FREQUENCIES, defaultValue: 'MTH', required: true },
+    {
+      name: 'selected',
+      label: 'Profiles',
+      type: 'radio',
+      defaultValue: 'yes',
+      required: true,
+      options: [
+        { value: 'yes', label: 'Client Location' },
+        { value: 'no', label: 'For All Client With Custom Mark Holder Profile' },
+      ],
+      span: 4,
+    },
+    { name: 'clientNumber', label: 'Client No.', type: 'client', group: 'Client Location' },
+    { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Client Location' },
+    { name: 'forceDate', label: 'Force date', type: 'date', required: true },
+  ],
 });
 
 // ------------------------------------------------------------------ P829 / P830
@@ -80,6 +108,9 @@ const finalBillCountColumns: ColumnDef[] = [
   { key: 'eligiblePsymFlag', header: 'Eligible to Generate' },
 ];
 
+/** P828Form.initForm: these admin roles start with every suppress flag set. */
+const P828_ADMINS: ROLE_TYPE[] = ['HBS_BILL_ADMIN', 'HBS_SCALE_ADMIN', 'HBS_INV_CORR_APP', 'HBS_SMP_ADMIN'];
+
 const suppressFields: FieldDef[] = [
   { name: 'suppressCompleted', label: 'Final Bills are completed', type: 'checkbox', group: 'Suppress output for Populations where:' },
   { name: 'suppressInProgress', label: 'Sampling Year in progress', type: 'checkbox', group: 'Suppress output for Populations where:' },
@@ -89,6 +120,32 @@ const suppressFields: FieldDef[] = [
     type: 'checkbox',
     defaultValue: 'Y',
     group: 'Suppress output for Populations where:',
+  },
+];
+
+/**
+ * P829/P830 Generate and Hold / Generate and Release (HBS3R830), offered on eligible ('*') rows only —
+ * GenerateFinalBillCommand refuses any other row.
+ */
+const eligibleToGenerate = { field: 'eligiblePsymFlag', values: ['*'] };
+const generateActions = (params: Record<string, string>): ActionDef[] => [
+  {
+    id: 'generate-hold',
+    label: 'Generate and Hold',
+    command: 'billing.finalBill.generateHold',
+    capability: 'FINAL_BILL_GENERATE',
+    confirm: 'Generate the final bills (status Held)?',
+    params,
+    showWhen: eligibleToGenerate,
+  },
+  {
+    id: 'generate-release',
+    label: 'Generate and Release',
+    command: 'billing.finalBill.generateRelease',
+    capability: 'FINAL_BILL_GENERATE',
+    confirm: 'Generate the final bills (status Ready)?',
+    params,
+    showWhen: eligibleToGenerate,
   },
 ];
 
@@ -107,6 +164,25 @@ const tenureCriteria: FieldDef[] = [
 // ------------------------------------------------------------------ P841-P844 field scale tables
 
 const deckParams = { timberMark: 'timberMark', fieldScaleDeckId: 'fieldScaleDeckId' };
+
+/** P832 rows → the summary-return lock keys. */
+const unissuedRowParams = { documentControlNumber: 'documentControlNumber', version: 'version', updateTimestamp: 'updateTimestamp' };
+
+/**
+ * P842–P844 bulk actions (P840Action.bulkRequestCommonAction): a row's check box was enabled
+ * when the mark is in one of the user's associated districts and the row has issued tallies
+ * (P842) or field-scale-flagged returns (P843/P844) — the queries' `selectable` column.
+ */
+const deckBulk = (docType: 'S' | 'W' | 'P', label: string, rowParams: Record<string, string>): BulkActionDef => ({
+  id: `deck-bulk-${docType}`,
+  label,
+  command: 'billing.fieldScaledDecks.bulk',
+  capability: 'FIELD_SCALED_DECKS',
+  params: { docType: `=${docType}`, ...deckParams },
+  rowParams,
+  showWhen: { field: 'selectable', values: ['Y'] },
+  danger: docType === 'S',
+});
 
 const statusCountColumns: ColumnDef[] = [
   { key: 'held', header: 'Held', format: 'number' },
@@ -134,9 +210,9 @@ export const screens: ScreenDef[] = [
     criteria: forceSummarizationCriteria,
     columns: forceSummarizationColumns,
     rowActions: [forceSummarizationAction('Force Next Piece Scale Tally Summarization Date')],
-    notes:
-      'Legacy "For All Client With Custom Mark Holder Profile" updated every listed profile plus the default profile in one step; here each profile is forced individually.',
+    createLink: { screen: 'force-piece-summarization-all', label: 'Force for a Client / All Clients', params: {}, capability: 'BILLING_FORCE' },
   },
+  forceAllForm('force-piece-summarization-all', 'P811/P812', 'P', 'Force Next Piece Scale Tally Summarization Date'),
   {
     kind: 'search',
     id: 'force-weigh-slip-summarization',
@@ -150,7 +226,9 @@ export const screens: ScreenDef[] = [
     criteria: forceSummarizationCriteria,
     columns: forceSummarizationColumns,
     rowActions: [forceSummarizationAction('Force Next Weight Slip Summarization Date')],
+    createLink: { screen: 'force-weigh-slip-summarization-all', label: 'Force for a Client / All Clients', params: {}, capability: 'BILLING_FORCE' },
   },
+  forceAllForm('force-weigh-slip-summarization-all', 'P813/P814', 'W', 'Force Next Weight Slip Summarization Date'),
   {
     kind: 'search',
     id: 'force-ratio-computation',
@@ -186,19 +264,7 @@ export const screens: ScreenDef[] = [
         capability: 'BILLING_FORCE',
         confirm:
           'Set the next ratio computation date of this profile to the force date? It must lie within the ratio computation period.',
-        params: {
-          popprofId: 'popprofId',
-          populationNumber: 'populationNumber',
-          samplingYear: 'samplingYear',
-          hbsFrequencyTypeCode: 'hbsFrequencyTypeCode',
-          nextRatioStmtDate: 'forceDate',
-          lastRatioStmtDate: 'lastRatioStmtDate',
-          startRatioStmtDate: 'startRatioStmtDate',
-          effectiveDate: 'effectiveDate',
-          expiryDate: 'expiryDate',
-          entryUserid: 'entryUserid',
-          entryTimestamp: 'entryTimestamp',
-        },
+        params: { popprofId: 'popprofId', forceDate: 'forceDate', updateTimestamp: 'updateTimestamp' },
       },
     ],
   },
@@ -215,12 +281,51 @@ export const screens: ScreenDef[] = [
     query: 'billing.finalBillStatus.populations',
     criteria: [
       { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true, defaultValue: DEFAULT_SAMPLING_YEAR },
+      // P828 population selection (HBS3R829 FB_RADIO_SELECTED); role defaults from P828Form.initForm.
+      {
+        name: 'districtScope',
+        label: 'Populations',
+        type: 'select',
+        defaultValue: 'ALL',
+        options: [
+          { value: 'ALL', label: 'All Populations' },
+          { value: 'DISTRICT', label: 'Populations in Region/District' },
+          { value: 'ASSOCIATED', label: 'Populations in Associated Districts' },
+          { value: 'SINGLE', label: 'Single Population' },
+          { value: 'OWNEDBY', label: 'Population Owned By' },
+        ],
+        roleDefaults: [
+          { roles: P828_ADMINS, value: 'ASSOCIATED' },
+          { roles: ['HBS_CLI_SITE_ADMIN'], value: 'OWNEDBY' },
+        ],
+      },
       { name: 'orgUnit', label: 'Populations in Region/District', codeList: 'codes.orgUnits' },
       { name: 'population', label: 'Single Population', upper: true, maxLength: 4 },
       { name: 'clientNumber', label: 'Population Owned By — Client No.', type: 'client' },
       { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
       { name: 'expiringBefore', label: 'Expiring Before', type: 'date', helperText: 'Leave blank to list all' },
-      ...suppressFields,
+      ...suppressFields.map((f) =>
+        f.name === 'suppressNoEligible' ? f : { ...f, roleDefaults: [{ roles: P828_ADMINS, value: 'Y' }] },
+      ),
+    ],
+    reports: [
+      {
+        reportId: 'HBS3R829',
+        label: 'Print',
+        params: {
+          FB_SAMPLING_YEAR: 'samplingYear',
+          FB_RADIO_SELECTED: 'districtScope',
+          FB_ORG_UNIT_NO: 'orgUnit',
+          FB_POPULATION_NMBR: 'population',
+          FB_CLIENT_NUMBER: 'clientNumber',
+          FB_CLIENT_LOCN_CODE: 'clientLocnCode',
+          FB_EXPIRING_BEFORE: 'expiringBefore',
+          FB_BILLS_COMPLETED_FLAG: 'suppressCompleted',
+          FB_YEAR_IN_PROGRESS_FLAG: 'suppressInProgress',
+          FB_NO_ELIGIBLE_BILLS_FLAG: 'suppressNoEligible',
+          FB_STRATUM_FLAG: '=N',
+        },
+      },
     ],
     columns: [
       { key: 'populationNumber', header: 'Pop No', sortable: true },
@@ -231,8 +336,9 @@ export const screens: ScreenDef[] = [
       screen: 'final-bill-status-strata',
       params: { samplingYear: 'samplingYear', population: 'populationNumber' },
     },
+    rowActions: generateActions({ samplingYear: 'samplingYear', population: 'populationNumber' }),
     notes:
-      'Industry users see only populations owned by their client. "Populations in Associated Districts" and Generate and Hold / Generate and Release (HBS3R830) are not yet available.',
+      'Industry users see only populations owned by their client. Generate and Hold / Generate and Release create the final bills of a population marked Eligible to Generate (*).',
   },
   {
     kind: 'search',
@@ -254,6 +360,7 @@ export const screens: ScreenDef[] = [
       { key: 'popExpiry', header: 'Stratum Expiry', format: 'date' },
       ...finalBillCountColumns,
     ],
+    rowActions: generateActions({ samplingYear: 'samplingYear', population: 'populationNumber', stratum: 'stratumNumber' }),
     rowLink: {
       screen: 'unissued-final-bills',
       label: 'Unissued final bills',
@@ -317,7 +424,26 @@ export const screens: ScreenDef[] = [
         },
       },
     ],
-    notes: 'Hold Selected / Release Selected are not yet available; open a return to hold or release it.',
+    // P832 Hold Selected / Release Selected (P831Action ACTION_HOLD / ACTION_RELEASE): legacy acted on
+    // checked rows listed as RDY/ERR (hold) or HLD (release) and skipped the others.
+    bulkActions: [
+      {
+        id: 'hold-selected',
+        label: 'Hold Selected',
+        command: 'billing.unissuedFinalBills.hold',
+        capability: 'FINAL_BILL_ADMIN',
+        rowParams: unissuedRowParams,
+        showWhen: { field: 'versionStateCode', values: ['RDY', 'ERR'] },
+      },
+      {
+        id: 'release-selected',
+        label: 'Release Selected',
+        command: 'billing.unissuedFinalBills.release',
+        capability: 'FINAL_BILL_ADMIN',
+        rowParams: unissuedRowParams,
+        showWhen: { field: 'versionStateCode', values: ['HLD'] },
+      },
+    ],
   },
 
   // ============================================================ Non-Renewable Tenures
@@ -421,11 +547,49 @@ export const screens: ScreenDef[] = [
         danger: true,
         confirm:
           'Remove this mark from final billing for this Pop/Yr? Not allowed when invoices or statements exist for the Pop/Yr/Mark.',
-        params: { populationNumber: 'populationNumber', samplingYear: 'samplingYear', timberMark: 'timberMark' },
+        params: {
+          populationNumber: 'populationNumber',
+          samplingYear: 'samplingYear',
+          timberMark: 'timberMark',
+          updateTimestamp: 'updateTimestamp',
+        },
         then: { screen: 'final-bill-tenures', params: { population: 'populationNumber', samplingYear: 'samplingYear' } },
       },
     ],
-    notes: 'To change the population, year or mark, delete this election and add a new one.',
+    editLink: {
+      screen: 'final-bill-tenure-edit',
+      label: 'Update',
+      capability: 'FINAL_BILL_ADMIN',
+      params: { population: 'populationNumber', samplingYear: 'samplingYear', timberMark: 'timberMark' },
+    },
+  },
+  {
+    kind: 'form',
+    id: 'final-bill-tenure-edit',
+    legacy: 'P836',
+    area: 'billing',
+    nav: false,
+    title: 'Update a Non-Renewable Tenure That Receives Final Bills',
+    capability: 'FINAL_BILL_ADMIN',
+    command: 'billing.finalBillTenure.update',
+    loadQuery: 'billing.finalBillTenures.detail',
+    keys: ['population', 'samplingYear', 'timberMark'],
+    fields: [
+      { name: 'opu', label: 'Current Population', readOnlyOnEdit: true, group: 'Current election' },
+      { name: 'osy', label: 'Current Sampling Year', readOnlyOnEdit: true, group: 'Current election' },
+      { name: 'otm', label: 'Current Timber Mark', readOnlyOnEdit: true, group: 'Current election' },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Current election' },
+      { name: 'populationNumber', label: 'Population', upper: true, maxLength: 4, required: true, group: 'New values' },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true, group: 'New values' },
+      { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, required: true, group: 'New values' },
+    ],
+    submitLabel: 'Save',
+    then: {
+      screen: 'final-bill-tenure',
+      params: { population: 'populationNumber', samplingYear: 'samplingYear', timberMark: 'timberMark' },
+    },
+    notes:
+      'Changing the population, year or mark replaces the election. Not allowed when invoices or statements exist for the old or the new Pop/Yr/Mark.',
   },
   {
     kind: 'search',
@@ -542,6 +706,7 @@ export const screens: ScreenDef[] = [
             { key: 'ratioSource', header: 'Source' },
             ...statusCountColumns,
           ],
+          bulkActions: [deckBulk('S', 'Cancel Issued Sample Tallies in Selected Strata', { psy: 'psy' })],
         },
       },
       {
@@ -556,6 +721,7 @@ export const screens: ScreenDef[] = [
             { key: 'fsFlag', header: 'FS Flag', format: 'number' },
             ...statusCountColumns,
           ],
+          bulkActions: [deckBulk('W', 'Clear Field Scale Flag for Weigh Slips in Selected Strata', { psy: 'psy' })],
         },
       },
       {
@@ -583,10 +749,9 @@ export const screens: ScreenDef[] = [
             { key: 'fsFlag', header: 'FS Flag', format: 'number' },
             ...statusCountColumns,
           ],
+          bulkActions: [deckBulk('P', 'Clear Field Scale Flag for Selected Log Tallies', { eventCode: 'eventCode' })],
         },
       },
     ],
-    notes:
-      'The bulk actions "Cancel Issued Sample Tallies in Selected Strata", "Clear Field Scale Flag for Weigh Slips in Selected Strata" and "Clear Field Scale Flag for Selected Log Tallies" are not yet available.',
   },
 ];

@@ -139,6 +139,22 @@ export const screens: ScreenDef[] = [
   legacy Jasper report prompts (`reports/hbs/catalog.json` lists each
   report's prompts).
 - Capabilities must exist in both `routes/access.ts` and `query/Capability.java`.
+- `actions` (detail) and `rowActions` (search) run a command on the record /
+  row. `showWhen` hides one unless the record's fields hold the listed values
+  (the legacy pages hid buttons by state); the backend re-checks. Return the
+  code field you test from the query (or a computed `Y`/`N` column when the
+  rule is not an equality, e.g. `clearable`, `confirmAllowed`). Keep date
+  windows and other checks whose legacy message the user must see as server
+  messages. Summary returns use the backend-decided `actionsAvailable` instead.
+- `bulkActions` (search screens and detail-section tables) add a check-box
+  column and "… Selected" buttons (legacy P832 Hold/Release Selected, P842–P844):
+  the ticked rows matching the action's `showWhen` are sent as
+  `rows: [{…rowParams}]` plus `params`; the command answers
+  `{results: [{label, status: PROCESSED|NOTPROCESSED|ERROR, message}]}`, shown
+  per row (`components/screens/BulkActions.tsx`). Such commands run one
+  savepoint per row (legacy autocommitted each), e.g. `detailReturns.bulk`.
+- `extraLinks` (detail) lead to bespoke pages with record values as URL params
+  (e.g. the scaler profile → `/profiles/scaler-key-request?licenceNumber=…`).
 
 ## Look and layout (nr-fta's)
 

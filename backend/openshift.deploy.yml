@@ -68,6 +68,11 @@ parameters:
   # would accept any token the shared realm signs, for any client.
   - name: KEYCLOAK_CLIENT_ID
     required: true
+  # Service-account client(s) of the legacy share bridge (HBS_LEGACY_BRIDGE role,
+  # docs/legacy-share-bridge.md); comma-separated, blank = bridge disabled.
+  - name: KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID
+    required: false
+    value: ""
   # nr-user-lookup-api (IDIR/BCeID lookups) — replaces the retired FAM
   # identity-lookup. Not required so PR previews (which skip the Keycloak
   # service-account step) deploy fine with these blank; the backend degrades
@@ -119,6 +124,12 @@ parameters:
   # default — the legacy AutoMate batch keeps running until cut-over and two
   # schedulers must never process the same returns. See docs/batch-jobs.md.
   - name: HBS_BATCH_ENABLED
+    required: false
+    value: "false"
+  # B1012 port: unpack of the files uploaded on P505 in this app (needs
+  # HBS_BATCH_ENABLED too). Unlike the other jobs it does not duplicate a
+  # legacy job: legacy B1012 never sees these files. See docs/coexistence.md.
+  - name: HBS_BATCH_UNPACK_ENABLED
     required: false
     value: "false"
   # Size of the shared ReadWriteMany volume that replaces the legacy
@@ -224,6 +235,8 @@ objects:
                   value: ${KEYCLOAK_ISSUER_URI}
                 - name: KEYCLOAK_CLIENT_ID
                   value: ${KEYCLOAK_CLIENT_ID}
+                - name: KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID
+                  value: ${KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID}
                 - name: USER_LOOKUP_BASE_URL
                   value: ${USER_LOOKUP_BASE_URL}
                 - name: USER_LOOKUP_TOKEN_URL
@@ -254,6 +267,8 @@ objects:
                   value: ${EMAIL_SEND_ENABLED}
                 - name: HBS_BATCH_ENABLED
                   value: ${HBS_BATCH_ENABLED}
+                - name: HBS_BATCH_UNPACK_ENABLED
+                  value: ${HBS_BATCH_UNPACK_ENABLED}
                 - name: HBS_STORAGE_XML_ROOT
                   value: /data/hbs/xml
                 - name: REPORTS_WORK_DIR
@@ -287,6 +302,26 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-backend-secret-${ZONE}
                       key: KEYSTORE_SECRET
+                # Scaler digital-signature secrets (legacy WebADE preferences
+                # dbms-crypto-key / keystore-password / keystore-filename).
+                # Security creates ${NAME}-signature-${ZONE} out of band (not
+                # in this template — docs/questions.md Q9). optional: a zone
+                # without it still starts; scaler key requests and the public
+                # key download then answer 503.
+                - name: HBS_SIGNATURE_DBMS_CRYPTO_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-signature-${ZONE}
+                      key: DBMS_CRYPTO_KEY
+                      optional: true
+                - name: HBS_SIGNATURE_KEYSTORE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-signature-${ZONE}
+                      key: KEYSTORE_PASSWORD
+                      optional: true
+                - name: HBS_SIGNATURE_KEYSTORE_PATH
+                  value: /etc/hbs-signature/hbs-keystore.jks
               # The JVM sizes its heap as a percentage of the memory LIMIT
               # (-XX:MaxRAMPercentage=60 in the Dockerfile), so changing the
               # limit here changes the heap. The old 800Mi limit paired with a
@@ -354,6 +389,12 @@ objects:
                   mountPath: /data/hbs/xml
                 - name: tmp-storage
                   mountPath: /tmp
+                - name: signature-keystore
+                  mountPath: /etc/hbs-signature
+                  readOnly: true
+                - name: settings
+                  mountPath: /config/settings
+                  readOnly: true
               securityContext:
                 allowPrivilegeEscalation: false
                 runAsNonRoot: true
@@ -378,6 +419,27 @@ objects:
             - name: xml-storage
               persistentVolumeClaim:
                 claimName: ${NAME}-backend-xml-${ZONE}
+            # HBS RSA signing keystore (JKS) from the same out-of-band Secret;
+            # key HBS_KEYSTORE → /etc/hbs-signature/hbs-keystore.jks. optional:
+            # an empty directory when the Secret doesn't exist yet (the app
+            # then reports the keystore as unreadable → 503 on download).
+            - name: signature-keystore
+              secret:
+                secretName: ${NAME}-signature-${ZONE}
+                optional: true
+                items:
+                  - key: HBS_KEYSTORE
+                    path: hbs-keystore.jks
+            # P038 processing parameters and alert text (AppSettings), one
+            # file per key. An out-of-band ConfigMap, not part of this template,
+            # so a deploy never overwrites values operations have set; edits
+            # reach the pod in about a minute, without a restart. optional:
+            # without it there is no banner and the share bridge gets 503.
+            # See docs/coexistence.md.
+            - name: settings
+              configMap:
+                name: ${NAME}-backend-settings-${ZONE}
+                optional: true
 
   # ── Service ───────────────────────────────────────────────
   - apiVersion: v1

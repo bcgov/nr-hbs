@@ -9,8 +9,9 @@ import { can } from '@/routes/access';
 import { availableCommands, runCommand, type Row } from '@/services/screens';
 import type { ActionDef } from '@/screens/types';
 
+import ActionPreview from './ActionPreview';
 import FieldGrid from './FieldGrid';
-import { linkHref } from './links';
+import { conditionsMet, linkHref } from './links';
 
 interface ActionButtonProps {
   action: ActionDef;
@@ -42,7 +43,7 @@ export const ActionButton: FC<ActionButtonProps> = ({ action, record, onDone, si
 
   // Hidden when the user lacks the capability, or when the command is a
   // reserved id whose workflow service isn't ported yet.
-  if (!can(user, action.capability) || !registered) return null;
+  if (!can(user, action.capability) || !registered || !conditionsMet(action.showWhen, record)) return null;
 
   const onConfirm = async () => {
     const body: Record<string, unknown> = { ...values };
@@ -51,7 +52,19 @@ export const ActionButton: FC<ActionButtonProps> = ({ action, record, onDone, si
     }
     const result = await runCommand(action.command, body);
     setOpen(false);
-    display({ kind: 'success', title: `${action.label} complete`, timeout: 4000 });
+    // Workflows may complete with edit errors (e.g. a release ending in ERR) or notes.
+    const editErrors = Array.isArray(result.editErrors) ? (result.editErrors as string[]) : [];
+    const messages = Array.isArray(result.messages) ? (result.messages as string[]) : [];
+    if (editErrors.length > 0) {
+      display({
+        kind: 'warning',
+        title: `${action.label} complete with edit errors`,
+        subtitle: editErrors.join(', '),
+        timeout: 10000,
+      });
+    } else {
+      display({ kind: 'success', title: `${action.label} complete`, subtitle: messages.join(' ') || undefined, timeout: 6000 });
+    }
     if (action.then) {
       const href = linkHref(action.then, { ...record, ...result });
       if (href) navigate(href);
@@ -74,6 +87,7 @@ export const ActionButton: FC<ActionButtonProps> = ({ action, record, onDone, si
         onConfirm={onConfirm}
       >
         {action.confirm && <p className="detail-dialog__subtitle">{action.confirm}</p>}
+        {open && action.preview && <ActionPreview action={action} record={record} />}
         {action.fields && action.fields.length > 0 && (
           <FieldGrid
             fields={action.fields}

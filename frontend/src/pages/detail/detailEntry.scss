@@ -1,0 +1,38 @@
+// Detail-return data entry (P550–P760): title-level workflow buttons wrap,
+// tally lines sit in a compact zebra table, defects open under their log.
+.hbs-detail-entry__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.hbs-detail-entry__empty {
+  padding: 1rem 0;
+  color: var(--cds-text-secondary);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.hbs-detail-entry__defects td {
+  background: var(--cds-layer-accent-01, #e0e0e0);
+}
+
+.hbs-detail-entry__defect-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.hbs-detail-entry__defect {
+  display: grid;
+  grid-template-columns: 7rem 7rem 8rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+
+  @media (max-width: 42rem) {
+    grid-template-columns: 1fr 1fr;
+  }
+}

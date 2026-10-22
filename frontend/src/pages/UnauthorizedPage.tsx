@@ -1,6 +1,7 @@
 import { Logout } from '@carbon/icons-react';
 import { Button, Column, Grid } from '@carbon/react';
 import type { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from '@/context/auth/useAuth';
 import { useTheme } from '@/context/theme/useTheme';
@@ -64,7 +65,9 @@ const UnauthorizedPage: FC = () => {
                   FAM, so say so — otherwise the page is a dead end. */}
               <p className="landing-note" data-testid="unauthorized-note">
                 Access to HBS requires a role assigned in FAM. Contact your HBS administrator, or
-                your organization&apos;s BCeID administrator, to request access.
+                your organization&apos;s BCeID administrator, to request access — see{' '}
+                <Link to="/public/access">how to get access</Link>. The{' '}
+                <Link to="/public">public queries</Link> need no role.
               </p>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import type { FieldDef, ReportLinkDef, ScreenDef } from '../types';
+import type { FieldDef, Option, ReportLinkDef, ScreenDef } from '../types';
 
 /**
  * Scale Control (legacy tab P900) — Late Submissions (P901/P902), Scale Event
@@ -13,6 +13,9 @@ import type { FieldDef, ReportLinkDef, ScreenDef } from '../types';
  * backend maps them to SCALE_CONTROL_TYPE_CODE (+ SCALE_ANOMALY_TYPE_CODE for
  * the single gap / duplicate options).
  */
+/** BT 10641 (AnomalyTypesTag): a scaler who isn't also a site admin isn't offered the arrival types. */
+const SCALER_ONLY: Option['hiddenFor'] = { roles: ['HBS_CLI_SCALER'], unlessRoles: ['HBS_CLI_SITE_ADMIN'] };
+
 const ANOMALY_TYPES = [
   { value: 'SCALING_GAP', label: 'Scaling Event Gaps' },
   { value: 'SCALING_DUP', label: 'Scaling Event Duplicates' },
@@ -20,15 +23,35 @@ const ANOMALY_TYPES = [
   { value: 'WEIGHING_GAP', label: 'Weighing Event Gaps' },
   { value: 'WEIGHING_DUP', label: 'Weighing Event Duplicates' },
   { value: 'WEIGHING', label: 'Weighing Event Gaps and Duplicates' },
-  { value: 'ARRIVAL_GAP', label: 'Arrival Event Gaps' },
-  { value: 'ARRIVAL_DUP', label: 'Arrival Event Duplicates' },
-  { value: 'ARRIVAL', label: 'Arrival Event Gaps and Duplicates' },
-  { value: 'ARR_DEP', label: 'Arrivals without matching Departures' },
+  { value: 'ARRIVAL_GAP', label: 'Arrival Event Gaps', hiddenFor: SCALER_ONLY },
+  { value: 'ARRIVAL_DUP', label: 'Arrival Event Duplicates', hiddenFor: SCALER_ONLY },
+  { value: 'ARRIVAL', label: 'Arrival Event Gaps and Duplicates', hiddenFor: SCALER_ONLY },
+  { value: 'ARR_DEP', label: 'Arrivals without matching Departures', hiddenFor: SCALER_ONLY },
   { value: 'DEP_ARR', label: 'Departures without matching Arrivals' },
   { value: 'WEIGH_SAMPLE', label: 'Weigh Slips without matching Samples' },
   { value: 'WEIGH_RED', label: 'Weigh Slips without matching Red Tag Scales' },
   { value: 'RED_WEIGH', label: 'Red Tag Scales without matching Weigh Slips' },
 ];
+
+/**
+ * Legacy radSearchBySites "Associated Sites" / "Sites in Associated Districts"
+ * (HBS_USER_SITE_DATA_DOMAIN / HBS_USER_DIST_DATA_DOMAIN of the signed-in user),
+ * defaulted per role as P911Action / P901Action did.
+ */
+const SITE_SCOPE: FieldDef = {
+  name: 'siteScope',
+  label: 'Sites',
+  type: 'select',
+  options: [
+    { value: 'ASSOCIATED_SITES', label: 'Associated Sites' },
+    { value: 'ASSOCIATED_DISTRICTS', label: 'Sites in Associated Districts' },
+  ],
+  roleDefaults: [
+    { roles: ['HBS_SCALE_ADMIN'], value: 'ASSOCIATED_DISTRICTS' },
+    { roles: ['HBS_CLI_SITE_ADMIN'], value: 'ASSOCIATED_SITES' },
+  ],
+  group: 'Scaling Criteria',
+};
 
 const ANOMALY_CRITERIA: FieldDef[] = [
   { name: 'status', label: 'Anomaly Status', type: 'select', codeList: 'codes.anomalyStatuses' },
@@ -40,6 +63,7 @@ const ANOMALY_CRITERIA: FieldDef[] = [
   { name: 'primaryLicence', label: 'Primary Scaler Licence', upper: true, maxLength: 4, group: 'Scaling Criteria' },
   { name: 'orgUnitNo', label: 'Sites in Region/District', type: 'select', codeList: 'codes.orgUnits', group: 'Scaling Criteria' },
   { name: 'scaleSite', label: 'Single Site', upper: true, maxLength: 4, group: 'Scaling Criteria' },
+  SITE_SCOPE,
 ];
 
 /** HBS2R9xx prompts (procs apply the scale-date range only when both ends are given). */
@@ -102,6 +126,7 @@ export const screens: ScreenDef[] = [
       },
       { name: 'orgUnitNo', label: 'Sites in Region/District', type: 'select', codeList: 'codes.orgUnits', group: 'Scale Site' },
       { name: 'scaleSite', label: 'Single Site', upper: true, maxLength: 4, group: 'Scale Site' },
+      { ...SITE_SCOPE, group: 'Scale Site' },
     ],
     columns: [
       { key: 'detailDocumentNumber', header: 'DDN', sortable: true },
@@ -192,7 +217,22 @@ export const screens: ScreenDef[] = [
     query: 'scaleControl.anomalies.detail',
     keys: ['anomalyId'],
     notes:
-      'Clearing an anomaly (legacy P954, HBS_SCALE_ADMIN) is not yet available here; it needs a dedicated service (see docs/areas/scale-control.md).',
+      'Clear (HBS_SCALE_ADMIN) is possible for an Outstanding anomaly at a site in one of your districts, ' +
+      'when its assessment status is Resolution complete or Adjustment complete.',
+    actions: [
+      {
+        id: 'clear',
+        label: 'Clear',
+        command: 'scaleControl.anomalies.clear',
+        capability: 'SCALE_CONTROL_ADMIN',
+        // ClearAnomalyCommand: Outstanding anomaly whose control is RCM/WCM (the query's `clearable`);
+        // the district check stays a server message (ANOMALY_USER_ACCESS), as in legacy P954.
+        showWhen: { field: 'clearable', values: ['Y'] },
+        confirm: 'Confirm Anomaly Clear: the anomaly becomes User Cleared.',
+        params: { anomalyId: 'anomalyId' },
+        fields: [{ name: 'userClearedComment', label: 'Comment', type: 'textarea', maxLength: 240, span: 4 }],
+      },
+    ],
     sections: [
       {
         title: 'Anomaly',
@@ -274,7 +314,9 @@ export const screens: ScreenDef[] = [
     capability: 'PRODUCTION_CONTROL',
     description: 'Update the window span (From Days / To Days) of one scale control type.',
     notes:
-      'From Days must be greater than To Days. Windows can only be changed when the status is Resolution complete or Adjustment complete. To change another control type, open it from Anomaly Assessment Windows.',
+      'From Days must be greater than To Days, the new From Days greater than the old To Days and the new To Days less than the old From Days. ' +
+      'Windows can only be changed when the status is Resolution complete or Adjustment complete. Widening the window (From Days increased, To Days unchanged) ' +
+      'reopens stale-dated anomalies inside it. To change another control type, open it from Anomaly Assessment Windows.',
     command: 'scaleControl.anomalyWindows.update',
     loadQuery: 'scaleControl.anomalyWindows.detail',
     keys: [],
@@ -300,9 +342,9 @@ export const screens: ScreenDef[] = [
       },
       { name: 'assessmentBegin', label: 'From Days', type: 'number', required: true, maxLength: 4, group: 'Window' },
       { name: 'assessmentEnd', label: 'To Days', type: 'number', required: true, maxLength: 4, group: 'Window' },
-      { name: 'presentationSequence', label: 'Presentation Sequence', type: 'number', required: true, readOnlyOnEdit: true, group: 'Batch' },
-      { name: 'previousAnomalyBatchId', label: 'Previous Batch', type: 'number', required: true, readOnlyOnEdit: true, group: 'Batch' },
-      { name: 'currentAnomalyBatchId', label: 'Current Batch', type: 'number', required: true, readOnlyOnEdit: true, group: 'Batch' },
+      { name: 'previousAnomalyBatchId', label: 'Previous Batch', type: 'number', readOnlyOnEdit: true, group: 'Batch' },
+      { name: 'currentAnomalyBatchId', label: 'Current Batch', type: 'number', readOnlyOnEdit: true, group: 'Batch' },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Batch' },
     ],
   },
 ];

@@ -1,6 +1,7 @@
-import { useEffect, type FC } from 'react';
+import { useEffect, useMemo, type FC } from 'react';
 
-import type { FieldDef } from '@/screens/types';
+import { useScopedUser } from '@/context/org/useOrg';
+import type { FieldDef, Option } from '@/screens/types';
 
 import FieldInput from './FieldInput';
 
@@ -36,13 +37,20 @@ const spanClass = (span: FieldDef['span']): string | undefined => {
 const effectiveSpan = (f: FieldDef): FieldDef['span'] =>
   f.type === 'client' && (f.span ?? 1) < 2 ? 2 : f.span;
 
-/** The field with only the options its `showWhen` allows for the current values. */
-const withAvailableOptions = (f: FieldDef, values: Record<string, string>): FieldDef =>
-  f.options?.some((o) => o.showWhen)
+const hiddenForUser = (o: Option, roles: string[]): boolean =>
+  !!o.hiddenFor &&
+  o.hiddenFor.roles.some((r) => roles.includes(r)) &&
+  !(o.hiddenFor.unlessRoles ?? []).some((r) => roles.includes(r));
+
+/** The field with only the options its `showWhen` / `hiddenFor` allow for the current values and user. */
+const withAvailableOptions = (f: FieldDef, values: Record<string, string>, roles: string[]): FieldDef =>
+  f.options?.some((o) => o.showWhen || o.hiddenFor)
     ? {
         ...f,
         options: f.options.filter(
-          (o) => !o.showWhen || o.showWhen.values.includes(values[o.showWhen.field] ?? ''),
+          (o) =>
+            (!o.showWhen || o.showWhen.values.includes(values[o.showWhen.field] ?? '')) &&
+            !hiddenForUser(o, roles),
         ),
       }
     : f;
@@ -77,16 +85,19 @@ export const FieldGrid: FC<FieldGridProps> = ({
   // A dependent choice that is no longer offered (e.g. a grouping the newly
   // picked return type has no report for) falls back to the field's default,
   // or its first remaining option.
+  const user = useScopedUser();
+  const roleKey = (user?.roles ?? []).join(',');
+  const roles = useMemo(() => (roleKey ? roleKey.split(',') : []), [roleKey]);
   useEffect(() => {
     fields.forEach((f) => {
-      const available = withAvailableOptions(f, values).options;
+      const available = withAvailableOptions(f, values, roles).options;
       const current = values[f.name] ?? '';
       if (!available || available === f.options || !current) return;
       if (available.some((o) => o.value === current)) return;
       const fallback = available.find((o) => o.value === f.defaultValue) ?? available[0];
       onChange(f.name, fallback?.value ?? '');
     });
-  }, [fields, values, onChange]);
+  }, [fields, values, onChange, roles]);
 
   let group: string | undefined;
   return (
@@ -107,7 +118,7 @@ export const FieldGrid: FC<FieldGridProps> = ({
         cells.push(
           <div key={f.name} className={['hbs-field-grid__cell', spanClass(effectiveSpan(f)), f.align === 'center' && 'hbs-field-grid__center'].filter(Boolean).join(' ')}>
             <FieldInput
-              field={withAvailableOptions(f, values)}
+              field={withAvailableOptions(f, values, roles)}
               value={values[f.name] ?? ''}
               onChange={(v) => onChange(f.name, v)}
               idPrefix={idPrefix}

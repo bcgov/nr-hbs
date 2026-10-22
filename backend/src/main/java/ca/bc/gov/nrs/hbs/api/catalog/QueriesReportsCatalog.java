@@ -267,6 +267,15 @@ public class QueriesReportsCatalog implements QueryCatalog {
                    DECODE(pfu.mgmt_unit_type, 'F', 'Woodlot', 'T', 'Tree Farm Licence',
                           'U', 'Timber Supply Area', 'V', 'Timber Supply Block') AS mgmt_unit_type_description,
                    pfu.mgmt_unit_id,
+                   -- TimberMarkReaderBean.findMgmtUnitDesc: CODE_LIST_TABLE 'MGMT_UNIT_XREF' names the
+                   -- code list of the unit type, whose entry for the unit id is the description
+                   -- (CodeLocator: both are external code lists; none when not cross-referenced).
+                   (SELECT MAX(d.expanded_result)
+                      FROM code_list_table x
+                      JOIN code_list_table d ON d.column_name = RTRIM(x.expanded_result)
+                                            AND d.code_argument = pfu.mgmt_unit_id
+                     WHERE x.column_name = 'MGMT_UNIT_XREF' AND x.code_argument = pfu.mgmt_unit_type)
+                     AS mgmt_unit_description,
                    mbc.client_number, %s, mbc.client_locn_code, %s,
                    fc.client_type_code, ctc.expanded_result AS client_type_description,
                    %s, %s, %s, %s, %s, %s, %s,

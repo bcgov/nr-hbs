@@ -8,20 +8,24 @@ Files:
 - Backend: `backend/src/main/java/ca/bc/gov/nrs/hbs/api/catalog/QueriesCatalog.java` (issued documents,
   transmissions, billing summary, `codes.queries.*`), `backend/src/main/java/ca/bc/gov/nrs/hbs/api/catalog/QueriesReportsCatalog.java`
   (harvest history, timber marks, cut to cruise, scale site summary, aged unbilled),
-  `backend/src/main/java/ca/bc/gov/nrs/hbs/api/queries/StatementDocumentController.java` (bespoke, replaces the
-  `/StatementDelivery` servlet)
-- Frontend: `frontend/src/screens/areas/queries.ts`
+  `backend/src/main/java/ca/bc/gov/nrs/hbs/api/queries/StatementDocumentController.java` and
+  `StatementTransmissionController.java` (bespoke, replace the `/StatementDelivery` servlet),
+  `StatementPdfRenderer.java` (XSL-FO → PDF, stylesheets in `backend/src/main/resources/xsl/<version>/`)
+- Frontend: `frontend/src/screens/areas/queries.ts`, `frontend/src/pages/StatementDeliveryPage.tsx`
+  (`/StatementDelivery/...` links), `frontend/src/pages/InvoiceInformationPage.tsx` (`/invoice-information`)
 
 All Queries screens use capability `QUERIES_VIEW` (legacy grant `web:/opq/P400.jsp` = MOF_USER, CLI_USER) except
 Aged Unbilled Scale (`MINISTRY`). The legacy sub-pages had no page security at all (anonymous users could open them
-by URL); the new app requires a logged-in MOF/CLI user for every screen. There is no anonymous/public site.
+by URL); the new app requires a logged-in MOF/CLI user for every screen of the Queries area. The legacy public menu is
+carried over separately as the public read-only area (`/public`, [public-access.md](../public-access.md)): harvest
+history, issued documents and statement copies, and timber marks, always FOI-severed for the anonymous viewer.
 
 ## Screen mapping
 
 | Legacy screen | New screen id | Query / command ids | Ported from |
 |---|---|---|---|
 | P400 Queries Menu | Queries area SideNav (no page) | — | `opq/P400.jsp` |
-| PUBLIC anonymous menu / tab bar (`/include/mainmenu_public.jsp`, `tab_public.jsp`) | not carried over | — | There is no anonymous site in the new app (FAM/BCeID login required). Public FAQ / glossary / manual links are static MOF web pages. |
+| PUBLIC anonymous menu / tab bar (`/include/mainmenu_public.jsp`, `tab_public.jsp`) | public read-only area `/public` (+ `/public/access` for "Register") | `/api/v1/hbs/public/**` (`publicaccess.PublicController`, whitelist `PublicQueries`) | Decided 2026-10-21 (Q1). See [public-access.md](../public-access.md). Public FAQ / glossary / manual links are static MOF web pages. |
 | P431 / P432 Mark Monthly Billing History (selection + report configuration) | `billing-history` (+ reports `HBS3R431` PDF and CSV, + Download XML) | `harvestHistory.billing` | Billing branch of `PROCEDURES/V7.01739__HBS_GET_HISTORY.sql` (same SELECT/filters as `V7.01498__HBS00001R.sql` behind `HBS3R431`); `ear/…/opq/ftas/MarkMonthlyBillingAction.java`; group/SPG/detail-line prompt codes from `ear/…/opq/ReportingFactory.java` (`getGroupTypeParam`, `getDisplaySPGParam`, `getDisplayDetailsParam`) and `opq/OpqConstants.java` |
 | P441 / P442 Mark Monthly Scaling History | `scaling-history` (+ report `HBS3R441`, + Download XML) | `harvestHistory.scaling` | Scaling branch of `HBS_GET_HISTORY` (same as `V7.01570__HBS3R441R.sql`) |
 | P493 / P494 Harvest Report XML Delivery Address + Confirmation | not carried over | — | Replaced: the history list is exportable (search export / CSV) and the PDF downloads directly; no e-mail drop-directory delivery. See "Legacy logic not yet ported" for the XML history file. |
@@ -31,8 +35,9 @@ by URL); the new app requires a logged-in MOF/CLI user for every screen. There i
 | P451 / P461 List of Issued Piece / Weight Scale Invoices | `issued-documents` results (`documentType` PSI / WSI); Print = `HBS4R452` / `HBS4R462`, Print Client Register = `HBS3R451` / `HBS3R461` | `issuedDocuments.search` | `opq/P451.jsp` columns |
 | P456 / P466 / P471 / P476 List of Issued Volume / Compiled Sample / Ratio Statements | `issued-documents` results (PSV / WSV / CSS / RS); Print `HBS4R452`/`HBS4R462`/`HBS4R472`/`HBS4R477`, Register `HBS3R451`/`HBS3R461`/`HBS3R471`/`HBS3R476` | `issuedDocuments.search` | `opq/P456.jsp` columns (Total Weight = `SAMPLE_SCALE_SUMMARY.NET_WEIGHT` for CSS) |
 | P474 Statement/Invoice Does Not Exist / Unavailable | not carried over as a page | — | Replaced by the empty-result state of `issued-document` and by the 404 / 410 responses of `StatementDocumentController` ("Statement Does Not Exist" / "Statement cannot be retrieved as it is older than seven years"). |
-| StatementDelivery servlet `/StatementDelivery/statements/<type>/<number>.pdf\|xml` | bespoke `GET /api/v1/hbs/statements/{type}/{number}.{pdf\|xml}`; rows carry `documentUrl` / `documentXmlUrl` | — | `ear/…/dad/StatementServlet.java`, `ear-ejb/…/dad/HBSTransmission.java`, `ear-ejb/…/dad/HbsFileManagerBean.findHbsFileByTransactionStatement` + `HbsFileQuery.pkByStatementNumber` (statement table → `HBS_FILE.FILE_OBJECT`), FOI from `TransactionStatementManagerBean.freedomOfInformationCheck` and `hbs-core/src/main/resources/xsl/V1_0h/freedom-of-info-{send,copy}-to.xsl` |
-| StatementDelivery `/transmissions/<file>` (stored transmission files in the client's statement drop directory) | not carried over | — | Files lived on the WebLogic file system (`DocumentDeliveryTransmissionHelper.getStatementDropDirectory`); see "Legacy logic not yet ported". The P453 XML/PDF File columns show the file names only. |
+| StatementDelivery servlet `/StatementDelivery/statements/<type>/<number>.pdf\|xml` | bespoke `GET /api/v1/hbs/statements/{type}/{number}.{pdf\|xml}`; rows carry `documentUrl` / `documentXmlUrl`; SPA route `/StatementDelivery/statements/:type/:file` (old links/bookmarks) | — | `ear/…/dad/StatementServlet.java`, `ear-ejb/…/dad/HBSTransmission.java`, `ear-ejb/…/dad/HbsFileManagerBean.findHbsFileByTransactionStatement` + `HbsFileQuery.pkByStatementNumber` (statement table → `HBS_FILE.FILE_OBJECT`), FOI from `TransactionStatementManagerBean.freedomOfInformationCheck` and `hbs-core/src/main/resources/xsl/V1_0h/freedom-of-info-{send,copy}-to.xsl`; PDF see "Ported" below |
+| StatementDelivery `/transmissions/<id>.pdf\|xml` (the statement e-mail links) | bespoke `GET /api/v1/hbs/statements/transmissions/{id}.{pdf\|xml}`; SPA route `/StatementDelivery/transmissions/:file` | — | `StatementServlet.handleTransmissionCommand`; files rebuilt from Oracle as legacy batch B2065 wrote them — see "Ported" below. The P453 XML/PDF File columns still show the stored file names. |
+| Invoice general information (`hbs/opq/cis/invoiceGeneralInformation.html`, linked from the statement e-mail) | public SPA page `/invoice-information` | — | Static content ported to `InvoiceInformationPage.tsx`; no sign-in, like the legacy page. |
 | P452 / P453 Search for Transmissions of Issued Statements / Transmissions of Issued Statements (+ Home "SearchFromHome") | `statement-transmissions` (`?recent=Y` = last 30 days for the user's client; Print = `HBS3R453`) | `statementTransmissions.search` | `PROCEDURES/V7.01576__HBS3R452.sql`; `ear/…/opq/P452Action.java` (`ACTION_HOME_SEARCH`, `setWorkbenchDateRange`) |
 | P453 per-type document count links | row link → `issued-documents?transmissionId=` | `issuedDocuments.search` (`transmissionId`) | `HBS3R450_*` `RB_TRANSMISSION_ID` branch (`DOCUMENT_DELIVERY_BATCH_ITEM`) |
 | P421 Billing Summary Selection ("List of Invoices and Volume Statements") | `billing-summary` (View PDF Report `HBS3R421` piece / `HBS3R422` weight) | `billingSummary.search` | `PROCEDURES/V7.01567__HBS3R421.sql`, `HBS3R422`, `FUNCTIONS/…HBS_BILLINGSMRYRPT_WHERECLAUSE.sql`; `ear/…/opq/P421Action.java` |
@@ -60,7 +65,9 @@ with the search criteria (`StatementTransmissionXml`):
   left out.
 - **Validation:** the result is checked against V1_0h, and a mismatch is only logged, since older
   stored files follow the schema version current when they were issued.
-- **Not ported:** legacy's "Generate PDF" (FOP rendering) waits on the statement PDF port.
+- **Batch order:** one `hbs-batch` per type in legacy's `HashMap` order (RS, PSV/CSS, PSI, WSV, WSI).
+- **Download PDF** (legacy "Generate PDF"): `GET /api/v1/hbs/statements/export.pdf`, the same document
+  rendered with the current stylesheets (see "Ported").
 
 **Download XML (legacy "Send XML").** `GET /api/v1/hbs/queries/{harvestHistory.billing|harvestHistory.scaling}/export/xml`
 (`HarvestHistoryXmlService`):
@@ -111,56 +118,43 @@ with the search criteria (`StatementTransmissionXml`):
   (no SDN/Site/Mark for RS, Pop/Str/Yr not for PSV, Total Weight CSS only) would need conditional columns; all
   columns are shown and are simply empty where not applicable.
 
-## Legacy logic not yet ported
+## Ported
 
-1. **Statement PDF rendering.** `GET …/statements/{type}/{n}.pdf` returns 501. Legacy rendered the stored XML via
-   XSL-FO: `ear-ejb/…/dad/HbsStatementPdfFactory.java` (Apache FOP 0.20 `Driver`, fop config, `xsldir`) with the
-   stylesheets in `hbs-core/src/main/resources/xsl/<TRANS_VERSION>/` (`hbs-transmission.xsl`, `piece-scale-invoice.xsl`,
-   `weight-scale-invoice.xsl`, `piece-scale-volume-statement.xsl`, `weight-scale-volume-statement.xsl`,
-   `compiled-sample-statement.xsl`, `ratio-statement.xsl`, `page-header.xsl`, `pagelayout.xsl`, …) chosen by
-   `HBS_FILE.HBS_TS_VERSION_ID → HBS_TS_VERSION.TRANS_VERSION`. Port = add Apache FOP 2.x + copy the XSL tree into
-   `backend/src/main/resources/xsl/`, then transform the (FOI-severed) XML in the controller. Multi-statement merge
-   (`combine.xsl`, `HBSTransmission.mergeStatement`) is needed for "Generate XML / Generate PDF" below.
-2. **P451/P456 "Generate XML" / "Generate PDF"** (≤ 200 documents) — `ear/…/dad/docd/DataDeliveryAction.java` →
-   `DocumentDeliveryManager.generateStatementReport` / `HbsStatementPdfFactory`: one merged XML/PDF of all listed
-   statements.
-3. **FOI gate on Print / Print Client Register** — `ear/…/opq/P450Action.canShowInPublic` / `canShowIndustry`
-   (`TransactionStatementManagerBean.findNotReleasableInfoCount` on `V_CLIENT_PUBLIC`, `findNotReleasableIndustryInfoCount`
-   on PIECE/WEIGHT/SAMPLE_SCL_SMRY_TXN): blocks the register reports for non-ministry users when any listed document
-   involves another Individual client ("The report contains personal information, and is temporarily unavailable for
-   public viewing"). The `HBS3R451/461/471/476` and `HBS4R4xx` reports are offered on the screen without this check;
-   with the new client fence a CLI user only lists documents of their own client, but the report procs themselves
-   are not fenced — a dedicated report guard should apply the fence/FOI before running them.
-4. **Harvest history validation** (`MarkMonthlyBillingAction.validateForm`): ≤ 12-month range, from ≥ max(today − 15 y,
-   1995-01-01), no future month, ≤ 10 marks/licences each existing (MBC/TM lookups), species/product/grade combination
-   valid for the range, "criteria selection insufficient" rule; XML history file (`DocdHelper.generateHistoryReport`,
-   < 5,000 records, e-mailed); CSV `HBS3C431` (Oracle report program, layout in `hbs/opq/ftas/invoiceSummaryFileLayout.html`).
-   The report CSV export of `HBS3R431` is offered instead.
-5. **History report prompts** — `INVSMRY_LICMARK01..10` / `INVSMRY_LICMARKTYPE` (1 = licence, 2 = mark, 3 = file type,
-   4 = mgmt unit) and `INVSMRY_FILETYPE1..3` were built from the radio choice in `ReportingFactory2.setParameters`.
-   The screen maps only `timberMarks` → `LICMARK01` with type 2; a multi-mark or licence/file-type report needs a
-   small mapping step (split the comma list, choose the type). Quoting the file types is done: the backend quotes
-   `RB_FILE_TYPE1..3` / `INVSMRY_FILETYPE1..3` itself ([reports.md](../reports.md) "Prompt rules").
-6. **P450 / P421 validations** — `validation.xml` `P450Form` / `P421Form` + actions: date ranges within the limiting
-   year and ≤ 12 months, not future; population/stratum/year only for non-piece types with valid P, P/Y, P/S/Y combos;
-   scale-site / mark / licence cross-reference checks; client/location validity.
-7. **P452 "Associated Locations"** (CLI_DOC_RCVR) — `HBS3R452` `rb_cli_loc_option = 'A'` restricted to
-   `HBS_USER_CLI_LOC_DATA_DOMAIN` rows of the user id. The registry has no user-id viewer bind, so the option is not
-   offered; leaving Client Location blank = all locations of the (fenced) client.
-8. **Stored transmission file download** (`StatementServlet.handleTransmissionCommand`) — needs a storage decision
-   (files are not in the database).
-9. **P481 MGU description** — `TimberMarkReaderBean.findMgmtUnitDesc` (CodeReader lookup through `MGMT_UNIT_XREF`
-   to a per-type code table). Only the MGU id is shown.
-   The Mgmt Unit Type choices are legacy's fixed list (`OpqConstants.MGMT_TYPE_CODE`: F, T, U, V, "U,V",
-   "F,T,U,V"), filtered with `IN`, and the type description is a `DECODE` — the app does not read
-   `MGMT_UNIT_TYPE_CODE` (the HBS proxy user has no grant on it).
-10. **P401 validations** (`P401Action`): scale-from ≥ Jan 1 of (current year − 7), "This report grouping is not available
-    for Piece Scale", association/client consistency, scaler licence not valid for weight. `scaleSiteSummary.search`
-    lists the active summary versions only (the reports also union the detail tallies — LOG_TALLY / WEIGH_SLIP /
-    sample tallies — and aggregate volumes); its client filter matches mark holder **or** site owner (the report
-    honours the association radio exactly; Stratum Owner is report-only).
-11. **P403 validations** — rates required, numeric, ≤ 2 decimals; date ≥ Jan 1 of (current year − 7).
-12. **P490 validation** — expiry date must be in the future (`futureExpirationDate`); mark/licence cross-reference.
+| Legacy | New | Notes |
+|---|---|---|
+| Statement PDF rendering — `ear-ejb/…/dad/HbsStatementPdfFactory.java` (FOP 0.20.5 `Driver`, `conf/hbsconfig.xml`, `support/logo.gif`) + `hbs-core/src/main/resources/xsl/<TRANS_VERSION>/` | `StatementPdfRenderer` (Apache FOP 2.12, JDK XSLT); `GET /api/v1/hbs/statements/{type}/{n}.pdf` | The XSL tree (V1_0 … V1_0h, V999_0) is copied **unchanged** to `backend/src/main/resources/xsl/` (minus `combine.xsl`, `hashtotal.xsl`, `ejb.xsl`, which need Xalan Java extensions and are replaced by Java merging). FO that FOP 0.20 accepted and 2.x rejects is repaired between XSLT and FOP by `Fop020CompatibilityFilter` (cell spans past the last column, empty `block-container`, borders on side regions). `xsl/support/hbs-fop.xconf`: Arial → base-14 Helvetica (same metrics; legacy embedded Arial from Windows font files), relaxed validation; the logo resolves from the classpath only. The single-statement PDF uses the file's own version (`HBS_FILE.HBS_TS_VERSION_ID → HBS_TS_VERSION.TRANS_VERSION`) and the FOI-severed XML, as `HBSTransmission.getPDFTransmission` did. |
+| P451/P456 "Generate PDF" — `ear/…/dad/docd/DataDeliveryAction.java` (ACTION_PDF_REPORT) → `DocumentDeliveryManagerBean.generateStatementReport` → `HbsStatementPdfFactory.getPDFTransmission(out, reader)` | `GET /api/v1/hbs/statements/export.pdf`; "Download PDF" next to "Download XML" on `issued-documents` (`pdfExport`) | Same criteria, FOI and ≤ 200 limit (`Constants.SUPPRESS_LIMIT`) as `export.xml`; rendered with the latest version (`XmlConstants.CURRENT_XSL_VERSION` = `HBS_TS_VERSION` with the highest id, `StatementXslVersion`). |
+| P451/P456 "Generate XML" — `generateStatementReport` | `GET /api/v1/hbs/statements/export.xml` (`StatementTransmissionXml`) | Batches now in legacy's `HashMap` order. |
+| Statement-delivery transmission files — batch `B2065.createDeliveryFiles` / `mergeItemIntoProperBatch` (writes `<id>.xml` / `<id>.pdf` to the client's drop directory) served by `StatementServlet.handleTransmissionCommand` | `GET /api/v1/hbs/statements/transmissions/{id}.{xml\|pdf}` (`StatementTransmissionController`, `DeliveryTransmissionXml`); SPA `/StatementDelivery/transmissions/:file` | Rebuilt from `DOCUMENT_DELIVERY_TRANSMISSION` + `DOCUMENT_DELIVERY_BATCH_ITEM` (ordered by `BATCH_ID`) + each item's `HBS_FILE.FILE_OBJECT`, type from `HBS_DETERMINE_STATEMENT_TYPE` (`DocumentDeliveryTransmissionQuery.selectTransmissionItems`): root attributes `transmission-id`, `client-number`, `client-location-code`, `recipient-type`, `date-created`/`time-created` (from `CREATION_DATE`, legacy `hh:mm:ss`), the first statement of each file, one batch per type in B2065's `HashMap` order. PDF with the current stylesheets (cover sheet included). Available once B2065 set `FILE_NAME` / `PDF_FILE_NAME` (status COM/SUB). Access as legacy: signed-in user; ministry any client (an optional `?clientNumber=` must match), others only their own (active) client; otherwise 404. No FOI severing (legacy served the client's own files). |
+| Statement e-mail reference page `invoiceGeneralInformation.html` (batch property `invoice_general_info`) | public SPA page `/invoice-information` | Configure the legacy batch `cfg_b_general_info` = `<new app URL>/invoice-information`. |
+
+Differences from legacy: the transmission XML is rebuilt rather than read from the share, so statements
+are copied as stored (legacy re-serialised them through Castor) and `xsi:schemaLocation` is not written;
+the PDF text uses Helvetica instead of embedded Arial. These need the TEST regression (open the same
+e-mail link in legacy and new and compare).
+
+## Ported — screen validations, FOI gate, associated locations, MGU description
+
+| Legacy | New | Notes |
+|---|---|---|
+| P450 FOI gate on Print / Print Client Register — `opq/P450Action.perform` (BT 2637 / BT17247), `canShowIndustry` → `TransactionStatementManagerBean.findNotReleasableIndustryInfoCount` (`TransactionStatementQuery.getNotReleasableIndustryInfoCount`) | `queries.QueriesReportGuard` (a `ReportRequestGuard` run by `HbsReportController` before every report) for `HBS4R452/462/472/477`, `HBS3R451/461/471/476`; these reports are now in `HbsReportController.INDUSTRY_REPORTS` | Every caller: `RB_DOC_NUMBER` is blanked (legacy `setDocumentNumber(null)`). Non-ministry caller: `RB_CLIENT_ASSOCIATION=BOTH`, `RB_CLIENT_NUMBER` = active client (the report procs filter only on the prompts, so this is the fence), then the legacy check over the listed documents (`issuedDocuments.search` with the prompts mapped back to criteria → their summary returns → `QueryCriteriaReads.industryNotReleasable`, bound, in chunks of 900): a piece / weight / compiled-sample transaction whose two parties are both other clients, one of them an Individual (`V_CLIENT_PUBLIC`), refuses the report with "The report contains personal information, and is temporarily unavailable for public viewing". Ratio statements are not checked (legacy). Legacy compared the parties with the user's `HBS_USER.CLIENT_NUMBER`; the new check uses the token's active client. `canShowInPublic` is not needed: the public area offers no reports. |
+| Harvest history validation — `opq/ftas/MarkMonthlyBillingAction.validateForm` (+ `getLimitDate`, `isBillingDateValid`, `isValidDateRange`, `isValidCliLoc`, `isValidMark`, `isValidLicence`, `isValidSPGCombination`) | `queries.QueriesCriteriaGuard` (`@Before` on `QueryService`) for `harvestHistory.billing/scaling`; the month rules in `queries.HarvestHistoryRules`, shared with the public area (`PublicQueries.historyRange`) | From = first of its month, To = last of its month (`TimberMarkHelper.getBillingDateFrom/To`), so "up to 12 months" is Jan–Dec; From ≥ max(1 Jan (year − 15), 1995-01-01); not after the last day of this month; From ≤ To. Client / location exist; every mark is a billed mark; every licence has billed marks; with two or more of species / product / grade the combination is in `SPECIES_PRODUCT_GRADE_XREF` during the interval; Mgmt Unit No needs a type; "Billing/Scaling History criteria selection insufficient". New: at most 10 marks / licences (legacy had 10 boxes). Not ported: the special species/product/grade groups (not offered) and "at least one billing type" (single select now). The XML history file (< 5,000 rows) was already ported (`HarvestHistoryXmlService`). |
+| History report prompts (`ReportingFactory2.setParameters`, item 5 of the old list) | `HarvestHistoryPrompts` (already in place) | Marks → `INVSMRY_LICMARK01..10` type 2, licences type 1, file types type 3, mgmt unit type 4; file types quoted by `ReportPromptRules`. |
+| P450 / P449 — validation.xml `P450Form` + `P450Action.perform` | `QueriesCriteriaGuard` for `issuedDocuments.search` | Scale / issue From: valid date, not before max(1 Jan (year − 7), 2003-11-01) ("Statement cannot be retrieved as … is older than seven years", BT 16733), From ≤ To, not in the future; To not in the future; a complete issue or scale date range unless a statement number (P449) or transmission id (P453 link) is given (`validateOneOfManyRequired`); client number with location, client / location exist; Pop/Strat/Year not for piece documents, P, P/Y or P/S/Y with 4/2/4 digits, sampling year ≥ year − 7; Ratio Statements take no scale site / dates / mark / districts (`searchFieldAllowed`); scale site and mark cross-references. |
+| P421 — validation.xml `P421Form` + `P421Action.perform` | `QueriesCriteriaGuard` for `billingSummary.search` | Billing / scale From: valid, ≥ 1 Jan (year − 7), not future, ≤ To, one month when nothing narrows harvest (district, file type, mark, licence, mgmt unit) and scale (district, site, population) (`billingSummaryDateRange`), at most 12 months (`dateRangeRestriction`); one date range required; licence, mark, scale site cross-references; sampling year limit; Pop/Strat/Year digits and combination (weight / sample only). |
+| P452 — validation.xml `P452Form` | `QueriesCriteriaGuard` for `statementTransmissions.search` | Transmission From ≥ the 7-year / 2003-11-01 limit, not future, ≤ To; To not future; client number / location exist. The Home "recent" search has no dates. |
+| P452 "Associated Locations" (CLI_DOC_RCVR) — `HBS3R452` `rb_cli_loc_option = 'A'` (`strAndAssLoc`) | `statementTransmissions.search` filter `clientLocationOption=A` (`HBS_USER_CLI_LOC_DATA_DOMAIN` of `:hbsUserId`); criterion "Client Locations" on `statement-transmissions`; `HBS3R453` gets `RB_CLI_LOC_OPTION` from it | |
+| P481 MGU description — `TimberMarkReaderBean.findMgmtUnitDesc` | `timberMarks.detail` column `mgmtUnitDescription` | Both look-ups are external code lists in `CODE_LIST_TABLE` (`CodeLocator`): `MGMT_UNIT_XREF` names the unit type's list, whose entry for the unit id is the description; blank when not cross-referenced (legacy swallowed the miss). |
+| P401 — `opq/dac/P401Action.validateForm` | `QueriesCriteriaGuard` for `scaleSiteSummary.search` | Scale From required / valid / ≥ 1 Jan (year − 7); To required / valid; return type required; Scale Site and Population grouping not for piece; mark and site exist; client association (All takes no client, the others need one: "Association Required." / "Client number Required." / "Client information Required."); Pop/Strat/Year (not for piece, digits, sampling-year limit, combination); scaler licence not for weight, must exist. |
+| P403 — `opq/dac/P403Action.validateForm` | `QueriesCriteriaGuard` (`agedUnbilled.search`: Scaled Prior To required / valid / ≥ 1 Jan (year − 7)); `QueriesReportGuard` (`HBS2R411/412`: each Estimated Average Rate > 0, numeric, ≤ 2 decimals) | The rates are report prompts, so they are checked when the report runs. |
+| P490 — validation.xml `P490Form` | `QueriesCriteriaGuard` for `cutToCruise.search` | Mark / licence cross-references; the expiry exclusion only with Forest File ID or client (BT11752) and not in the future ("Expiration Date may not be a future date." — the legacy rule refuses a future date); client exists, client / location exist. The screen's expiry date is no longer required (optional in the proc and legacy). |
+
+Report-path note: the guards run on `POST /reports/{id}` through the new `service.v1.report.ReportRequestGuard`
+extension point (`HbsReportController` applies every guard bean in turn).
+
+## Not carried over (from the old list)
+
+- **P450 sort radio / `populationStratumYearSortAllowed`**: the sort radio became sortable columns.
 
 ## Missing capabilities
 
@@ -171,7 +165,6 @@ None — `QUERIES_VIEW` and `MINISTRY` cover the area.
 - Should industry users still be able to retrieve (FOI-severed) statements of other clients by number, as the public
   legacy site allowed? `StatementDocumentController` currently does (legacy behaviour, with severing), while the lists
   are fenced to the user's own client.
-- Is a PDF rendering of statements still required (FOP port), or is the XML + the register reports enough?
 - Report prompts are concatenated into dynamic SQL inside the legacy `HBS2R*` / `HBS3R*` procedures (e.g.
   `HBS3R450_*`, `HBS_BILLINGSMRYRPT_WHERECLAUSE`, `HBS2R401`). The screens only pass criteria values, but the report
   endpoint should validate prompt formats (codes, numbers, dates) before calling them — a cross-area concern.

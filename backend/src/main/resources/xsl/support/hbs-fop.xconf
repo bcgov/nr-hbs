@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Apache FOP 2.x configuration for statement / invoice PDFs
+  (replaces the legacy FOP 0.20.5 hbs-core conf/hbsconfig.xml).
+
+  - Legacy embedded Arial from the Windows font files (#{f_arial} tokens).
+    Those files are not available in the container, so "Arial" is mapped to
+    the PDF base-14 Helvetica, which has the same metrics; nothing is embedded.
+  - The 0.20-era stylesheets carry properties FOP 2.x validates more strictly
+    (margins on side regions, empty table bodies); validation is relaxed so
+    they render as they did, with FOP logging a warning instead.
+  - Images (logo.gif) are resolved by StatementPdfRenderer from the classpath
+    only; nothing is fetched from the network or the file system.
+-->
+<fop version="1.0">
+  <strict-configuration>true</strict-configuration>
+  <strict-validation>false</strict-validation>
+  <fonts>
+    <substitutions>
+      <substitution>
+        <from font-family="Arial" font-weight="normal" font-style="normal"/>
+        <to font-family="Helvetica" font-weight="normal" font-style="normal"/>
+      </substitution>
+      <substitution>
+        <from font-family="Arial" font-weight="normal" font-style="italic"/>
+        <to font-family="Helvetica" font-weight="normal" font-style="italic"/>
+      </substitution>
+      <substitution>
+        <from font-family="Arial" font-weight="bold" font-style="normal"/>
+        <to font-family="Helvetica" font-weight="bold" font-style="normal"/>
+      </substitution>
+      <substitution>
+        <from font-family="Arial" font-weight="bold" font-style="italic"/>
+        <to font-family="Helvetica" font-weight="bold" font-style="italic"/>
+      </substitution>
+      <substitution>
+        <from font-family="ArialMT" font-weight="normal" font-style="normal"/>
+        <to font-family="Helvetica" font-weight="normal" font-style="normal"/>
+      </substitution>
+      <substitution>
+        <from font-family="ArialMT" font-weight="normal" font-style="italic"/>
+        <to font-family="Helvetica" font-weight="normal" font-style="italic"/>
+      </substitution>
+      <substitution>
+        <from font-family="ArialMT" font-weight="bold" font-style="normal"/>
+        <to font-family="Helvetica" font-weight="bold" font-style="normal"/>
+      </substitution>
+      <substitution>
+        <from font-family="ArialMT" font-weight="bold" font-style="italic"/>
+        <to font-family="Helvetica" font-weight="bold" font-style="italic"/>
+      </substitution>
+    </substitutions>
+  </fonts>
+</fop>

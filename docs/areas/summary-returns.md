@@ -23,22 +23,21 @@
 | P055/P105/P155 | Segregations | "Segregations" (Txn Seq column replaces Prev/Next Txn) | `summaryReturns.segregations` | `PieceScaleSegregationQuery`, `SummaryScaleTxnSegregationsTag` |
 | P056/P106/P156 | Notations | "Notations" | `summaryReturns.notations` | `*ScaleNotationQuery` |
 | P107 | Daily Load Summaries | "Daily Load Summaries" | `summaryReturns.dailyLoads` | `WeightScaleDailyLoadSummaryQuery` |
-| P050 | Add Piece / Volume Estimate / Area Based Estimate Return | `summary-return-add-piece` (`?pssmryType=AREAEST` etc.) | reserved `summaryReturns.addPiece` | `P050Action.addScaleReturn` |
-| P100 | Weight Scale Summary Return (add) | `summary-return-add-weight` | reserved `summaryReturns.addWeight` | `P100Action` |
-| P150 | Add Sample Scale Submitted Summary Return | `summary-return-add-sample` | reserved `summaryReturns.addSample` | `P150Action` |
-| P053/P103/P153 | Update Piece/Weight/Sample Scale Return | `summary-return-update` (loads `summaryReturns.detail`) | reserved `summaryReturns.update` | `P050/P100/P150Action` Save |
-| P052.. buttons | Hold, Release, Discard, Cancel, C&R With/Without Changes, Replace With/Without Changes, Request/Approve/Reject Rate Correction, Re-queue Txn | `summary-return` actions | reserved `summaryReturns.hold/.release/.discard/.cancel/.cancelReplaceWithChanges/.cancelReplaceWithoutChanges/.replaceWithChanges/.replaceWithoutChanges/.requestRateCorrection/.approveRateCorrection/.rejectRateCorrection/.requeueTxn` (body documentControlNumber, version, returnType [+trxId]) | see below |
-| P054/P104/P154 | Confirmation Screen | confirm modal; preview not yet ported | – | `FetchConfirmationDataTag` |
-| P054A | Confirm Custody Transfer | not a screen; becomes a validation response of the service | – | P050Action `authorizationFailure` |
-| P057/P157, P058/P109/P158, P110 | Update segregations / notations / daily loads | not yet ported (editable grids need the service) | – | P057/P157/P058/P109/P158/P110Action |
+| P050 | Add Piece / Volume Estimate / Area Based Estimate Return | `summary-return-add-piece` (`?pssmryType=AREAEST` etc.) | `summaryReturns.addPiece` | `P050Action.addScaleReturn` |
+| P100 | Weight Scale Summary Return (add) | `summary-return-add-weight` | `summaryReturns.addWeight` | `P100Action` |
+| P150 | Add Sample Scale Submitted Summary Return | `summary-return-add-sample` | `summaryReturns.addSample` | `P150Action` |
+| P053/P103/P153 | Update Piece/Weight/Sample Scale Return | `summary-return-update` (loads `summaryReturns.detail`) | `summaryReturns.update` | `P050/P100/P150Action` Save |
+| P052.. buttons | Hold, Release, Discard, Cancel, C&R With/Without Changes, Replace With/Without Changes, Request/Approve/Reject Rate Correction | `summary-return` actions (shown per record from `summaryReturns.preview`) | `summaryReturns.hold/.release/.discard/.cancel/.cancelReplaceWithChanges/.cancelReplaceWithoutChanges/.replaceWithChanges/.replaceWithoutChanges/.requestRateCorrection/.approveRateCorrection/.rejectRateCorrection` (body documentControlNumber, version, updateTimestamp) | see Ported |
+| P102/P152 Re-queue Txn | Re-queue | not carried over: button and action commented out in legacy (P102/P152.jsp, P100/P150Action, `SummaryScaleReturnStateHelper.reQueue`) | – | – |
+| P054/P104/P154 | Confirmation Screen | confirm modal with the transaction preview | `summaryReturns.preview` (`action`) | `FetchConfirmationDataTag` |
+| P054A | Confirm Custody Transfer | update form "Confirm Custody Transfer" (body `confirmCustodyTransfer`) | `summaryReturns.update` refuses without it | P050Action `authorizationFailure` |
+| P057/P157, P058/P109/P158, P110 | Update segregations / notations / daily loads | bespoke page `/scale-returns/summary-return-children?grid=segregations\|notations\|dailyLoads` | `summaryReturns.saveSegregations/.saveNotations/.saveDailyLoads` (reads `summaryReturns.segregationRows`, `.notations`, `.dailyLoads`) | P057/P157/P058/P109/P158/P110Action |
 | P174 | Summary Document Unavailable | replaced: `within_limit` filter; "Available" column on P042 | – | `DacValidator.compareForYearLimit`, `strWhereLimitYear` |
 | /dac/summary/admin/* | grant only | not carried over: no JSPs/actions exist | – | action_lnk.tsv |
 | P054S001-7, P104S001-7, P154S001-7, P101S002, P151S002, P108 | mock-ups | not carried over: unreachable static prototypes | – | – |
 | HBS3R415/416 (CSV 3C415/416) | View PDF Report | belongs to the invoice screens (Queries area) | – | – |
 
-Reserved command ids are not registered on the backend, so the SPA hides
-their buttons and disables the save on the add/update forms (it reads
-`GET /api/v1/hbs/commands`) until `SummaryReturnWorkflowService` registers them.
+All ids are WorkflowCommand beans in `backend/.../summaryreturns/` (see Ported).
 
 ### Deviations from legacy
 
@@ -55,93 +54,72 @@ their buttons and disables the save on the add/update forms (it reads
 - The detail screen shows the Piece and Weight/Sample field groups and all three Print buttons on every return.
 - HBS2R0x1 report prompts are validated by `HbsReportService` (character whitelist); dates are sent as yyyy-mm-dd.
 
-## Legacy logic not yet ported
+## Ported (work package 3 — built, needs TEST regression)
 
-No CommandDefinitions are registered. A `SummaryReturnWorkflowService` must implement the reserved ids, one transaction per action, writing through the HBS_CREATE/STORE/REMOVE procs for HBS_SCALE_RETURN, PIECE_SCALE_SUMMARY, PIECE_SCL_SMRY_TXN, PIECE_SCL_SEG, *_NOTATION, SAMPLE_SEG, SAMPLE/WEIGHT_SCL_SMRY_TXN, HBS_UPDATE_SAMPLE_SCL_SMRY_TXN, *_SEG_ERROR.
+Package `backend/src/main/java/ca/bc/gov/nrs/hbs/api/summaryreturns/` (one transaction per command,
+writes only through the table-API procs, `RowLock` on the version's UPDATE_TIMESTAMP, industry fence).
 
-**DDL gap:** there are no table-API procs for WEIGHT_SCALE_SUMMARY, SAMPLE_SCALE_SUMMARY, WEIGHT_SCL_DAILY_LOAD_SUMMARY, *_SCL_VERSION_ERROR or WEIGHT_SCL_TXN_SEGREGATION (the legacy code wrote them with inline SQL). Add procs, or grant a DML role (DBA decision).
+| Legacy | New | Command id |
+|---|---|---|
+| `ScaleReturnStateFactory` + `ScaleReturn*State` | `ScaleReturnState` (state table + every UI transition) | – |
+| `SummaryReturnFieldsTag`, `ButtonsForCBATag`, P052/P102/P152 role blocks, P053 Release/Discard | `SummaryButtons`; commands refuse a button the page would not have shown | – |
+| `SummaryScaleReturnHelper.isEditable[Piece]ScaleReturn`, `DacHelper.has{ScaleSite,District,Scaler}Authorization` | `SummaryReturnAccess` | – |
+| `SummaryScaleReturnStateHelper.hold` (BT16641, BT15212) | `SummaryReturnWorkflows.hold` | `summaryReturns.hold` |
+| `SummaryWorkflowManager.release` → `Release.execute` (BT17364 NTI, BT15212 generated segregations, CWC previous-version release), `P100Action.updateYTDCyclicBillingInd` (BT7327) | `SummaryReturnWorkflows.release` | `summaryReturns.release`, `summaryReturns.approveRateCorrection` |
+| `SummaryScaleReturnStateHelper.discard / discardGeneratedFailed` | `SummaryReturnWorkflows.discard` | `summaryReturns.discard` |
+| `…cancel / replaceWithoutChanges / cancelAndReplaceWithoutChanges` (+ area-based NTI) | same names | `summaryReturns.cancel/.replaceWithoutChanges/.cancelReplaceWithoutChanges` |
+| `…replaceWithChanges / cancelAndReplaceWithChanges / createNewVersion` | same names | `summaryReturns.replaceWithChanges/.cancelReplaceWithChanges` |
+| `…requestRateCorrection / rejectRateCorrection` | same names | `summaryReturns.requestRateCorrection/.rejectRateCorrection` |
+| `FetchConfirmationDataTag` (P054) | `SummaryPreviewCommand` (read only) | `summaryReturns.preview` |
+| `updateScaleReturnVersion`, `updateSummaryScaleReturnAndChildrenWithAudit`, `createAndStore…`, `save/removeScaleReturnErrors`, `AuditManager2Impl.createAudit` | `SummaryReturnWriter`, `AuditTrail` (HBS_AUDIT + HBS_SCALE_RETURN_AUDIT with the legacy field names) | – |
+| `PieceScaleValidator`, `WeightScaleValidator`, `SampleScaleValidator`, `Summary[Billable]ScaleReturnValidator`, `RateManager` rate checks (HBS_RATES procs), BT15212 area-based generation | `edits/SummaryReleaseEdits` (+ `PieceEdits`, `WeightEdits`, `SampleEdits`, `BillableEdits`, `Rates`, `Lookups`, `AreaBasedSegregations`) | – |
+| P050/P100/P150 add, P053/P103/P153 update, P057/P157, P058/P109/P158, P110 | `entry/` | `summaryReturns.addPiece/.addWeight/.addSample/.update/.saveSegregations/.saveNotations/.saveDailyLoads` |
+| `DetailManagerBean.isEligibleForRateCorrection`, generated discard detail reset, `extendRateCorrection` | `generated/LegacyGeneratedSummaryDetails` (+ `detailreturns.DetailWorkflow` for the replacement-pending release after a reset) | – |
+| P832 Hold / Release Selected (billing) | `SummaryReturnWorkflows.hold` / `.release` via `billing.UnissuedFinalBillCommands` | `billing.unissuedFinalBills.hold/.release` |
 
-1. **Add.** Code: `P050Action.addScaleReturn`, `P100Action`, `P150Action`, `SummaryScaleReturnManagerBean.createAndStoreSummaryScaleReturn` (~l.246).
-   - Validation (`presentation/.../SummaryScaleReturnValidator` `validateP050Form` / `validateP050FormDates` / `validateP100Form` / `validateP150Form`):
-     - required fields; scaler licence type S/R;
-     - site/licence authorization, except for HBS_SUMM_DATA_CORR and SPC_SUBM_AGNT;
-     - area-based returns need a cruise-based, client-owned mark;
-     - BCOMB / private-mark rules;
-     - Bill To / Copy To must exist, and are cleared when they can be derived;
-     - sections < 100;
-     - Field Deck Id required for FLDSCLEST;
-     - a waste cut block must belong to the mark;
-     - the batch slip must exist and not be cleared;
-     - Area Cut ≤ 9999.9;
-     - `validatePopStratYear` (default-ratio populations allow PR only);
-     - 7-year limit.
-   - DCN comes from `SummaryScaleReturnHelper.getId`. New returns start as OIP, generated N, version 1, state INC.
-   - Estimates force category CR/FI/WA/OT; waste returns use site ZZZ.
-   - AREAEST derives licence, return number and site (`findAreaBasedLicenseNo/ReturnNo/ScaleSiteNo`) and sets log count 0.
-2. **Update and sub-grids.** Code: `updateSummaryScaleReturnAndChildren` (~l.615).
-   - Optimistic lock ("…updated by another process.").
-   - P054A custody transfer.
-   - Segregation rules:
-     - species/product/grade;
-     - pieces ≥ 0;
-     - SB4 xor NMV;
-     - beachcomb marks.
-   - Daily loads must be > 0 and feed the totals.
-   - Editability (`isEditablePieceScaleReturn` / `isEditableScaleReturn`):
-     - never for generated returns;
-     - CTL may edit INC; CORR may edit INC or HLD;
-     - estimate rules per CLI_CRUISE_ADMIN / SPC_SUBM_AGNT / site / licence / district.
-   - The legacy sub-grids had no role or state checks. The port must add them.
-3. **State machine.** Code: `ejb/summary/control/ScaleReturnStateFactory` + `ScaleReturn*State`, `SummaryScaleReturnStateHelper` (1,589 LOC), `control/workflow/SummaryWorkflowManagerBean` (Release/Compile/Extend, WorkflowStateHelper).
-   - **Held** (OIP/CIP/CWC/CWR/RCP/RNP + INC; OIP/RCP + HLD):
-     - Release → RDY. Becomes PND if a correction is pending, ERR on an edit failure, or NTI for area-based returns with Area Cut 0.
-     - Discard:
-       - OIP → DIS/DEL
-       - CWC → OCM/DEL
-       - CWR → OCM/ISS
-       - RCP → CCM/DEL
-       - RNP → CCM/CAN
-   - **Ready** (RDY/ERR, NTI, SPR):
-     - Hold, OIP/RCP only. The old version becomes SPR and inactive, and a new HLD version is created (`createAndStoreSummaryScaleReturnVersionForHold`, BT16641).
-     - Discard.
-   - **Locked** (LCK), batch-driven:
-     - Invoice/reconcile → OCM/ISS, CCM/CAN, RCC/ISS or RNC/ISS.
-     - Failed reconcile → FAL; failed release → ERR.
-   - **Invoiced** (ISS/CAN):
-     - Cancel → CIP/RDY (NTI for area-based).
-     - Replace without changes → RNP/RDY.
-     - Replace with changes → RCP/INC.
-     - Cancel & replace with changes → CWC/INC.
-     - Cancel & replace without changes → CWR/RDY.
-     - Request rate correction → CWR/AWP.
-   - **Awaiting approval** (CWR + AWP):
-     - Approve = Release (`Release.extendRateCorrectionDetails` → `SummarizationManager.extendRateCorrection`).
-     - Reject.
-     - Discard → OCM/DEL.
-   - **Sample FAL:** Re-queue (`helper.requeue`, `isValidRequeueTxnId`).
-   - Button visibility: `SummaryReturnFieldsTag`, `ButtonsForCBATag`.
-4. **Release edits.** Code: `control/SummaryScaleReturnValidator.applyEditsAndValidate` with `PieceScaleValidator` (1,823 LOC), `WeightScaleValidator`, `SampleScaleValidator`, `SummaryBillableScaleReturnValidator`.
-   - Errors are saved and removed with `saveScaleReturnErrors` / `removeScaleReturnErrors`.
-   - Generated returns get client edits only.
-   - A final bill (FB) needs prior billing activity.
-   - Area-based returns: `generateAreaBasedSegregationsAndNotation`.
-5. **Transactions and pricing.** Code: `SummaryScaleReturnExtender.extend`, `BillableScaleExtender`, `Piece/Weight/SampleScaleExtender` (weight uses the STRATUM ratio), `Generated*Extender`.
-   - DR/CR and ORG/CAN/RPL come from the state.
-   - Rates: `RateHelper` → `plu/RateManagerBean` → `HBS_RATES` procs `Retrieve_Normal_Rate`, `Retrieve_Beachcomb_Rate`, `Retrieve_Waste_Rate`, `Get_Override_And_Appraisal`.
-   - Writes `*_SCL_SMRY_TXN` and `*_SCL_TXN_SEGREGATION` (the rate components).
-   - Invoicing and reconciliation are batch: `ReconciliationDelegate`, `TransactionStatementDelegate`.
-6. **Confirmation preview.** `FetchConfirmationDataTag` builds:
-   - the previous invoiced version and the next pending version;
-   - the resulting transactions;
-   - for rate corrections, the correctable detail transactions (`IsEligibleForRateCorrectionTag`).
+States left for the legacy batch: release ends RDY/ERR/NTI/PND exactly as `Release.execute`
+(B2031/B2041 extension selects RDY/ERR of OIP/CIP/RNP/RCP/CWR/CWC and re-runs the release edits
+for OIP/RCP before extending); a CWC release also puts the previous invoiced version back to
+RDY and active so the cancel is extended first; one active version per document at the end of
+every command. Pricing stays in the batch extension; at release the rates are only checked to
+exist (SD08/SD10/SD11/SD12/SD17 via `HBS_RATES`).
 
-   Proposed as a `summaryReturns.preview` read.
-7. **Discard of generated returns.** `removeSummaryScaleReturnAndChildren` frees the detail transactions and deletes the compiled statements and files (~l.2590).
+**DDL gap — corrected.** The table-API procs for WEIGHT/SAMPLE_SCALE_SUMMARY,
+WEIGHT_SCL_DAILY_LOAD_SUMMARY, the version/segregation/load-summary error tables,
+WEIGHT_SCALE_NOTATION, HBS_AUDIT / HBS_SCALE_RETURN_AUDIT and YTD_CYCLIC_BILLING all exist in
+nr-mof-db and are what the legacy entity beans called; no proposed DDL is needed for these
+workflows.
 
-## Capabilities (open)
+### Deviations / legacy defects kept
 
-- Weight/sample add and update should use `SUMMARY_RETURN_CONTROL` (HBS_SUMM_DATA_CTL/CORR).
-- Cancel, replace, hold, release, discard and re-queue should use `SUMMARY_RETURN_CORRECT` (HBS_SUMM_DATA_CORR).
-- Approve/reject rate correction should be HBS_INV_CORR_APP only; it currently uses `DETAIL_RETURN_APPROVE`.
+- Every legacy step committed separately (and re-read with `verifyScaleReturnIsInState`); here the
+  whole action is one transaction.
+- Button rules were only UI hiding in legacy; the commands now enforce them (`SummaryButtons`).
+- Release from the update page: save first, then Release on the view page (legacy did both in
+  one click; the RCP/CWC confirmation is the Release confirmation with the preview).
+- Hold of an area-based return deletes notation 98, or the last notation when there is none
+  (legacy loop bug; the generated notation is 50).
+- The generated-segregation edits of an area-based release are computed but not saved (legacy
+  discarded the result of `validateGeneratedSegregations`).
+- `removeScaleReturnErrors` removes the version errors of every version of the document and
+  leaves weight load-summary errors, as legacy did.
+- Audit field "Number_Sections" for the sample check-scale indicator is the legacy constant.
+- Generated summaries (`generated/`): discarding a failed generated summary resets each detail
+  document (lock check, latest txn FAL, fail → reset, PND / CAN companions) and then, as legacy
+  `WorkflowManagerBean.reset` did, processes a replacement-pending (PNV) version on the real
+  detail-return workflow (`DetailWorkflow.processReplacementVersionPendingAfterReset`: the reset
+  version is superseded when OIP/RWC and active RDY/AWP, the PNV goes to AWP or through the full
+  detail release). A CWC detail fails the reset as it did in legacy; generated SFP piece summaries
+  cannot be discarded (legacy only looked at log tallies). Needs a business decision.
+- Add / update / grids (`entry/`): category drop-downs are enforced on the server; weight and
+  sample notation edits are saved (legacy P109/P158 only saved additions).
 
-These are broader capabilities in the meantime. Add the narrower ones with the service, in both `Capability.java` and `access.ts`.
+## Capabilities
+
+- `SUMMARY_RETURN_EDIT` (broad): add piece, update, hold, release, discard, the grids; the
+  per-role / per-state / data-domain rules are checked in the commands.
+- `SUMMARY_RETURN_CONTROL` (HBS_SUMM_DATA_CTL, HBS_SUMM_DATA_CORR): add weight / sample
+  (legacy grant add/* is HBS_SUMM_DATA_CTL; checked in the command).
+- `SUMMARY_RETURN_CORRECT` (HBS_SUMM_DATA_CORR, HBS_BILL_ADMIN): cancel / replace.
+- `SUMMARY_RETURN_ADMIN` (HBS_BILL_ADMIN): request rate correction.
+- `SUMMARY_RATE_CORRECTION_APPROVE` (HBS_INV_CORR_APP): approve / reject rate correction.

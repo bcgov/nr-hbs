@@ -85,6 +85,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
    * @param ex the InvalidParameterException
    * @return the ApiError object
    */
+  @ExceptionHandler(ca.bc.gov.nrs.hbs.api.workflow.WorkflowValidationException.class)
+  protected ResponseEntity<Object> handleWorkflowValidation(ca.bc.gov.nrs.hbs.api.workflow.WorkflowValidationException ex) {
+    ApiError apiError = new ApiError(BAD_REQUEST);
+    apiError.setMessage(String.join(" ", ex.problems().stream().map(p -> p.message()).distinct().toList()));
+    ex.problems().forEach(p -> apiError.addWorkflowError(p.field(), p.message()));
+    log.info("Workflow validation failed: {}", apiError.getMessage());
+    return buildResponseEntity(apiError);
+  }
+
   @ExceptionHandler(IllegalArgumentException.class)
   protected ResponseEntity<Object> handleInvalidParameter(IllegalArgumentException ex) {
     ApiError apiError = new ApiError(BAD_REQUEST);

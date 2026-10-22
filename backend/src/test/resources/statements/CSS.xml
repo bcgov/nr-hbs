@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hbs-transmission xmlns="gov.bc.ca/forests/hbs/statement/v1" transmission-id="1" batch-count="1" date-created="2026-09-15" time-created="10:15:00">
+  <hbs-batch batch-type-code="CSS" document-count="1">
+    <compiled-sample-statements>
+      <compiled-sample-statement>
+        <header>
+          <statement-number>1000001</statement-number>
+          <issue-date>2026-09-03</issue-date>
+          <transaction-type>ORG</transaction-type>
+          <population-owner>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </population-owner>
+          <stratum-owner>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </stratum-owner>
+          <timber-mark>TIMBER</timber-mark>
+          <license>LICENSE</license>
+          <cutting-permit>CUT</cutting-permit>
+          <region-harvested org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <region-scaled org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <district-harvested org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <district-scaled org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <scale-date>2026-09-11</scale-date>
+          <scale-site id="ID" name="WESTERN FOREST PRODUCTS INC"/>
+          <summary-doc-number>534</summary-doc-number>
+          <summary-type>Generated</summary-type>
+          <return-category code="CO" description="Primary Scale"/>
+          <prev-statement-number>1000008</prev-statement-number>
+          <scaler name="WESTERN FOREST PRODUCTS INC" license="XXXX"/>
+          <return-number>RETU</return-number>
+          <sample-weight>625</sample-weight>
+          <sample-volume>1577.813</sample-volume>
+          <weigh-slip>WEIGH SLIP</weigh-slip>
+          <population-number>POPU</population-number>
+          <stratum-number>ST</stratum-number>
+          <sampling-year>690</sampling-year>
+          <related-statement-number>1000000</related-statement-number>
+        </header>
+        <segregation-details>
+          <segregation-detail pieces="716" volume="1626.072" fraction="99.09" ratio="0.02146" species="SPECIES" species-code="SP" product="PRODUCT" product-code="PR" grade="GRADE" grade-code="G"/>
+          <segregation-totals pieces="846" volume="1696.442" ratio="3.02479"/>
+        </segregation-details>
+        <detail-document scale-date="2026-09-13" scaler-license="XXXX" return-number="RETU" load-arrival-number="LOAD ARRIV" LDS-number="LDS NUMBER" weigh-slip-number="WEIGH SLIP" log-count="963" volume="1759.775" gross-weight="989" grapple-weight="1002" tare-weight="1015" original-DDN="ORIGINAL DDN" original-scale-site="ORIG" original-scaler-license="XXXX" original-scaler-name="ORIGINAL SCALER NAME" original-return-number="ORIG" DDN="DDN" DV="17" transaction-sequence="30"/>
+        <notations>
+          <notation number="99" type="ABC">Rates as per appraisal effective 2026-09-01.</notation>
+        </notations>
+        <fine-print>Payment is due within 30 days of the issue date. Interest is charged on overdue accounts.</fine-print>
+      </compiled-sample-statement>
+    </compiled-sample-statements>
+  </hbs-batch>
+</hbs-transmission>

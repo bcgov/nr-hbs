@@ -103,6 +103,19 @@ public class BillingCatalog implements QueryCatalog {
         + ", NVL(SUM(CASE WHEN v.st = 'CAN' THEN " + m + " ELSE 0 END), 0) AS cancelled";
   }
 
+  /**
+   * The HBS3R842..844 {@code slect} column plus the JSP's count check: a group row's
+   * check box is enabled when the mark's district is one of the viewer's associated
+   * districts ({@code HBS_USER_DIST_DATA_DOMAIN}) and the row has something to act on
+   * (P842: issued tallies; P843/P844: field-scale-flagged returns).
+   */
+  private static String selectable(String alias, String groupRows, String countColumn) {
+    return "SELECT " + alias + ".*, CASE WHEN " + groupRows + " AND " + alias + "." + countColumn + " > 0"
+        + " AND EXISTS (SELECT 1 FROM timber_mark c, hbs_user_dist_data_domain i"
+        + " WHERE c.timber_mark = :timberMark AND i.org_unit_no = c.forest_district AND i.user_id = :hbsUserId)"
+        + " THEN 'Y' ELSE 'N' END AS selectable FROM (";
+  }
+
   /** The two binds every field-scale query needs; fragments are no-ops on the outer view. */
   private static QueryDefinition.Builder deckFilters(QueryDefinition.Builder b) {
     return b.filter(QueryFilter.required("timberMark", "AND :timberMark IS NOT NULL", Type.UPPER))
@@ -204,6 +217,17 @@ public class BillingCatalog implements QueryCatalog {
           + " p.client_number, p.client_locn_code, " + Y_COLS,
       "e.stratum_number,");
 
+  /**
+   * The HBS3R829 population (P829) or stratum (P830) list as an outer
+   * {@code fb} view ending in {@code WHERE 1=1}, for the final-bill generate
+   * workflow ({@code billing.GenerateFinalBillCommand}) to re-check a row's
+   * eligibility flag before calling HBS3R830. Binds {@code :samplingYear}
+   * (and {@code :population} for strata).
+   */
+  public static String finalBillStatusSql(boolean byStratum) {
+    return byStratum ? FINAL_BILL_BY_STRATUM : FINAL_BILL_BY_POPULATION;
+  }
+
   private static QueryDefinition.Builder finalBillSuppressFilters(QueryDefinition.Builder b) {
     return b
         .filter(QueryFilter.date("expiringBefore", "AND fb.pop_expiry < :expiringBefore"))
@@ -220,7 +244,8 @@ public class BillingCatalog implements QueryCatalog {
   // ---------------------------------------------------------------------------------------------
 
   private static final String UNISSUED_COMMON_COLS =
-      "wss.document_control_number, wss.version, wss.scale_date, srvsc.description AS status,"
+      "wss.document_control_number, wss.version, wss.update_timestamp, wss.scale_date,"
+          + " srvsc.description AS status,"
           + " wss.scl_rtn_version_state_code AS version_state_code, wss.scale_site_id_nmbr AS scale_site,"
           + " wss.population_number, wss.stratum_number, wss.sampling_year, wss.timber_mark,"
           + " wss.client_number_paid_by, wss.client_locn_code_paid_by,"
@@ -229,7 +254,7 @@ public class BillingCatalog implements QueryCatalog {
           + " pop.client_number AS pop_client_number, pop.client_locn_code AS pop_client_locn_code";
 
   private static final String UNISSUED_GROUP =
-      " GROUP BY wss.document_control_number, wss.version, wss.scale_date, srvsc.description,"
+      " GROUP BY wss.document_control_number, wss.version, wss.update_timestamp, wss.scale_date, srvsc.description,"
           + " wss.scl_rtn_version_state_code, wss.scale_site_id_nmbr, wss.population_number,"
           + " wss.stratum_number, wss.sampling_year, wss.timber_mark, wss.client_number_paid_by,"
           + " wss.client_locn_code_paid_by, wss.client_number_copied_to, wss.client_locn_code_copied_to,"
@@ -261,7 +286,8 @@ public class BillingCatalog implements QueryCatalog {
 
   private static final String UNISSUED_SQL =
       "SELECT * FROM ("
-          + " SELECT u.document_control_number, u.version, u.scale_date, u.status, u.version_state_code,"
+          + " SELECT u.document_control_number, u.version, u.update_timestamp, u.scale_date, u.status,"
+          + " u.version_state_code,"
           + " u.scale_site, u.population_number, u.stratum_number, u.sampling_year,"
           + " u.population_number || '/' || u.stratum_number || '/' || u.sampling_year AS pop_str_year,"
           + " u.timber_mark, u.client_number_paid_by || '-' || u.client_locn_code_paid_by AS invoice_to,"
@@ -306,7 +332,8 @@ public class BillingCatalog implements QueryCatalog {
           + "   AND ycbs.timber_mark = rh.timber_mark(+)"
           + UNISSUED_GROUP
           + ") u"
-          + " GROUP BY u.document_control_number, u.version, u.scale_date, u.status, u.version_state_code,"
+          + " GROUP BY u.document_control_number, u.version, u.update_timestamp, u.scale_date, u.status,"
+          + " u.version_state_code,"
           + " u.scale_site, u.population_number, u.stratum_number, u.sampling_year, u.timber_mark,"
           + " u.client_number_paid_by, u.client_locn_code_paid_by, u.client_number_copied_to,"
           + " u.client_locn_code_copied_to, u.mark_client_number, u.mark_client_locn_code,"
@@ -417,7 +444,7 @@ public class BillingCatalog implements QueryCatalog {
           + CHECK_SCALE_RULE + RATIO_WHERE + deck("a") + ") v";
 
   private static final String SAMPLE_TALLIES_SQL =
-      "SELECT * FROM ("
+      selectable("st", "st.seq = 1", "issued")
           + "SELECT 1 AS seq, v.psy, v.ytd_ratio, v.ratio_source, " + sums842("1")
           + " FROM " + SAMPLE_TALLY_BASE + " GROUP BY v.psy, v.ytd_ratio, v.ratio_source"
           + " UNION ALL SELECT 2, 'Total', NULL, NULL, " + sums842("1") + " FROM " + SAMPLE_TALLY_BASE
@@ -435,7 +462,7 @@ public class BillingCatalog implements QueryCatalog {
           + " AND a.scale_event_type_code IN ('PS','SS','RS','PD')" + RATIO_WHERE + deck("a") + ") v";
 
   private static final String WEIGH_SLIPS_SQL =
-      "SELECT * FROM ("
+      selectable("ws", "ws.seq = 1", "fs_flag")
           + "SELECT 1 AS seq, v.psy, v.ytd_ratio, v.ratio_source, " + sumsFs("1")
           + " FROM " + WEIGH_SLIP_BASE + " GROUP BY v.psy, v.ytd_ratio, v.ratio_source"
           + " UNION ALL SELECT 2, 'Total', NULL, NULL, " + sumsFs("1") + " FROM " + WEIGH_SLIP_BASE
@@ -462,6 +489,7 @@ public class BillingCatalog implements QueryCatalog {
   private static final String LOG_TALLY_BASE =
       "(SELECT a.scl_rtn_version_state_code st, NVL(a.field_scale_ind, 'N') fs, a.net_volume,"
           + " DECODE(b.scale_event_type_code, 'PS', 1, 'FD', 2, 'RT', 3, 'RR', 4, 'CS', 5) AS seq,"
+          + " b.scale_event_type_code AS event_code,"
           + " DECODE(b.scale_event_type_code, 'RT', 'Local Red Tag', b.description) AS event_type"
           + " FROM log_tally a, scale_event_type_code b"
           + " WHERE a.active_version_ind = 'Y' AND a.scale_event_type_code = b.scale_event_type_code"
@@ -469,11 +497,11 @@ public class BillingCatalog implements QueryCatalog {
           + " AND a.scale_event_type_code IN ('PS','FD','RT','RR','CS')" + deck("a") + ") v";
 
   private static final String LOG_TALLIES_SQL =
-      "SELECT * FROM ("
-          + "SELECT v.seq, v.event_type, " + sumsFs("1") + " FROM " + LOG_TALLY_BASE
-          + " GROUP BY v.seq, v.event_type"
-          + " UNION ALL SELECT 6, 'Total', " + sumsFs("1") + " FROM " + LOG_TALLY_BASE
-          + " UNION ALL SELECT 7, 'Volume (M3)', " + sumsFs("v.net_volume") + " FROM " + LOG_TALLY_BASE
+      selectable("lt", "lt.seq <= 5", "fs_flag")
+          + "SELECT v.seq, v.event_type, v.event_code, " + sumsFs("1") + " FROM " + LOG_TALLY_BASE
+          + " GROUP BY v.seq, v.event_type, v.event_code"
+          + " UNION ALL SELECT 6, 'Total', NULL, " + sumsFs("1") + " FROM " + LOG_TALLY_BASE
+          + " UNION ALL SELECT 7, 'Volume (M3)', NULL, " + sumsFs("v.net_volume") + " FROM " + LOG_TALLY_BASE
           + ") lt WHERE 1=1";
 
   @Override
@@ -493,7 +521,7 @@ public class BillingCatalog implements QueryCatalog {
                        pp.hbs_frequency_type_code, ftc.description AS frequency_description,
                        pp.effective_date, pp.expiry_date, pp.last_ratio_stmt_date,
                        pp.next_ratio_stmt_date, pp.start_ratio_stmt_date,
-                       pp.entry_userid, pp.entry_timestamp, :forceDate AS force_date,
+                       pp.entry_userid, pp.entry_timestamp, pp.update_timestamp, :forceDate AS force_date,
                        CASE WHEN pp.popprof_id = 1 THEN 'Y' ELSE 'N' END AS global_profile
                   FROM population_profile pp, hbs_frequency_type_code ftc
                  WHERE pp.hbs_frequency_type_code = ftc.hbs_frequency_type_code(+)""")
@@ -520,7 +548,12 @@ public class BillingCatalog implements QueryCatalog {
                     + " (SELECT ou.org_unit_no FROM org_unit ou WHERE ou.rollup_region_no = :orgUnit))"))
             .filter(QueryFilter.upper("population", "AND fb.population_number = :population"))
             .filter(QueryFilter.eq("clientNumber", "AND fb.client_number = :clientNumber"))
-            .filter(QueryFilter.eq("clientLocnCode", "AND fb.client_locn_code = :clientLocnCode")))
+            .filter(QueryFilter.eq("clientLocnCode", "AND fb.client_locn_code = :clientLocnCode"))
+            // P828 "Populations in Associated Districts" (HBS3R829 FB_RADIO_SELECTED = ASSOCIATED,
+            // strAssociatedPop): the org units of HBS_USER_DIST_DATA_DOMAIN for the user id.
+            .filter(QueryFilter.upper("districtScope",
+                "AND (:districtScope <> 'ASSOCIATED' OR fb.org_unit_no IN"
+                    + " (SELECT dd.org_unit_no FROM hbs_user_dist_data_domain dd WHERE dd.user_id = :hbsUserId))")))
             .clientScope("AND fb.client_number = :scopeClientNumber")
             .sort("populationNumber", "fb.population_number")
             .sort("popExpiry", "fb.pop_expiry")
@@ -690,7 +723,8 @@ public class BillingCatalog implements QueryCatalog {
       SELECT fbdm.population_number, fbdm.sampling_year, fbdm.timber_mark, mbc.file_type_code,
              mbc.client_number AS mark_client_number, mbc.client_locn_code AS mark_client_locn_code,
              p.client_number AS pop_client_number, p.client_locn_code AS pop_client_locn_code,
-             fbdm.entry_userid, fbdm.entry_timestamp, fbdm.update_userid, fbdm.update_timestamp
+             fbdm.entry_userid, fbdm.entry_timestamp, fbdm.update_userid, fbdm.update_timestamp,
+             fbdm.population_number AS opu, fbdm.sampling_year AS osy, fbdm.timber_mark AS otm
         FROM final_billable_dropout_mark fbdm, mark_billed_cli mbc, population p
        WHERE mbc.timber_mark = fbdm.timber_mark
          AND p.population_number(+) = fbdm.population_number
@@ -710,7 +744,7 @@ public class BillingCatalog implements QueryCatalog {
         .sql("SELECT mhp.mhprof_id, mhp.client_number, mhp.client_locn_code, mhp.hbs_return_type_code,"
             + " mhp.hbs_frequency_type_code, ftc.description AS frequency_description,"
             + " mhp.forced_summarization_date, mhp.effective_date, mhp.expiry_date,"
-            + " mhp.entry_userid, mhp.entry_timestamp, :forceDate AS force_date,"
+            + " mhp.entry_userid, mhp.entry_timestamp, mhp.update_timestamp, :forceDate AS force_date,"
             + " CASE WHEN mhp.mhprof_id IN (1, 2) THEN 'Y' ELSE 'N' END AS default_profile"
             + " FROM hbs_mark_holder_profile mhp, hbs_frequency_type_code ftc"
             + " WHERE mhp.hbs_frequency_type_code = ftc.hbs_frequency_type_code(+)"
@@ -727,75 +761,16 @@ public class BillingCatalog implements QueryCatalog {
         .build();
   }
 
+  /**
+   * No registry commands: the force-date, final-bill and non-renewable-tenure
+   * writes are workflows with the legacy validations, in package
+   * {@code ca.bc.gov.nrs.hbs.api.billing} ({@code billing.markHolderProfile.forceSummarizationDate},
+   * {@code billing.forceSummarization.force}, {@code billing.populationProfile.forceRatioComputationDate},
+   * {@code billing.finalBill.generateHold / generateRelease},
+   * {@code billing.finalBillTenure.create / update / remove}).
+   */
   @Override
   public List<CommandDefinition> commands() {
-    return List.of(
-        // P812 / P814 "Yes": set FORCED_SUMMARIZATION_DATE on one profile.
-        // HBS_STORE_HBS_MARK_PROFILE rewrites every column, so the row's current
-        // values are posted back unchanged except the forced date and audit columns.
-        CommandDefinition.builder("billing.markHolderProfile.forceSummarizationDate")
-            .legacy("P811/P812, P813/P814")
-            .capability(Capability.BILLING_FORCE)
-            .procedure("HBS_STORE_HBS_MARK_PROFILE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM hbs_mark_holder_profile WHERE mhprof_id = :mhprofId")
-            .requiredBody("mhprofId", Type.NUMBER)
-            .text("clientNumber")
-            .text("clientLocnCode")
-            .requiredBody("hbsReturnTypeCode", Type.UPPER)
-            .requiredBody("hbsFrequencyTypeCode", Type.UPPER)
-            .requiredBody("forcedSummarizationDate", Type.DATE)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-
-        // P824 "Yes": set NEXT_RATIO_STMT_DATE on one population profile.
-        CommandDefinition.builder("billing.populationProfile.forceRatioComputationDate")
-            .legacy("P823/P824")
-            .capability(Capability.BILLING_FORCE)
-            .procedure("HBS_STORE_POPULATION_PROFILE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM population_profile WHERE popprof_id = :popprofId")
-            .requiredBody("popprofId", Type.NUMBER)
-            .requiredBody("populationNumber", Type.STRING)
-            .requiredBody("samplingYear", Type.NUMBER)
-            .requiredBody("hbsFrequencyTypeCode", Type.UPPER)
-            .requiredBody("nextRatioStmtDate", Type.DATE)
-            .requiredBody("lastRatioStmtDate", Type.DATE)
-            .date("startRatioStmtDate")
-            .requiredBody("effectiveDate", Type.DATE)
-            .date("expiryDate")
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-
-        // P835 Save: elect a non-renewable mark for final billing.
-        CommandDefinition.builder("billing.finalBillTenure.create")
-            .legacy("P835")
-            .capability(Capability.FINAL_BILL_ADMIN)
-            .procedure("HBS_CREATE_FINAL_BILL_MARK")
-            .requiredBody("populationNumber", Type.UPPER)
-            .requiredBody("samplingYear", Type.NUMBER)
-            .requiredBody("timberMark", Type.UPPER)
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .build(),
-
-        // P836 Delete.
-        CommandDefinition.builder("billing.finalBillTenure.remove")
-            .legacy("P836")
-            .capability(Capability.FINAL_BILL_ADMIN)
-            .procedure("HBS_REMOVE_FINAL_BILL_MARK")
-            .requiredBody("populationNumber", Type.UPPER)
-            .requiredBody("samplingYear", Type.NUMBER)
-            .requiredBody("timberMark", Type.UPPER)
-            .build()
-    );
+    return List.of();
   }
 }

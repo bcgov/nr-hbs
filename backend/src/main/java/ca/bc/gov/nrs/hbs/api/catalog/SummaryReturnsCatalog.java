@@ -23,13 +23,10 @@ import java.util.List;
  * {@code HBS_WEIGHT_SCALE_PAYBYCOPYTO}. The seven-year limit ({@code strWhereLimitYear},
  * {@code DacValidator.compareForYearLimit}) is reproduced as {@code within_limit}.
  *
- * <p>Writes: none. Every legacy summary-return write (add, update, segregations,
- * notations, daily loads, hold/release/discard/cancel/replace, rate corrections,
- * re-queue) runs through {@code SummaryScaleReturnManagerBean} /
- * {@code SummaryWorkflowManagerBean} Java logic (versioning, edits, pricing), not a
- * single table-API proc call, so it is NOT exposed as a registry command. See
- * docs/areas/summary-returns.md, "Legacy logic not yet ported", for the reserved
- * command ids the screens already point at.
+ * <p>Writes: none here. Every summary-return write (add, update, segregations,
+ * notations, daily loads, hold/release/discard/cancel/replace, rate corrections) is a
+ * WorkflowCommand in {@code ca.bc.gov.nrs.hbs.api.summaryreturns} (ported
+ * {@code SummaryScaleReturnManagerBean} / {@code SummaryWorkflowManagerBean} logic).
  */
 @Component
 public class SummaryReturnsCatalog implements QueryCatalog {
@@ -85,7 +82,8 @@ public class SummaryReturnsCatalog implements QueryCatalog {
                    CAST(NULL AS NUMBER) AS net_weight, CAST(NULL AS VARCHAR2(10)) AS load_arrival_number,
                    CAST(NULL AS VARCHAR2(10)) AS weigh_slip_number, CAST(NULL AS NUMBER) AS sample_volume,
                    CAST(NULL AS VARCHAR2(1)) AS check_scale_ind,
-                   pss.update_userid, pss.update_timestamp""" : "");
+                   pss.update_userid, pss.update_timestamp,
+                   hsr.volest_batch_id AS batch_slip_id""" : "");
 
     String weight = """
         SELECT 'W', wss.document_control_number, wss.version,
@@ -119,7 +117,8 @@ public class SummaryReturnsCatalog implements QueryCatalog {
                    (SELECT SUM(d.weight) FROM weight_scl_daily_load_summary d
                      WHERE d.document_control_number = wss.document_control_number AND d.version = wss.version),
                    NULL, NULL, NULL, NULL, NULL,
-                   wss.update_userid, wss.update_timestamp""" : "");
+                   wss.update_userid, wss.update_timestamp,
+                   hsr.volest_batch_id""" : "");
 
     String sample = """
         SELECT 'S', sss.document_control_number, sss.version,
@@ -150,7 +149,8 @@ public class SummaryReturnsCatalog implements QueryCatalog {
                    (SELECT SUM(sg.volume) FROM sample_segregation sg
                      WHERE sg.document_control_number = sss.document_control_number AND sg.version = sss.version),
                    sss.check_scale_ind,
-                   sss.update_userid, sss.update_timestamp""" : "");
+                   sss.update_userid, sss.update_timestamp,
+                   hsr.volest_batch_id""" : "");
 
     return piece + "\n        UNION ALL\n" + weight + "\n        UNION ALL\n" + sample;
   }
@@ -239,7 +239,9 @@ public class SummaryReturnsCatalog implements QueryCatalog {
   private static QueryDefinition.Builder searchFilters(QueryDefinition.Builder b) {
     return b
         .filter(QueryFilter.of("documentControlNumber", "AND x.document_control_number = :documentControlNumber", Type.NUMBER))
-        .filter(QueryFilter.upper("status", "AND x.status = :status"))
+        // OVRRULE: P202 candidate-returns link (HBS2R051 strAndVersionStatusCodeOvr).
+        .filter(QueryFilter.upper("status", "AND (x.status = :status OR (:status = 'OVRRULE'"
+            + " AND x.status NOT IN ('LCK', 'ISS', 'CAN', 'DEL') AND x.category <> 'WA'))"))
         .filter(QueryFilter.upper("generated", "AND x.generated = :generated"))
         .filter(QueryFilter.upper("category", "AND x.category = :category"))
         .filter(QueryFilter.upper("pssmryType", "AND x.pssmry_type = :pssmryType"))
@@ -487,13 +489,13 @@ public class SummaryReturnsCatalog implements QueryCatalog {
             .capability(Capability.SCALE_RETURNS_VIEW)
             .sql("""
                 SELECT x.* FROM (
-                  SELECT document_control_number, version, notation_number, notation_type_code, text
+                  SELECT ntn_id, document_control_number, version, notation_number, notation_type_code, text
                     FROM piece_scl_notation
                   UNION ALL
-                  SELECT document_control_number, version, notation_number, notation_type_code, text
+                  SELECT ntn_id, document_control_number, version, notation_number, notation_type_code, text
                     FROM weight_scale_notation
                   UNION ALL
-                  SELECT document_control_number, version, notation_number, notation_type_code, text
+                  SELECT ntn_id, document_control_number, version, notation_number, notation_type_code, text
                     FROM sample_scl_notation
                 ) x WHERE 1=1""")
             .filter(QueryFilter.required("documentControlNumber", "AND x.document_control_number = :documentControlNumber", Type.NUMBER))
@@ -501,6 +503,36 @@ public class SummaryReturnsCatalog implements QueryCatalog {
             .orderBy("x.notation_number")
             .clientScope(childFence())
             .maxRows(500)
+            .build(),
+
+        // ── Editable segregation rows (P057 piece / P157 sample): the stored row, ids included ──
+        QueryDefinition.builder("summaryReturns.segregationRows")
+            .legacy("P057/P157")
+            .capability(Capability.SCALE_RETURNS_VIEW)
+            .sql("""
+                SELECT x.* FROM (
+                  SELECT seg.segregation_id, seg.document_control_number, seg.version,
+                         NVL(seg.scale_species_code, seg.input_species) AS species,
+                         NVL(seg.scale_product_code, seg.input_product) AS product,
+                         NVL(seg.scale_grade_code, seg.input_grade) AS grade,
+                         NVL(seg.other_description_type_code, seg.input_other_desc) AS other_description,
+                         seg.number_of_pieces AS pieces, seg.volume, seg.sb4_ind AS sb4, seg.nmv_ind AS nmv,
+                         seg.avoidable_ind AS avoidable,
+                         NVL(seg.timber_mark, seg.input_bcomb_timber_mark) AS bcomb_mark
+                    FROM piece_scl_segregation seg
+                  UNION ALL
+                  SELECT seg.segregation_id, seg.document_control_number, seg.version,
+                         NVL(seg.scale_species_code, seg.input_species),
+                         NVL(seg.scale_product_code, seg.input_product),
+                         NVL(seg.scale_grade_code, seg.input_grade),
+                         NULL, seg.number_of_pieces, seg.volume, NULL, NULL, NULL, NULL
+                    FROM sample_segregation seg
+                ) x WHERE 1=1""")
+            .filter(QueryFilter.required("documentControlNumber", "AND x.document_control_number = :documentControlNumber", Type.NUMBER))
+            .filter(QueryFilter.required("version", "AND x.version = :version", Type.NUMBER))
+            .orderBy("x.segregation_id")
+            .clientScope(childFence())
+            .maxRows(2000)
             .build(),
 
         // ── Weight daily load summaries (P107, DailyLoadSummariesTag) ───────
@@ -557,9 +589,8 @@ public class SummaryReturnsCatalog implements QueryCatalog {
 
   /**
    * Intentionally empty: no summary-return write is a single table-API proc call
-   * (see class comment). The reserved ids used by the screens
-   * ({@code summaryReturns.addPiece}, {@code .hold}, {@code .release}, …) are to be
-   * served by a dedicated SummaryReturnWorkflowService.
+   * (see class comment). The {@code summaryReturns.*} commands are WorkflowCommand
+   * beans in {@code ca.bc.gov.nrs.hbs.api.summaryreturns}.
    */
   @Override
   public List<CommandDefinition> commands() {

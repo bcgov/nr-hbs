@@ -60,6 +60,18 @@ Industry users may run the return, invoice-copy and billing-history reports
 (scoped to their client by the procs); every other report is ministry-only —
 the legacy audience rules (`HbsReportController.INDUSTRY_REPORTS`).
 
+Before a report runs, every `ReportRequestGuard` bean may check or rewrite its
+prompts (legacy per-screen report actions):
+
+| Guard | Reports | Rule |
+|---|---|---|
+| `queries.QueriesReportGuard` | `HBS4R452/462/472/477`, `HBS3R451/461/471/476` | `P450Action`: document number dropped; industry forced to their client (`RB_CLIENT_ASSOCIATION=BOTH`) and refused when another individual client is a party (BT17247 FOI gate) |
+| `queries.QueriesReportGuard` | `HBS2R411/412` | `P403Action`: Estimated Average Rates > 0, ≤ 2 decimals |
+| `submissions.SubmissionReportGuard` | `HBS2R032/033` | industry only for their own transmission / batch |
+
+After a report is produced, `ReportLogWriter` writes the legacy HBS_REPORT_LOG
+row (`PresentationHelper.logReport`), best effort.
+
 In the SPA, reports are run from **Reports** (any report, humanized prompt
 names) or from screen buttons that pre-map criteria to prompts
 (`ReportLinkDef`), replacing the legacy per-screen "View PDF"/"Send" buttons

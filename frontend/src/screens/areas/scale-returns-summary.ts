@@ -2,20 +2,16 @@ import type { ActionDef, ColumnDef, FieldDef, Option, ReportLinkDef, ScreenDef }
 
 /**
  * Scale Returns - Summary (legacy /dac/summary/*). Backend:
- * backend/.../catalog/SummaryReturnsCatalog.java (ids `summaryReturns.*`).
+ * backend/.../catalog/SummaryReturnsCatalog.java (queries, ids `summaryReturns.*`)
+ * and backend/.../summaryreturns/ (the ported workflow commands).
  * Mapping of every legacy screen: docs/areas/summary-returns.md.
  *
- * Writes: the legacy add / update / workflow actions are Java business logic
- * (SummaryScaleReturnManagerBean / SummaryWorkflowManagerBean), not single
- * table-API proc calls, so the commands referenced below are RESERVED ids for
- * the summary-return workflow service still to be ported. Until it lands the
- * buttons report "unknown command" instead of writing anything.
+ * The view page's buttons are the legacy P052/P102/P152 buttons; which ones a
+ * user sees for a return comes from `summaryReturns.preview` (the ported
+ * SummaryReturnFieldsTag rules), and each confirmation shows the legacy P054
+ * transaction preview. Every write sends back the version's `updateTimestamp`
+ * (optimistic lock).
  */
-
-const PENDING_NOTE =
-  'Saving and workflow actions for summary returns are being ported from the legacy Java ' +
-  '(validation, versioning, pricing). Until then this screen is read-only in effect: ' +
-  'submitting will report that the action is not yet available.';
 
 const SCALE_TYPES: Option[] = [
   { value: 'P', label: 'Piece Scale' },
@@ -118,6 +114,8 @@ const SEARCH_CRITERIA: FieldDef[] = [
   { name: 'returnNumber', label: 'Return Number', maxLength: 4, group: 'Location or Scaling Criteria' },
   { name: 'fieldScaleDeckId', label: 'Field Deck Id', upper: true, maxLength: 1, group: 'Location or Scaling Criteria' },
   { name: 'invoiceNumber', label: 'Statement No', upper: true, maxLength: 7, group: 'Location or Scaling Criteria' },
+  // P202 confirmed-returns link (legacy hidden overrideRatingRuleId).
+  { name: 'overrideRatingRuleId', label: 'Override Rule No', type: 'number', group: 'Location or Scaling Criteria' },
   { name: 'population', label: 'Population', upper: true, maxLength: 4, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
   { name: 'stratum', label: 'Stratum', upper: true, maxLength: 2, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
   { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
@@ -127,6 +125,11 @@ const SEARCH_CRITERIA: FieldDef[] = [
   { name: 'billToClient', label: 'Bill To', type: 'client', group: 'Client Association - Client No' },
   { name: 'copyToClient', label: 'Copy To', type: 'client', group: 'Client Association - Client No' },
 ];
+
+/** Bespoke editor of a return's segregations / notations / daily loads (pages/SummaryReturnGridPage). */
+export const SUMMARY_GRID_PATH = '/scale-returns/summary-return-children';
+
+const KEYS = { documentControlNumber: 'documentControlNumber', version: 'version' };
 
 const action = (
   id: string,
@@ -139,27 +142,33 @@ const action = (
   label,
   command: `summaryReturns.${id}`,
   capability,
-  params: { documentControlNumber: 'documentControlNumber', version: 'version', returnType: 'returnType' },
+  params: { ...KEYS, returnType: 'returnType', updateTimestamp: 'updateTimestamp' },
   confirm,
+  // P054/P104/P154 confirmation: the transactions the action will produce.
+  preview: { command: 'summaryReturns.preview', params: KEYS },
+  // Land on the version that is active afterwards (hold / replace create a new one).
+  then: { screen: 'summary-return', params: KEYS },
   ...extra,
 });
 
-/** P052/P102/P152 buttons (SummaryReturnFieldsTag); state rules are enforced by the pending service. */
+/**
+ * P052/P102/P152 buttons (SummaryReturnFieldsTag; P053 Release / Discard). Shown
+ * per record from `summaryReturns.preview` → availableActions. Re-queue Txn is not
+ * carried over: its button and action were commented out in the legacy JSPs and
+ * P100/P150Action.
+ */
 const DETAIL_ACTIONS: ActionDef[] = [
-  action('release', 'Release', 'SUMMARY_RETURN_EDIT', 'Release this summary return for billing?'),
-  action('hold', 'Hold', 'SUMMARY_RETURN_EDIT', 'Hold this summary return? A new held version is created.'),
+  action('release', 'Release', 'SUMMARY_RETURN_EDIT', 'Confirm Release'),
+  action('hold', 'Hold', 'SUMMARY_RETURN_EDIT', 'Confirm Hold'),
   action('discard', 'Discard', 'SUMMARY_RETURN_EDIT', 'Confirm Discard', { danger: true }),
-  action('cancel', 'Cancel', 'SUMMARY_RETURN_EDIT', 'Confirm Cancel', { danger: true }),
-  action('cancelReplaceWithChanges', 'Cancel & Replace With Changes', 'SUMMARY_RETURN_EDIT', 'Confirm Cancel & Replace With Changes'),
-  action('cancelReplaceWithoutChanges', 'Cancel & Replace Without Changes', 'SUMMARY_RETURN_EDIT', 'Confirm Cancel & Replace Without Changes'),
-  action('replaceWithChanges', 'Replace With Changes', 'SUMMARY_RETURN_EDIT', 'Confirm Replace With Changes'),
-  action('replaceWithoutChanges', 'Replace Without Changes', 'SUMMARY_RETURN_EDIT', 'Confirm Replace Without Changes'),
+  action('cancel', 'Cancel', 'SUMMARY_RETURN_CORRECT', 'Confirm Cancel', { danger: true }),
+  action('cancelReplaceWithChanges', 'Cancel & Replace With Changes', 'SUMMARY_RETURN_CORRECT', 'Confirm Cancel & Replace With Changes'),
+  action('cancelReplaceWithoutChanges', 'Cancel & Replace Without Changes', 'SUMMARY_RETURN_CORRECT', 'Confirm Cancel & Replace Without Changes'),
+  action('replaceWithChanges', 'Replace With Changes', 'SUMMARY_RETURN_CORRECT', 'Confirm Replace With Changes'),
+  action('replaceWithoutChanges', 'Replace Without Changes', 'SUMMARY_RETURN_CORRECT', 'Confirm Replace Without Changes'),
   action('requestRateCorrection', 'Request Rate Correction', 'SUMMARY_RETURN_ADMIN', 'Confirm Request Rate Correction'),
-  action('approveRateCorrection', 'Approve Rate Correction', 'DETAIL_RETURN_APPROVE', 'Confirm Approve Rate Correction'),
-  action('rejectRateCorrection', 'Reject Rate Correction', 'DETAIL_RETURN_APPROVE', 'Confirm Reject Rate Correction', { danger: true }),
-  action('requeueTxn', 'Re-queue Txn', 'SUMMARY_RETURN_EDIT', 'Re-queue the failed transaction (Sample Scale, Failed Reconciliation only).', {
-    fields: [{ name: 'trxId', label: 'Transaction Id', type: 'number', required: true }],
-  }),
+  action('approveRateCorrection', 'Approve Rate Correction', 'SUMMARY_RATE_CORRECTION_APPROVE', 'Confirm Approve Rate Correction'),
+  action('rejectRateCorrection', 'Reject Rate Correction', 'SUMMARY_RATE_CORRECTION_APPROVE', 'Confirm Reject Rate Correction', { danger: true }),
 ];
 
 /** Fields shared by the add/update forms; names equal the summaryReturns.detail aliases. */
@@ -199,6 +208,7 @@ const weightFields = (): FieldDef[] => [
   { name: 'scaleDate', label: 'Scale Date', type: 'date', required: true },
   { name: 'copyToClientNumber', label: 'Copy To', type: 'client' },
   { name: 'copyToClientLocn', label: 'Copy To Location', maxLength: 2 },
+  { name: 'fieldScaleDeckId', label: 'Field Deck Id', upper: true, maxLength: 1 },
 ];
 
 const sampleFields = (): FieldDef[] => [
@@ -335,18 +345,29 @@ export const screens: ScreenDef[] = [
     capability: 'SCALE_RETURNS_VIEW',
     query: 'summaryReturns.detail',
     keys: ['documentControlNumber', 'version'],
-    notes: PENDING_NOTE,
     editLink: {
       screen: 'summary-return-update',
       params: { documentControlNumber: 'documentControlNumber', version: 'version' },
       label: 'Update',
       capability: 'SUMMARY_RETURN_EDIT',
     },
+    actionsAvailable: {
+      command: 'summaryReturns.preview',
+      params: KEYS,
+      key: 'availableActions',
+      editAction: 'update',
+    },
+    // P057/P157 Segregations, P058/P109/P158 Notations, P110 Daily Load Summaries (edit grids).
+    extraLinks: [
+      { path: SUMMARY_GRID_PATH, params: { ...KEYS, grid: '=segregations' }, label: 'Edit Segregations', capability: 'SUMMARY_RETURN_EDIT', requiresAction: 'update' },
+      { path: SUMMARY_GRID_PATH, params: { ...KEYS, grid: '=notations' }, label: 'Edit Notations', capability: 'SUMMARY_RETURN_EDIT', requiresAction: 'update' },
+      { path: SUMMARY_GRID_PATH, params: { ...KEYS, grid: '=dailyLoads' }, label: 'Edit Daily Loads', capability: 'SUMMARY_RETURN_EDIT', requiresAction: 'update' },
+    ],
     actions: DETAIL_ACTIONS,
     reports: [
-      { reportId: 'HBS2R052', label: 'Print (Piece)', params: { PSRETURN_DOCUMENTNUMBER: 'documentControlNumber', PSRETURN_VERSIONNUMBER: 'version' } },
-      { reportId: 'HBS2R102', label: 'Print (Weight)', params: { WSRETURN_DOCUMENTNUMBER: 'documentControlNumber', WSRETURN_VERSIONNUMBER: 'version' } },
-      { reportId: 'HBS2R152', label: 'Print (Sample)', params: { SSRETURN_DOCUMENTNUMBER: 'documentControlNumber', SSRETURN_VERSIONNUMBER: 'version' } },
+      { reportId: 'HBS2R052', label: 'Print (Piece)', fileName: 'Piece Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { PSRETURN_DOCUMENTNUMBER: 'documentControlNumber', PSRETURN_VERSIONNUMBER: 'version' } },
+      { reportId: 'HBS2R102', label: 'Print (Weight)', fileName: 'Weight Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { WSRETURN_DOCUMENTNUMBER: 'documentControlNumber', WSRETURN_VERSIONNUMBER: 'version' } },
+      { reportId: 'HBS2R152', label: 'Print (Sample)', fileName: 'Sample Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { SSRETURN_DOCUMENTNUMBER: 'documentControlNumber', SSRETURN_VERSIONNUMBER: 'version' } },
     ],
     sections: [
       {
@@ -549,7 +570,6 @@ export const screens: ScreenDef[] = [
     fields: grouped('Piece Scale Summary Return', pieceFields()),
     submitLabel: 'Add',
     then: TO_DETAIL,
-    notes: PENDING_NOTE,
   },
   // ── P100 add weight ─────────────────────────────────────────────────
   {
@@ -560,12 +580,11 @@ export const screens: ScreenDef[] = [
     title: 'Weight Scale Summary Return',
     navLabel: 'Add Summary Return: Weight',
     nav: true,
-    capability: 'SUMMARY_RETURN_EDIT',
+    capability: 'SUMMARY_RETURN_CONTROL',
     command: 'summaryReturns.addWeight',
     fields: grouped('Weight Scale Summary Return', weightFields()),
     submitLabel: 'Add',
     then: TO_DETAIL,
-    notes: PENDING_NOTE,
   },
   // ── P150 add sample ─────────────────────────────────────────────────
   {
@@ -576,12 +595,11 @@ export const screens: ScreenDef[] = [
     title: 'Add A Sample Scale Submitted Summary Return',
     navLabel: 'Add Summary Return: Sample',
     nav: true,
-    capability: 'SUMMARY_RETURN_EDIT',
+    capability: 'SUMMARY_RETURN_CONTROL',
     command: 'summaryReturns.addSample',
     fields: grouped('Sample Scale Summary Return', sampleFields()),
     submitLabel: 'Add',
     then: TO_DETAIL,
-    notes: PENDING_NOTE,
   },
   // ── P053 / P103 / P153 update (one form; fill the section for the return's scale type) ──
   {
@@ -600,22 +618,46 @@ export const screens: ScreenDef[] = [
       { name: 'documentControlNumber', label: 'SDN', readOnlyOnEdit: true, group: 'Scale Return' },
       { name: 'version', label: 'Version No', readOnlyOnEdit: true, group: 'Scale Return' },
       { name: 'returnType', label: 'Scale Type', readOnlyOnEdit: true, group: 'Scale Return' },
-      ...grouped('Piece Scale (P053)', pieceFields().map((f) => ({ ...f, required: false }))),
+      { name: 'returnStateCode', label: 'State', readOnlyOnEdit: true, group: 'Scale Return' },
+      { name: 'status', label: 'Status', readOnlyOnEdit: true, group: 'Scale Return' },
+      // Optimistic lock: the version's UPDATE_TIMESTAMP as loaded is sent back with the save.
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Scale Return' },
+      ...grouped('Scale Return', [
+        { name: 'category', label: 'Return Category', codeList: 'codes.summaryReturns.categories', required: true },
+        { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6 },
+        { name: 'scaleSite', label: 'Scale Site', upper: true, maxLength: 4 },
+        { name: 'scalerLicence', label: 'Scaler Licence', upper: true, maxLength: 4, helperText: 'Piece and sample returns' },
+        { name: 'scaleDate', label: 'Scale Date', type: 'date', required: true },
+        { name: 'billToClientNumber', label: 'Bill To', type: 'client', helperText: 'Piece and weight returns' },
+        { name: 'billToClientLocn', label: 'Bill To Location', maxLength: 2 },
+        { name: 'copyToClientNumber', label: 'Copy To', type: 'client' },
+        { name: 'copyToClientLocn', label: 'Copy To Location', maxLength: 2 },
+        { name: 'fieldScaleDeckId', label: 'Field Deck Id', upper: true, maxLength: 1 },
+      ]),
       ...grouped(
-        'Weight Scale (P103)',
-        weightFields()
-          .filter((f) => ['populationNumber', 'stratumNumber', 'samplingYear'].includes(f.name))
+        'Piece Scale (P053)',
+        pieceFields()
+          .filter((f) => !['category', 'timberMark', 'scaleSite', 'scalerLicence', 'scaleDate', 'billToClientNumber',
+            'billToClientLocn', 'copyToClientNumber', 'copyToClientLocn', 'fieldScaleDeckId'].includes(f.name))
           .map((f) => ({ ...f, required: false })),
       ),
       ...grouped(
-        'Sample Scale (P153)',
+        'Weight / Sample Scale (P103 / P153)',
         sampleFields()
-          .filter((f) => ['loadArrivalNumber', 'netWeight', 'weighSlipNumber'].includes(f.name))
+          .filter((f) => ['populationNumber', 'stratumNumber', 'samplingYear', 'loadArrivalNumber', 'netWeight',
+            'weighSlipNumber'].includes(f.name))
           .map((f) => ({ ...f, required: false })),
       ),
+      {
+        name: 'confirmCustodyTransfer',
+        label: 'Confirm Custody Transfer',
+        type: 'select',
+        options: YES_NO_ALL,
+        helperText: 'P054A: answer Yes when the save moves a held return to a scale site / licence you are not authorized for',
+        group: 'Confirmation',
+      },
     ],
     submitLabel: 'Save',
     then: TO_DETAIL,
-    notes: PENDING_NOTE,
   },
 ];

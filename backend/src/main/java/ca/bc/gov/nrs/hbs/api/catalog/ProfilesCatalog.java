@@ -190,7 +190,8 @@ public class ProfilesCatalog implements QueryCatalog {
                  tps.effective_date AS effective_date,
                  tps.expiry_date AS expiry_date,
                  tps.entry_userid AS entry_userid,
-                 tps.entry_timestamp AS entry_timestamp
+                 tps.entry_timestamp AS entry_timestamp,
+                 tps.update_timestamp AS update_timestamp
             FROM trading_partner_submitter tps
            WHERE 1=1""")
       .filter(QueryFilter.required("profileKey",
@@ -256,7 +257,8 @@ public class ProfilesCatalog implements QueryCatalog {
                  pop.client_number AS client_number,
                  pop.client_locn_code AS client_locn_code,
                  pp.entry_userid AS entry_userid,
-                 pp.update_userid AS update_userid
+                 pp.update_userid AS update_userid,
+                 pp.update_timestamp AS update_timestamp
             FROM population_profile pp
             LEFT JOIN population pop ON pop.population_number = pp.population_number
                                     AND pop.sampling_year = pp.sampling_year
@@ -339,6 +341,10 @@ public class ProfilesCatalog implements QueryCatalog {
           WHERE x.last_active > (SYSDATE - 365)""")
       .filter(QueryFilter.required("expiryDate", "AND TRUNC(x.expiry_date) <= :expiryDate", Type.DATE))
       .filter(QueryFilter.number("orgUnitNo", "AND :orgUnitNo IN (x.scalers_ou, x.dst_no, x.rgn_no)"))
+      // P364 "In my Org Unit" (P364Action.loadForm chkInMyOrgUnit): the caller's HBS_USER.ORG_UNIT_NO.
+      .filter(QueryFilter.upper("inMyOrgUnit", """
+          AND (:inMyOrgUnit <> 'Y' OR (SELECT hu.org_unit_no FROM hbs_user hu WHERE hu.user_id = :hbsUserId)
+                                     IN (x.scalers_ou, x.dst_no, x.rgn_no))"""))
       .sort("licenceNumber", "x.licence_number")
       .sort("lastActive", "x.last_active")
       .sort("expiryDate", "x.expiry_date")
@@ -405,54 +411,15 @@ public class ProfilesCatalog implements QueryCatalog {
         SCALER_SEARCH, SCALER_EXPIRING, SCALER_DETAIL, SCALER_KEY_HISTORY);
   }
 
+  /**
+   * The P322/P323 scale site profile writes and the P332/P333 population
+   * profile writes run the legacy Java rules first, so they are
+   * {@code WorkflowCommand} beans in {@code ca.bc.gov.nrs.hbs.api.profiles}
+   * (same command ids): ScaleSiteProfileCreate / ScaleSiteProfileUpdate,
+   * PopulationProfileCreate / PopulationProfileUpdate / PopulationProfileDelete.
+   */
   @Override
   public List<CommandDefinition> commands() {
-    return List.of(
-        // P323 — ClientProfileManagerBean.createAndStoreTradingPartnerSubmitter
-        CommandDefinition.builder("profiles.scaleSites.create")
-            .legacy("P323")
-            .capability(Capability.SCALE_SITE_ADMIN)
-            .procedure("HBS_CREATE_TRA_PART_SUBMITTER")
-            .sequence("TRADING_PARTNER_SUBMITTER_SEQ")       // i_tps_id
-            .constant("TPSS")                                 // i_tpsubmtr_type
-            .text("clientNumber")                             // i_client_number (blank for Detail)
-            .text("clientLocnCode")                           // i_client_locn_code
-            .requiredBody("scaleSiteId", Type.UPPER)          // i_scale_site_id_nmbr
-            .requiredBody("returnType", Type.UPPER)           // i_hbs_return_type_code
-            .auditUser()                                      // i_entry_userid
-            .now()                                            // i_entry_timestamp
-            .auditUser()                                      // i_update_userid
-            .now()                                            // i_update_timestamp
-            .requiredBody("effectiveDate", Type.DATE)         // i_effective_date
-            .requiredBody("expiryDate", Type.DATE)            // i_expiry_date
-            .requiredBody("docType", Type.UPPER)              // i_tp_doc_type
-            .build(),
-        // P322 — ClientProfileManagerBean.updateTradingPartnerSubmitter (only expiry is editable)
-        CommandDefinition.builder("profiles.scaleSites.update")
-            .legacy("P322")
-            .capability(Capability.SCALE_SITE_ADMIN)
-            .procedure("HBS_STORE_TRA_PART_SUBMITTER")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM trading_partner_submitter WHERE tps_id = :tpsId")
-            .requiredBody("tpsId", Type.NUMBER)
-            .requiredBody("submitterType", Type.UPPER)
-            .text("clientNumber")
-            .text("clientLocnCode")
-            .requiredBody("scaleSiteId", Type.UPPER)
-            .requiredBody("returnType", Type.UPPER)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .requiredBody("docType", Type.UPPER)
-            .build(),
-        // P332 Delete — ClientProfileManagerBean.removePopulationProfile
-        CommandDefinition.builder("profiles.population.delete")
-            .legacy("P332")
-            .capability(Capability.SAMPLING_ADMIN)
-            .procedure("HBS_REMOVE_POPULATION_PROFILE")
-            .requiredBody("popprofId", Type.NUMBER)
-            .build());
+    return List.of();
   }
 }

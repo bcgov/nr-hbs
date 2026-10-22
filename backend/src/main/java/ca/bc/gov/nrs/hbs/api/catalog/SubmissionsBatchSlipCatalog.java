@@ -46,7 +46,11 @@ public class SubmissionsBatchSlipCatalog implements QueryCatalog {
              pb.update_userid,
              pb.update_timestamp,
              (SELECT NULLIF(COUNT(*), 0) FROM hbs_scale_return sr
-               WHERE sr.volest_batch_id = pb.batch_id) AS documents_received
+               WHERE sr.volest_batch_id = pb.batch_id) AS documents_received,
+             -- state rule of BatchSlipCommands.Confirm (Pending, documents received), for the button
+             CASE WHEN pb.paper_batch_status_code = 'PND'
+                   AND EXISTS (SELECT 1 FROM hbs_scale_return sr2 WHERE sr2.volest_batch_id = pb.batch_id)
+                  THEN 'Y' ELSE 'N' END AS confirm_allowed
         FROM hbs_paper_batch pb
         LEFT JOIN paper_batch_status_code sc ON sc.paper_batch_status_code = pb.paper_batch_status_code
         LEFT JOIN org_unit ou ON ou.org_unit_no = pb.org_unit_no
@@ -97,68 +101,14 @@ public class SubmissionsBatchSlipCatalog implements QueryCatalog {
     );
   }
 
+  /**
+   * No registry commands: P280 / P283 are workflows with the legacy P280Form
+   * validations and P283 state rules ({@code submissions.BatchSlipCommands}:
+   * {@code batchSlip.create}, {@code batchSlip.update}, {@code batchSlip.cancel},
+   * {@code batchSlip.confirm}).
+   */
   @Override
   public List<CommandDefinition> commands() {
-    return List.of(
-        // P280 Save → createAndStorePaperBatch, status PND.
-        CommandDefinition.builder("batchSlip.create")
-            .legacy("P280")
-            .capability(Capability.BATCH_SLIP_EDIT)
-            .procedure("THE.HBS_CREATE_HBS_PAPER_BATCH")
-            .sequence("HBS_PAPER_BATCH_SEQ")              // i_batch_id
-            .constant("PND")                               // i_paper_batch_status_code
-            .requiredBody("scaleSiteNo", Type.UPPER)       // i_scale_site_id_nmbr
-            .constant("")                                  // i_dtl_doc_batch_id (null; set by B1012 matching)
-            .constant("")                                  // i_hbs_return_type_code (null)
-            .requiredBody("scaledFrom", Type.DATE)         // i_from_scale_date
-            .requiredBody("scaledTo", Type.DATE)           // i_to_scale_date
-            .requiredBody("documentCount", Type.NUMBER)    // i_document_count
-            .requiredBody("hdqSentDate", Type.DATE)        // i_hdq_sent_date
-            .requiredBody("senderUserid", Type.UPPER)      // i_sender_userid (DOMAIN\USERID)
-            .text("paperBatchComment")                     // i_paper_batch_comment
-            .requiredBody("orgUnitNo", Type.NUMBER)        // i_org_unit_no (region)
-            .auditUser()                                   // i_entry_userid
-            .now()                                         // i_entry_timestamp
-            .constant("")                                  // i_update_userid (null, as legacy)
-            .constant("")                                  // i_update_timestamp (null, as legacy)
-            .build(),
-        // P283 Save → updatePaperBatch (status unchanged).
-        store("batchSlip.update", null),
-        // P283 Cancel → status CLR.
-        store("batchSlip.cancel", "CLR"),
-        // P283 Confirm → status MAT (legacy also required docReceived == documentCount; see docs).
-        store("batchSlip.confirm", "MAT")
-    );
-  }
-
-  /** HBS_STORE_HBS_PAPER_BATCH overwrites every column, so every value is re-sent. */
-  private static CommandDefinition store(String id, String status) {
-    CommandDefinition.Builder b = CommandDefinition.builder(id)
-        .legacy("P283")
-        .capability(Capability.BATCH_SLIP_EDIT)
-        .procedure("THE.HBS_STORE_HBS_PAPER_BATCH")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM hbs_paper_batch WHERE batch_id = :batchId")
-        .requiredBody("batchId", Type.NUMBER);             // i_batch_id
-    if (status == null) {
-      b.requiredBody("statusCode", Type.UPPER);            // i_paper_batch_status_code
-    } else {
-      b.constant(status);
-    }
-    return b
-        .requiredBody("scaleSiteNo", Type.UPPER)           // i_scale_site_id_nmbr
-        .number("dtlDocBatchId")                           // i_dtl_doc_batch_id
-        .upper("returnType")                               // i_hbs_return_type_code
-        .requiredBody("scaledFrom", Type.DATE)             // i_from_scale_date
-        .requiredBody("scaledTo", Type.DATE)               // i_to_scale_date
-        .requiredBody("documentCount", Type.NUMBER)        // i_document_count
-        .requiredBody("hdqSentDate", Type.DATE)            // i_hdq_sent_date
-        .requiredBody("senderUserid", Type.UPPER)          // i_sender_userid
-        .text("paperBatchComment")                         // i_paper_batch_comment
-        .requiredBody("orgUnitNo", Type.NUMBER)            // i_org_unit_no
-        .existing("entryUserid")          // i_entry_userid (unchanged)
-        .existing("entryTimestamp")         // i_entry_timestamp (unchanged; day precision)
-        .auditUser()                                       // i_update_userid
-        .now()                                             // i_update_timestamp
-        .build();
+    return List.of();
   }
 }

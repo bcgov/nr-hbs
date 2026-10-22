@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One batch of every document type (schema V6_1b / mapping V3). Each hash placeholder is
+     replaced by the test with the SHA-256 hash total of its document. -->
+<HBS xmlns="gov.bc.ca/forests/hbs/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="gov.bc.ca/forests/hbs/v3 HBS_Schema_V6_1b.xsd">
+  <transmission>
+    <BatchCount>9</BatchCount>
+    <Type>P</Type>
+    <Creator>0012345600</Creator>
+    <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+  </transmission>
+  <WSB>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-01</FromScaleDate><ToScaleDate>2026-10-01</ToScaleDate><SubmitterBatchID>WSB1</SubmitterBatchID><DocumentCount>1</DocumentCount><BatchControlTotal>42000</BatchControlTotal></BatchHeader>
+    <WSBDocument DDN="WS00000000001" DV="1">
+      <EventType>PS</EventType>
+      <WSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-01</ScaleDate><ScaleTime>08:15:30</ScaleTime><WeighSlipNumber>1001</WeighSlipNumber>
+        <PrimaryScalerLicence>AB12</PrimaryScalerLicence><Comment>first load</Comment>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+        <EC_Signature><SigningScalerLicence>AB12</SigningScalerLicence><SigningDate>2026-10-01</SigningDate><SigningTime>08:20:00</SigningTime><EC_ENCR_SIG>0A0B0C</EC_ENCR_SIG><Method>RSA_15</Method><Identifier>01</Identifier></EC_Signature>
+      </WSCommon>
+      <WSWeights><Gross>42000</Gross><Tare>15000</Tare></WSWeights>
+      <WSSource><Source>TM123</Source><IncomingLDSNumber>LDS1</IncomingLDSNumber><TransportIdentifier>TRUCK7</TransportIdentifier><CutblockID>cb1</CutblockID></WSSource>
+      <FieldScaleFlag>N</FieldScaleFlag>
+      <PSY>P1-2026</PSY>
+      <SampleType>N</SampleType>
+    </WSBDocument>
+  </WSB>
+  <WSR>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-01</FromScaleDate><ToScaleDate>2026-10-01</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>30000</BatchControlTotal></BatchHeader>
+    <WSRDocument DDN="WS00000000002" DV="1">
+      <EventType>RT</EventType>
+      <WSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-01</ScaleDate><ScaleTime>09:00:00</ScaleTime><WeighSlipNumber>1002</WeighSlipNumber>
+        <PrimaryScalerLicence>AB12</PrimaryScalerLicence>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </WSCommon>
+      <WSWeights><Gross>30000</Gross><Tare>12000</Tare></WSWeights>
+      <WSSource><Source>TM123</Source><IncomingLDSNumber>LDS2</IncomingLDSNumber><TransportIdentifier>TRUCK7</TransportIdentifier><CutblockID>CB1</CutblockID></WSSource>
+      <FieldScaleFlag>N</FieldScaleFlag>
+      <PSY>P1-2026</PSY>
+    </WSRDocument>
+  </WSR>
+  <WSO>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-01</FromScaleDate><ToScaleDate>2026-10-01</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <WSODocument DDN="WS00000000003" DV="1">
+      <EventType>CU</EventType>
+      <WSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-01</ScaleDate><ScaleTime>10:00:00</ScaleTime><WeighSlipNumber>1003</WeighSlipNumber>
+        <PrimaryScalerLicence>AB12</PrimaryScalerLicence>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </WSCommon>
+    </WSODocument>
+  </WSO>
+  <PPS>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-02</FromScaleDate><ToScaleDate>2026-10-02</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>2</BatchControlTotal></BatchHeader>
+    <PPSDocument DDN="PS00000000001" DV="1">
+      <EventType>PS</EventType>
+      <PSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-02</ScaleDate><PrimaryScalerLicence>AB12</PrimaryScalerLicence><PrimaryScalerReturnNumber>17</PrimaryScalerReturnNumber>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </PSCommon>
+      <LoadArrivalNumber>LA1</LoadArrivalNumber><IncomingLDSNumber>LDS3</IncomingLDSNumber><TransportIdentifier>TRUCK8</TransportIdentifier>
+      <Source>TM123</Source><CutblockID>CB2</CutblockID><FieldScaleFlag>N</FieldScaleFlag>
+      <SplitLoad><ParcelID>1</ParcelID><ParcelCount>2</ParcelCount></SplitLoad>
+      <PSMeasure>
+        <Log><LogNumber>1</LogNumber><SP>FI</SP><GR>H</GR><LT>50</LT><TP>20</TP><BT>24</BT><NetVolume>767</NetVolume><DefectCount>0</DefectCount></Log>
+        <Log><LogNumber>2</LogNumber><SP>CE</SP><GR>J</GR><LT>50</LT><TP>20</TP><BT>24</BT><NetVolume>667</NetVolume><DefectCount>1</DefectCount>
+          <Defect><DefectNumber>1</DefectNumber><DefectCode>RT</DefectCode><DefectVolume>100</DefectVolume><DefectFmtDesc>BUTT ROT</DefectFmtDesc></Defect></Log>
+        <LogCount>2</LogCount>
+        <ScaleMethod>N</ScaleMethod>
+      </PSMeasure>
+    </PPSDocument>
+  </PPS>
+  <PSS>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-02</FromScaleDate><ToScaleDate>2026-10-02</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <PSSDocument DDN="SS00000000001" DV="1">
+      <EventType>SS</EventType>
+      <PSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-02</ScaleDate><PrimaryScalerLicence>AB12</PrimaryScalerLicence><PrimaryScalerReturnNumber>18</PrimaryScalerReturnNumber>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </PSCommon>
+      <Source>TM123</Source><PSY>P1-2026</PSY><WeighSlipNumber>0001001</WeighSlipNumber><SampleWeight>5000</SampleWeight>
+      <PSMeasure>
+        <Log><LogNumber>1</LogNumber><SP>FI</SP><GR>H</GR><LT>50</LT><TP>20</TP><BT>24</BT><NetVolume>767</NetVolume><DefectCount>0</DefectCount></Log>
+        <LogCount>1</LogCount>
+        <ScaleMethod>N</ScaleMethod>
+      </PSMeasure>
+    </PSSDocument>
+  </PSS>
+  <POT>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-02</FromScaleDate><ToScaleDate>2026-10-02</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <POTDocument DDN="PS00000000002" DV="1">
+      <EventType>4R</EventType>
+      <PSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-02</ScaleDate><PrimaryScalerLicence>AB12</PrimaryScalerLicence><PrimaryScalerReturnNumber>19</PrimaryScalerReturnNumber>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </PSCommon>
+      <LoadArrivalNumber>LA2</LoadArrivalNumber><IncomingLDSNumber>LDS4</IncomingLDSNumber><TransportIdentifier>TRUCK9</TransportIdentifier><Source>TM123</Source>
+    </POTDocument>
+  </POT>
+  <ARL>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-03</FromScaleDate><ToScaleDate>2026-10-03</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <ARLEntry>
+      <Arrival><ArrivalDate>20261003</ArrivalDate><LoadArrivalNumber>LA3</LoadArrivalNumber><IncomingLDSNumber>LDS5</IncomingLDSNumber><TransportIdentifier>TRUCK1</TransportIdentifier></Arrival>
+      <Source>tm123</Source>
+      <EventType>B4</EventType>
+      <ScaleSite>S123</ScaleSite>
+    </ARLEntry>
+  </ARL>
+  <DPL>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-03</FromScaleDate><ToScaleDate>2026-10-03</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <DPLEntry>
+      <DepartureDate>20261003</DepartureDate><OutgoingLDSNumber>OLDS1</OutgoingLDSNumber><Destination>S999</Destination><DepartureNumber>D1</DepartureNumber><OutgoingTransportIdentifier>TRUCK2</OutgoingTransportIdentifier>
+      <EventType>DP</EventType>
+      <ScaleSite>S123</ScaleSite>
+    </DPLEntry>
+  </DPL>
+  <SFP>
+    <BatchHeader><ScaleSite>S123</ScaleSite><FromScaleDate>2026-10-04</FromScaleDate><ToScaleDate>2026-10-04</ToScaleDate><DocumentCount>1</DocumentCount><BatchControlTotal>1</BatchControlTotal></BatchHeader>
+    <SFPDocument DDN="FS00000000001" DV="1">
+      <EventType>PS</EventType>
+      <PSCommon>
+        <ScaleSite>S123</ScaleSite><ScaleDate>2026-10-04</ScaleDate><PrimaryScalerLicence>AB12</PrimaryScalerLicence><PrimaryScalerReturnNumber>20</PrimaryScalerReturnNumber>
+        <Software><SoftwareProduct>SCALEPRO</SoftwareProduct><SoftwareVersion>6</SoftwareVersion><SoftwareRevision>1b</SoftwareRevision></Software>
+        <EC_Digest><Method>SHA256</Method><EC_HTX64>@HASH@</EC_HTX64></EC_Digest>
+      </PSCommon>
+      <LoadArrivalNumber>LA4</LoadArrivalNumber><IncomingLDSNumber>LDS6</IncomingLDSNumber><TransportIdentifier>TRUCK3</TransportIdentifier>
+      <Source>TM123</Source><CutblockID>CB3</CutblockID><FieldScaleFlag>N</FieldScaleFlag>
+      <SFPMeasure>
+        <ScaleMethod>K</ScaleMethod>
+        <DetailRecordCount>1</DetailRecordCount>
+        <Stack><PR>SS</PR><StackNumber>1</StackNumber><SP>CE</SP><LT>100</LT><WD>100</WD><HT>100</HT><CnvFactor>80</CnvFactor><SolidVol>800</SolidVol></Stack>
+      </SFPMeasure>
+    </SFPDocument>
+  </SFP>
+</HBS>

@@ -70,9 +70,9 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
 - **In this repo.**
   - ✅ Uploaded XML lands on a ReadWriteMany PVC (`SubmissionStorage`,
     `backend/openshift.deploy.yml`), with path-traversal-safe keys.
-  - ✅ The alert banner and processing parameters become DB settings
-    (`processing-parameters` screen). This needs the proposed table in
-    `docs/db/proposed-ddl.sql`.
+  - ✅ The alert banner and processing parameters move to the settings
+    ConfigMap, shown read-only on the `processing-parameters` screen
+    (`docs/coexistence.md`).
   - 🔴 Per-client FTP inbound/outbound, Microfiche, and print queues are open
     (items 5, 10, 11).
 
@@ -98,9 +98,16 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
   SHA-256 and RSA padding from `HBS_RSA_PADDING_SCHEME`.
 - **Consequence.** Turning off WebADE loses the place the key is stored. The
   crypto must be reproduced byte-for-byte or every scaler's registered key breaks.
-- **In this repo.** 🔴 Not ported, deliberately; key generation/display is not
-  exposed on the scaler-profile screens. Needs the key moved to an OpenShift
-  Secret/Vault, a rotation plan, and a security review.
+- **In this repo.** 🟡 Built (work package 2), waiting for the Secret
+  ([questions.md](questions.md) Q9). The key comes from an optional OpenShift
+  Secret, is bound in Java (`signature/DbmsCryptoCipher`: AES-128-CBC,
+  PKCS5, zero IV — the DBMS_CRYPTO semantics), never in SQL text, never
+  logged; the new key is shown once (P363). Scaler key requests
+  (`profiles.scalers.requestKey`) and the HBS public-key download are 503 until
+  the Secret exists. Signature *verification* stays in legacy B1021 (B1012
+  never verified). Still needed: a TEST round-trip check against Oracle, a
+  rotation plan (rotating means re-encrypting every `HBS_SCALER_AUTH_KEY` row
+  and changing WebLogic at the same time), and the security review.
 
 ## 7. Revenue / AR handoff is a database contract 🔴
 
@@ -163,7 +170,9 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
 - **Plan.** Optimistic locking (ETag/revision), a DB unique index on the
   active version, an explicit state machine, and an admin "correction console"
   with automatic audit. Together these remove roughly 80% of the data-fix workload.
-- **Status.** 🔴 Needs the logic port (item 1) and a DBA index change.
+- **Status.** 🟡 Row locks in the new app prevent new duplicates. The unique
+  index was withdrawn because it would break legacy batch;
+  `docs/db/active-version-duplicates.sql` detects duplicates instead.
 
 ## 13. Hard-coded limits and legacy defects that must not be ported ✅
 
@@ -194,8 +203,8 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
   org picker is reused. The data-domain
   maintenance screen is kept (`user-data-domains`). 🔴 FAM must create the 28
   roles. **Public anonymous access** (invoice/statement copies, timber mark,
-  stumpage rates, sampling plans) has no equivalent in the FSP model; see
-  `docs/questions.md`.
+  stumpage rates, sampling plans): ✅ decided (Q1, 2026-10-21) and built as a
+  separate public read-only area. See [public-access.md](public-access.md).
 
 ## 15. Shared `THE` schema with FTA, CLIENT, SCS, WASTE, MPR 🟡
 
@@ -208,8 +217,8 @@ Status key: ✅ handled in this repo · 🟡 partly handled / scaffolded ·
   owned schema. Reads are ported SQL and writes go through the legacy procs
   (`CommandDefinition`). 🔴 Some procs the legacy Java calls **don't exist** in
   nr-mof-db (`HBS2R026`, `HBS2R331`, `*_XU_FOREST_TALLY` …). Validate against
-  the TEST database before relying on those paths. New objects (`HBS_SHEDLOCK`, the
-  app-setting table) need nr-mof-db migrations: `docs/db/`.
+  the TEST database before relying on those paths. The one new object
+  (`HBS_SHEDLOCK`) needs an nr-mof-db migration: `docs/db/`.
 
 ## 16. EDI channel 🔴
 

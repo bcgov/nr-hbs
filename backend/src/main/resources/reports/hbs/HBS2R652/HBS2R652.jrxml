@@ -309,7 +309,7 @@ $F{FIELD_SCALE_DECK_ID}==null || $F{FIELD_SCALE_DECK_ID}.isEmpty()
 	</variable>
 	<variable name="Sum (HBS2R652.NET_VOLUME, HBS2R652.DETAIL_DOCUMENT_NUMBER)" class="java.math.BigDecimal" resetType="Group" resetGroup="Group 0" calculation="Sum">
 		<variableExpression><![CDATA[$F{NET_VOLUME}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		<initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<group name="Group 0">
 		<groupExpression><![CDATA[$F{DETAIL_DOCUMENT_NUMBER}]]></groupExpression>

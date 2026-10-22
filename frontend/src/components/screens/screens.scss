@@ -43,6 +43,26 @@
   gap: 0.5rem;
 }
 
+/* Bulk actions over a table with a check-box column (BulkActions.tsx). */
+.hbs-bulk {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.hbs-bulk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.hbs-bulk__results {
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
+  list-style: disc;
+}
+
 .hbs-search__row-actions {
   display: flex;
   gap: 0.5rem;

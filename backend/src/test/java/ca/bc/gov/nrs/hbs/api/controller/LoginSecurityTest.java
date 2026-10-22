@@ -91,8 +91,7 @@ class LoginSecurityTest {
   @Test
   void queryWithoutCapability_is403() throws Exception {
     // Production-control settings are HBS_PROD_CTL only.
-    mvc.perform(post("/api/v1/hbs/commands/admin.processParameter.save")
-            .with(token("HBS_MOF_USER")).contentType("application/json").content("{}"))
+    mvc.perform(get("/api/v1/hbs/queries/admin.processingParameters/list").with(token("HBS_MOF_USER")))
         .andExpect(status().isForbidden());
   }
 }
