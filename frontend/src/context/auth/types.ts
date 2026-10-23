@@ -38,6 +38,8 @@ export const AVAILABLE_ROLES = [
   'HBS_MOF_ADMIN',
   'HBS_MOF_USER',
   'HBS_MOF_MGR',
+  // Service account of the legacy share bridge (client credentials; never a person).
+  'HBS_LEGACY_BRIDGE',
 ] as const;
 
 export type ROLE_TYPE = (typeof AVAILABLE_ROLES)[number];
@@ -72,6 +74,7 @@ export const ROLE_LABELS: Record<ROLE_TYPE, string> = {
   HBS_SPC_ADMIN: 'Other Industry Administrator',
   HBS_SPC_SFTWR_VNDR: 'Software Vendor',
   HBS_SPC_SUBM_AGNT: 'Data Submission Agent',
+  HBS_LEGACY_BRIDGE: 'Legacy Share Bridge (service account)',
 };
 
 type RoleValue = string[] | null;

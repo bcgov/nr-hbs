@@ -37,7 +37,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  *       ({@code <issuer>/protocol/openid-connect/certs}), cached with
  *       refresh-ahead and retry so a brief IdP hiccup doesn't 401 users;</li>
  *   <li>issuer + expiry;</li>
- *   <li>{@code azp} must be HBS's CSS client id ({@link AuthorizedPartyValidator});</li>
+ *   <li>{@code azp} must be HBS's CSS client id ({@link AuthorizedPartyValidator}),
+ *       or a configured service-account client carrying only service roles
+ *       (the legacy share bridge, {@code hbs.keycloak.legacy-bridge-client-id});</li>
  *   <li>at least one HBS role in {@code client_roles} ({@link HbsRoleValidator}).</li>
  * </ul>
  *
@@ -54,12 +56,18 @@ public class HbsSecurityConfig {
   public JwtDecoder jwtDecoder(
       @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri,
       @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri,
-      @Value("${hbs.keycloak.client-id}") String expectedClientId) {
+      @Value("${hbs.keycloak.client-id}") String expectedClientId,
+      @Value("${hbs.keycloak.legacy-bridge-client-id:}") String legacyBridgeClientId) {
     LOG.info("Validating Keycloak access tokens from {} for client {}", issuerUri, expectedClientId);
+    java.util.List<String> serviceAccounts = java.util.Arrays.stream(legacyBridgeClientId.split(","))
+        .map(String::trim).filter(id -> !id.isEmpty()).toList();
+    if (!serviceAccounts.isEmpty()) {
+      LOG.info("Accepting legacy share-bridge service-account tokens from client(s) {}", serviceAccounts);
+    }
     NimbusJwtDecoder decoder = buildJwtDecoder(jwkSetUri);
     decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
         JwtValidators.createDefaultWithIssuer(issuerUri),
-        new AuthorizedPartyValidator(expectedClientId),
+        new AuthorizedPartyValidator(expectedClientId, serviceAccounts),
         new HbsRoleValidator()));
     return decoder;
   }

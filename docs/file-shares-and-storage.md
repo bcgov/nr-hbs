@@ -14,11 +14,12 @@ Each share and its replacement:
 | Legacy share | Used for | Replacement | Status |
 |---|---|---|---|
 | `XMLinput` | P505 uploads + B1011 output, read by B1012 | PVC `/data/hbs/xml/input/<client>/<transmissionId>.xml` (`SubmissionStorage`) | ✅ |
-| `XMLarchive` | unpacked XML | PVC `/data/hbs/xml/archive/…`, purged by B9000 | ✅ (purge); unpack 🔴 |
+| `XMLarchive` | unpacked XML | PVC `/data/hbs/xml/archive/…`, purged by B9000 | ✅ (purge); ✅ `intake.UnpackJob` moves each unpacked P505 file (and its `.submitter` sidecar) here |
 | `FTPfiles\<client>\HBS\Inbound` | scale-software vendors drop XML | authenticated upload API for vendors, or managed SFTP | 🔴 decision ([questions.md](questions.md) Q3) |
-| `FTPfiles\<client>\HBS\Outbound` | statement delivery by "FTP" | download from the Queries screens (statement endpoint) + e-mail notice | 🟡 |
+| `FTPfiles\<client>\HBS\Outbound` | statement delivery by "FTP" | download from the Queries screens (statement endpoint) + e-mail notice | 🟡 FTP push stays in legacy B2065 |
+| Statement drop directory (`DocumentDeliveryTransmissionHelper.getStatementDropDirectory`, B2065 `<id>.xml` / `<id>.pdf`) | the statement e-mail links (`/StatementDelivery/transmissions/<id>.pdf\|xml`) | not needed — the new app rebuilds each transmission's XML/PDF from Oracle (`StatementTransmissionController`, [areas/queries.md](areas/queries.md#ported)) | ✅ (TEST regression) |
 | `ReportingOutput` | on-screen report drops + e-mail pickup links (P410) | not needed — reports stream to the browser | ✅ |
-| `ProcessParam` | processing-parameter CSV, printer names, alert banner (edited on P038) | DB settings table + Administration › Processing Parameters | 🟡 needs DDL ([db/proposed-ddl.sql](db/proposed-ddl.sql)) |
+| `ProcessParam` | processing-parameter CSV, printer names, alert banner (edited on P038) | Settings ConfigMap, shown read-only in Administration › Processing Parameters ([coexistence.md](coexistence.md#settings-configmap)) | ✅ |
 | `Microfiche` | legal archive copy of every invoice/statement | immutable object storage with records retention | 🔴 decision (Q7) |
 | `InvoicePrint\SendTo` / `\CopyTo` | print queue (B2065 → B2075) | print vendor / BC Mail Plus or a print-queue screen | 🔴 decision (Q6) |
 | `PrintedInvoice\*`, `PrintArchive` | printed output archive | as above | 🔴 |

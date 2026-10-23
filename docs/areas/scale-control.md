@@ -29,10 +29,10 @@ Legacy paths below are relative to `hba-archive/hbs/trunk/source/ear/`. DDL path
 | P952 List of Weigh Slips without matching Red Tag Scales | `scale-anomalies` (`WEIGH_RED`) | same; report HBS2R952 | `V7.01552__HBS2R952.sql` |
 | P953 List of Red Tag Scales without matching Weigh Slips | `scale-anomalies` (`RED_WEIGH`) | same; report HBS2R953 | `V7.01553__HBS2R953.sql` |
 | P955 User Cleared Anomaly Details | `scale-anomaly-detail` ("User Cleared" section) | `scaleControl.anomalies.detail` | `AnomalyManagerBean.findAnomalyDetails` |
-| P954 Confirm Anomaly Clear | `scale-anomaly-detail` shows the record. **The Clear action is not ported** (see below) | — | `P911Action.performActionClearAnomalies`, `AnomalyManagerBean.updateScaleAnomalyLog` |
+| P954 Confirm Anomaly Clear | `scale-anomaly-detail` action **Clear** (comment) | `scaleControl.anomalies.clear` (workflow) | `P911Action.performActionClearAnomalies`, `AnomalyManagerBean.updateScaleAnomalyLog` |
 | clearConfirm.jsp (old bulk clear) | not carried over: dead, superseded by P954 | — | `opq/audit/clearConfirm.jsp` |
 | P908 Anomaly Assessment Windows (view mode, from P911 "View Assessment Windows") | `anomaly-windows-view` (header button "View Assessment Windows" on `scale-anomalies`) | `scaleControl.anomalyWindows.list` | `AnomalyManagerBean.findAllAnomalyAssessmentParameter`; `AnomalyAssessmentControlQuery.selectByAll`; `AnomalyBatchEventQuery.selectAllByLastEvent` |
-| P908 / P909 Anomaly Assessment Windows (edit) / Confirm New Assessment Windows | `anomaly-windows` (form, PRODUCTION_CONTROL; one control type per save) | `scaleControl.anomalyWindows.detail`, command `scaleControl.anomalyWindows.update` → `HBS_STORE_ANMLY_ASSESS_CONTROL` | `P908Action.java`, `ScaleAnomalyHelper.populateAssessmentControlParamList`; `AnomalyManagerBean.processAssessmentWindow`; `PROCEDURES/V7.01853__HBS_STORE_ANMLY_ASSESS_CONTROL.sql` |
+| P908 / P909 Anomaly Assessment Windows (edit) / Confirm New Assessment Windows | `anomaly-windows` (form, PRODUCTION_CONTROL; one control type per save) | `scaleControl.anomalyWindows.detail`, workflow `scaleControl.anomalyWindows.update` | `P908Action.java`, `ScaleAnomalyHelper.populateAssessmentControlParamList`; `AnomalyManagerBean.processAssessmentWindow`; `PROCEDURES/V7.01853__HBS_STORE_ANMLY_ASSESS_CONTROL.sql` |
 | P961 Search Scale Return Change Log | `change-log` (SCALE_CONTROL_MINISTRY_VIEW) | `scaleControl.changeLog.search`; report HBS2R962 | `hbs-ejb/.../infrastructure/audit/AuditDetailQuery.java`, `AuditManager2Impl.findAuditDetails`; `ScaleReturnAuditsTag.java`, `P962Action.java`; `V7.01554__HBS2R962.sql` |
 | P962 Scale Return Change Log (one document, linked from summary/detail return views) | `change-log-document?returnFormat=SSR\|DSR&documentNumber=…&versionNumber=…` | `scaleControl.changeLog.document`; report HBS2R962 | same |
 | P971 Search for Timber Transport Events | `transport-events` | `scaleControl.transport.search`; reports HBS3R972/973/974/979 | `V7.01601__HBS3R972.sql`, `V7.01602__HBS3R973.sql`, `V7.01603__HBS3R974.sql`, `V7.01605__HBS3R979.sql`; `P971Action.java`, `LdsHelper.java`; `ReportingFactory2.getTimberTransportEventParameters` |
@@ -70,35 +70,47 @@ Area code lists: `codes.scaleControl.controlTypes` (SCALE_CONTROL_TYPE_CODE), `c
 - **Client fence.** Industry users are fenced to scale sites owned by their client (`scale_site.owner_cli_number`) on late submissions and anomalies. Legacy fenced CLI "All Sites" anomaly searches the same way, through HBS_USER.CLIENT_NUMBER. For control type X the legacy procs joined the site by timber brand, so they fenced on the *originating* site. The port fences on the receiving site.
 - **Dates on `scale-anomalies` are optional**, so the Home deep links (which carry only `anomalyType`) run straight away. Legacy required the Document Event Date range.
 
-## Legacy logic not yet ported
+## Ported workflows (work package 7)
 
-1. **Clear an anomaly (P954).** Source: `hbs-view/.../opq/audit/P911Action.java` (`performActionClearAnomalies`, actionType=Clear / clearConfirmation) and `hbs-ejb/.../dac/anomaly/AnomalyManagerBean.updateScaleAnomalyLog`. This is not a safe single command. `HBS_STORE_SCALE_ANOMALY_LOG` (`PROCEDURES/V7.01915__HBS_STORE_SCALE_ANOMALY_LOG.sql`) rewrites all 23 columns, so a body-driven command would let the browser rewrite the document links and batch ids. A dedicated service should:
-   - require HBS_SCALE_ADMIN (legacy role check in P911Action);
-   - re-read the SCALE_ANOMALY_LOG row by `anomalyId` and require status `O`;
-   - require ANOMALY_ASSESSMENT_CONTROL status `RCM` or `WCM` for its control type (`clearFlag`);
-   - require the scale site's ORG_UNIT_NO to be in the admin's district data domain (`hbs3:isScaleSiteAssociatedWithOrgUnit`, HBS_USER_DIST_DATA_DOMAIN);
-   - call HBS_STORE_SCALE_ANOMALY_LOG with the existing values, except status `U`, `i_user_id` = the audit user, `i_cleared_datetime` = now, and `i_user_cleared_comment` = the comment (optional, max 240). Note `i_org_batch_id` is the last argument.
+| Legacy | Id | Class | Notes |
+|---|---|---|---|
+| P954 Clear | `scaleControl.anomalies.clear` | `scalecontrol.ClearAnomalyCommand` | SCALE_CONTROL_ADMIN (HBS_SCALE_ADMIN). Anomaly must be Outstanding, its control type's assessment status RCM/WCM (`getClearFlag`), the document's site in the caller's HBS_USER_DIST_DATA_DOMAIN districts (errors.scaleanomaly-user-access). `HBS_STORE_SCALE_ANOMALY_LOG` from the DB row with status U, user, now, comment (≤ 240). |
+| P908 → P909 | `scaleControl.anomalyWindows.update` | `scalecontrol.UpdateAssessmentWindowCommand` | RowLock; status must be unchanged and RCM/WCM (error.status.changed); `validateAnomalyAssessmentWindow` rules and texts; store; when widened (To same, From up): WIP → `HBS_UPDATE_STALE_ANOMALIES(today − From, type, current batch)` → WCM, all in one transaction. Returns the P909 preview (next run, From / To dates). |
+| P901 / P911 validations | (query guard) | `submissions.SearchCriteriaGuard` | `@Before` advice on `QueryService`: limiting year (1 Jan, year − 7), dates not in the future, From ≤ To, scale site exists (and, for industry users, is their client's), licence exists in QUANT_LICENSE and not combined with arrival / arrival-departure types, days late 1–731. 400 with the legacy messages. |
+| P901 / P911 "Associated Sites" / "Sites in Associated Districts" | filter `siteScope` | `ScaleControlCatalog` (`SubmissionsCatalog.siteScopeFilter`) | `:hbsUserId` + HBS_USER_SITE / DIST_DATA_DOMAIN. Defaults: HBS_SCALE_ADMIN → districts, CLI_SITE_ADMIN → sites (`FieldDef.roleDefaults`). |
 
-   It then becomes an ActionDef on `scale-anomaly-detail` with a Comment field (capability SCALE_CONTROL_ADMIN, or ANOMALY_EDIT if the business wants industry site admins to clear).
-2. **Assessment window update (P908 → P909 Confirm).** Source: `P908Action.java`, `HBSValidator.validateAnomalyAssessmentWindow`, `AnomalyManagerBean.processAssessmentWindow` / `processAssessmentWindowExpand`. The `anomaly-windows` form calls only `HBS_STORE_ANMLY_ASSESS_CONTROL`, and the read-only batch-id, status and sequence values come back from the browser. A dedicated service should:
-   - reject the change unless the current DB status is RCM or WCM (`validateStatus`: "Your request was denied, because the status of a scale control type has changed.");
-   - enforce the rules: From Days > To Days; new From > old To; new To < old From; at least one value changed;
-   - when To Days is unchanged and From Days has increased (window expanded): set status `WIP`, call `HBS_UPDATE_STALE_ANOMALIES(TO_CHAR(SYSDATE - newFromDays,'yyyy-mm-dd'), type, current_anomaly_batch_id)`, then set status `WCM`. Without this step, stale-dated (`S`) anomalies inside the widened window are not reopened.
-   - show the P909 preview first (proposed next run = tomorrow, From Date = run − From Days, To Date = run − To Days).
-3. **Home-link default window (P911 actionType=homepage).** Legacy set Scale Date From/To to the last HBS_ANOMALY_BATCH_EVENT `to_scale_date` − 30 days … `to_scale_date` (`AnomalyManager.findLastAnomalyBatchEvent`, `WORKBENCH_DATE_RANGE`). The deep link now searches without a date window.
-4. **"Associated Sites" / "Sites in Associated Districts" scopes** (P901 and P911, `radSearchBy`/`radSearchBySites`). These need HBS_USER_SITE_DATA_DOMAIN / HBS_USER_DIST_DATA_DOMAIN filtered by the caller's user id. QueryService has no user-id viewer bind (`:hbsUserId`), so they are not offered. Single site, region/district and (for industry) the client fence are.
-5. **Scaler-role restrictions on P911** (CLI_SCALER without CLI_SITE_ADMIN). Legacy forced the user's own primary scaler licence (`hbs3:retrieveScalerLicense`) and hid the arrival and mismatch types. Not ported; this needs the user-id bind or a scaler-licence claim.
-6. **P911 / P901 validations** (`P911Action.validateForm`, validation.xml P901Form):
-   - limiting year (from date ≥ 1 Jan of current year − 7), dates not in the future, From ≤ To;
-   - the scale site must exist and be in the user's site data domain (`errors.scaleanomaly-user-access`);
-   - the licence must exist in QUANT_LICENSE;
-   - the licence option cannot be combined with arrival or arrival/departure types;
-   - days late must be 1–731.
+The registry command `scaleControl.anomalyWindows.update` was removed from `ScaleControlCatalog`.
 
-   Bad input now returns no rows instead of an error.
-7. **P971, P975, P977, P981 cross-reference validations** (timber mark, scale site, region/district; cut block mask; number-range toggles; 12-month limit). Also the P971 defaults: To Date = From Date and To number = From number when left blank (`LdsHelper.setCriteria`). See `validation.xml` P971Form / P975Form / P977Form / P981Form and `HBSValidator`.
-8. **Change-log industry fence.** `change-log-document` does not check who owns the return. Legacy didn't either. Fence it by joining the DDN to LOG_TALLY / WEIGH_SLIP / SAMPLE_LOG_TALLY and the SDN to the summary tables, reusing the scale-returns fence.
-9. **P991 "Product required for SPC_SFTWR_VNDR"** (`requiredOnRole`). The SQL vendor fence (`:hbsUserType = 'SPC'` → own products only) covers it on the server.
+The P954 Clear button shows only when the anomaly query's `clearable` is Y (Outstanding, control RCM/WCM —
+`ActionDef.showWhen`); the district check stays a server message, as legacy showed it.
+
+## Ported (leftovers package)
+
+1. **Home-link default window (P911 actionType=homepage, BT 1887)**: `HomePage.tsx` reads
+   `scaleControl.anomalyWindows.list` and adds `scaleDateFrom` = last HBS_ANOMALY_BATCH_EVENT `TO_SCALE_DATE`
+   − 30 days (`WORKBENCH_DATE_RANGE`) and `scaleDateTo` = that date to each "Recent Anomalies" link (per
+   control type, `ANOMALY_TYPE_FILTER` mapping). The legacy role default of the site scope is the screen's
+   existing `siteScope` role default.
+2. **CLI_SCALER without CLI_SITE_ADMIN on P911** (BT 10641, `RetrieveScalerLicenseTag`, `AnomalyTypesTag`):
+   the industry fence `ANOMALY_CLIENT_SCOPE` now also admits anomalies whose primary scaler licence is one of the
+   client's QUANT_LICENSEs (a scaler's own licence; company clients hold none, so site admins keep the site
+   fence), and `scalecontrol.ScaleControlCriteriaGuard` refuses the arrival types for that role with a new
+   message ("This anomaly type is not available to scalers." — legacy did not list them). The SPA doesn't offer the
+   arrival types to that role (`Option.hiddenFor`). Not reproduced: legacy showed the scaler's licence
+   prefilled and read-only; here the field is free but the fence only returns the scaler's own licences.
+3. **P971, P975, P977, P981 validations** — `ScaleControlCriteriaGuard` (validation.xml `P971Form`, `P975Form`,
+   `P977Form`, `P981Form`, legacy messages): P971 field combinations per transport type
+   (`transportFieldRequired` / `transportFieldPermitted`), From required / ≤ 12 months / ≥ 1 Jan (year − 7) /
+   not future, To ≥ From, mark / site / originating / destination cross-references, cut block / transport id /
+   LDS asterisk format and "Cut Block not permitted without Timber Mark", load and weigh-slip ranges, and the
+   **To = From default** of `LdsHelper.setCriteria` (a blank To number is set to the From number); P975
+   selection required, mark cross-reference, client numeric, district exists; P981 mark / cut block / dates;
+   P977/P978 (`scaleControl.lds.create/update`, `@Before` on `CommandService`) mark required + billed, cut block
+   required, start / end numbers required and numeric.
+4. **Change-log industry fence** on `scaleControl.changeLog.document`: `clientScope` — an SSR document must
+   pass the summary-return fence (bill to, copy to, mark holder, site owner, stratum owner), a DSR document the
+   detail-return fence (`DetailReturnsSql.CLIENT_FENCE`). Legacy P962 had no fence of its own.
+5. **P991 "Product required for SPC_SFTWR_VNDR"** — covered by the SQL vendor fence.
 
 ## Report-path gaps (shared `HbsReportService`, not in these files)
 

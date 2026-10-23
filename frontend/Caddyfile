@@ -4,6 +4,17 @@
 	auto_https off
 	admin 0.0.0.0:3003
 	order coraza_waf first
+	# Real client IP for the backend's per-IP rate limit on the public
+	# (anonymous) API, /api/v1/hbs/public/** (docs/public-access.md). The
+	# OpenShift router appends the caller to X-Forwarded-For; trusting the
+	# private ranges (router / cluster hops) and reading the list right-to-left
+	# (strict) yields the first untrusted address, which a caller can't spoof
+	# by sending their own X-Forwarded-For.
+	servers {
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+		client_ip_headers X-Forwarded-For
+	}
 }
 :3000 {
 	log {
@@ -32,7 +43,9 @@
 	# Proxy requests to API service
 	reverse_proxy /api* {$BACKEND_URL} {
 		header_up Host {http.reverse_proxy.upstream.hostport}
-		header_up X-Real-IP {remote_host}
+		# {client_ip} (see trusted_proxies above), not {remote_host}, which is
+		# the router pod. The backend reads it as hbs.public.rate-limit.client-ip-header.
+		header_up X-Real-IP {client_ip}
 	}
 	header {
 		-Server

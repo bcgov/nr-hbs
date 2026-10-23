@@ -13,14 +13,12 @@ import java.time.Instant;
 import java.util.stream.Stream;
 
 /**
- * Intake watchdog for B1011/B1012 (receive + unpack scale-data XML).
- *
- * <p>The unpack itself (legacy {@code hbs-batch B1012}, 2.7K LOC: Castor
- * unmarshal, scaler digital-signature verification, creation of transmission
- * → batch → document → version rows via ~40 HBS_CREATE_* procs) is NOT yet
- * ported — see docs/batch-jobs.md and docs/legacy-logic-to-port.md. Until it
- * is, this job reports files that have waited in the input area longer than
- * expected so nothing submitted through the new upload is silently stranded.
+ * Intake watchdog for the P505 uploads. {@code intake.UnpackJob} (the B1012
+ * port) moves every file it unpacked to the archive area, so a file still in
+ * the input area after a few hours is one the unpack could not process (it
+ * failed and was rolled back, its file could not be archived, or the unpack
+ * job is switched off). This job reports them so nothing submitted through
+ * the new upload is silently stranded.
  */
 @Component
 @Slf4j
@@ -54,7 +52,8 @@ public class XmlIntakeMonitorJob {
       }
       if (stale > 0) {
         throw new IllegalStateException(stale + " submitted file(s) have waited more than "
-            + STALE.toHours() + "h for unpacking");
+            + STALE.toHours() + "h for unpacking (B1012 port: check the unpack job log, "
+            + "or hbs.batch.unpack.enabled)");
       }
       return "no stale submissions";
     });

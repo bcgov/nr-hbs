@@ -42,7 +42,8 @@ public class ProfilesBillingCatalog implements QueryCatalog {
              CASE WHEN mhp.effective_date > SYSDATE THEN 'Y' ELSE 'N' END AS future_dated,
              mhp.entry_userid AS entry_userid,
              mhp.entry_timestamp AS entry_timestamp,
-             mhp.update_userid AS update_userid
+             mhp.update_userid AS update_userid,
+             mhp.update_timestamp AS update_timestamp
         FROM hbs_mark_holder_profile mhp
         JOIN v_client_public fc ON fc.client_number = mhp.client_number
         JOIN hbs_return_type_code rt ON rt.hbs_return_type_code = mhp.hbs_return_type_code
@@ -93,7 +94,8 @@ public class ProfilesBillingCatalog implements QueryCatalog {
              cdp.expiry_date AS expiry_date,
              cdp.entry_userid AS entry_userid,
              cdp.entry_timestamp AS entry_timestamp,
-             cdp.update_userid AS update_userid
+             cdp.update_userid AS update_userid,
+             cdp.update_timestamp AS update_timestamp
         FROM hbs_client_delivery_profile cdp
         JOIN v_client_public fc ON fc.client_number = cdp.client_number
         JOIN hbs_delivery_method_code dm ON dm.hbs_delivery_method_code = cdp.hbs_delivery_method_code
@@ -193,7 +195,17 @@ public class ProfilesBillingCatalog implements QueryCatalog {
                  apw.app_effective_date AS effective_date,
                  TO_CHAR(apw.app_effective_date, 'YYYY-MM-DD') AS effective_date_key,
                  mbc.cutting_permit_id AS cutting_permit_id,
+                 -- P385 "Sale Method" (markQueryResult.saleMethodCode = HARVEST_SALE of the licence,
+                 -- TimberMarkQuery.SELECT_LOAD; description = hbs1:codedescription table
+                 -- SALE_METHOD_CODE, an external code list in CODE_LIST_TABLE per CodeLocator).
+                 (SELECT MAX(hs.sale_method_code) FROM harvest_sale hs
+                   WHERE hs.forest_file_id = mbc.forest_file_id) AS sale_method_code,
+                 (SELECT MAX(clt.expanded_result) FROM harvest_sale hs
+                    JOIN code_list_table clt ON clt.column_name = 'SALE_METHOD_CODE'
+                                            AND clt.code_argument = hs.sale_method_code
+                   WHERE hs.forest_file_id = mbc.forest_file_id) AS sale_method_description,
                  mbc.mark_status_st AS mark_status,
+                 tsc.expanded_result AS mark_status_desc,
                  tm.catastrophic_ind AS catastrophic_ind,
                  ou.org_unit_code || ' - ' || ou.org_unit_name AS admin_org,
                  mbc.cruise_based_ind AS cruise_based_ind,
@@ -224,6 +236,7 @@ public class ProfilesBillingCatalog implements QueryCatalog {
             JOIN mark_billed_cli mbc ON mbc.timber_mark = apw.timber_mark
             LEFT JOIN timber_mark tm ON tm.timber_mark = apw.timber_mark
             LEFT JOIN org_unit ou ON ou.org_unit_no = mbc.forest_district
+            LEFT JOIN code_list_table tsc ON tsc.column_name = 'TIMBER_STATUS_CODE' AND tsc.code_argument = mbc.mark_status_st
            WHERE 1=1""")
       .filter(QueryFilter.required("timberMark", "AND apw.timber_mark = :timberMark", Type.UPPER))
       .filter(QueryFilter.required("effectiveDate", "AND TRUNC(apw.app_effective_date) = :effectiveDate", Type.DATE))
@@ -241,7 +254,8 @@ public class ProfilesBillingCatalog implements QueryCatalog {
              SUM(r.volume_per_hectare) OVER (PARTITION BY r.timber_mark, r.app_effective_date, r.scale_species_code)
                AS species_volume_per_hectare,
              r.entry_userid AS entry_userid,
-             r.entry_timestamp AS entry_timestamp
+             r.entry_timestamp AS entry_timestamp,
+             r.update_timestamp AS update_timestamp
         FROM cruise_based_sp_grd_ratio r
        WHERE 1=1""";
 
@@ -284,128 +298,23 @@ public class ProfilesBillingCatalog implements QueryCatalog {
         CBB_SEARCH, CBB_DETAIL, CBB_RATIOS, CBB_RATIO_RECORD);
   }
 
+  /**
+   * Single-proc writes with no legacy rule. The mark holder (P342–P344),
+   * delivery add/update (P372/P373) and cruise-based row add/update (P383)
+   * writes run the legacy Java rules first and are {@code WorkflowCommand}
+   * beans in {@code ca.bc.gov.nrs.hbs.api.profiles} with the same command ids.
+   */
   @Override
   public List<CommandDefinition> commands() {
     return List.of(
-        // P343 — createAndStoreMarkHolderProfile
-        CommandDefinition.builder("profiles.markHolders.create")
-            .legacy("P343")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_CREATE_HBS_MARK_PROFILE")
-            .sequence("HBS_MARK_HOLDER_PROFILE_SEQ")      // i_mhprof_id
-            .requiredBody("clientNumber", Type.STRING)     // i_client_number
-            .requiredBody("clientLocnCode", Type.STRING)   // i_client_locn_code
-            .requiredBody("returnType", Type.UPPER)        // i_hbs_return_type_code
-            .requiredBody("frequency", Type.UPPER)         // i_hbs_frequency_type_code
-            .date("forcedSummarizationDate")               // i_forced_summarization_date (null on add)
-            .requiredBody("effectiveDate", Type.DATE)      // i_effective_date
-            .requiredBody("expiryDate", Type.DATE)         // i_expiry_date
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .build(),
-        // P342 — updateMarkHolderProfile (expiry only)
-        CommandDefinition.builder("profiles.markHolders.update")
-            .legacy("P342")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_STORE_HBS_MARK_PROFILE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM hbs_mark_holder_profile WHERE mhprof_id = :mhprofId")
-            .requiredBody("mhprofId", Type.NUMBER)
-            .requiredBody("clientNumber", Type.STRING)
-            .requiredBody("clientLocnCode", Type.STRING)
-            .requiredBody("returnType", Type.UPPER)
-            .requiredBody("frequency", Type.UPPER)
-            .date("forcedSummarizationDate")
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-        // P344 Yes — removeMarkHolderProfile
-        CommandDefinition.builder("profiles.markHolders.delete")
-            .legacy("P344")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_REMOVE_HBS_MARK_PROFILE")
-            .requiredBody("mhprofId", Type.NUMBER)
-            .build(),
-        // P373 — createAndStoreClientDeliveryProfile
-        CommandDefinition.builder("profiles.delivery.create")
-            .legacy("P373")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_CREATE_HBS_CLI_DEL_PROFILE")
-            .sequence("HBS_CLI_DEL_PROFILE_SEQ")           // i_dlvprof_id
-            .requiredBody("clientNumber", Type.STRING)
-            .requiredBody("clientLocnCode", Type.STRING)
-            .requiredBody("deliveryMethod", Type.UPPER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .build(),
-        // P372 — updateClientDeliveryProfile (entry user kept; update user now recorded correctly)
-        CommandDefinition.builder("profiles.delivery.update")
-            .legacy("P372")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_STORE_HBS_CLI_DEL_PROFILE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM hbs_client_delivery_profile WHERE dlvprof_id = :dlvprofId")
-            .requiredBody("dlvprofId", Type.NUMBER)
-            .requiredBody("clientNumber", Type.STRING)
-            .requiredBody("clientLocnCode", Type.STRING)
-            .requiredBody("deliveryMethod", Type.UPPER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-        // P374 Yes — removeClientDeliveryProfile
+        // P374 Yes — removeClientDeliveryProfile (no rule in P374Action)
         CommandDefinition.builder("profiles.delivery.delete")
             .legacy("P374")
             .capability(Capability.PROFILE_BILLING_ADMIN)
             .procedure("HBS_REMOVE_HBS_CLI_DEL_PROFILE")
             .requiredBody("dlvprofId", Type.NUMBER)
             .build(),
-        // P383 grid row add — createAndStoreCruiseBasedSpGrRatio
-        CommandDefinition.builder("profiles.cruiseBased.ratio.create")
-            .legacy("P383")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_CREATE_CB_SP_GRD_RATIO")
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("speciesCode", Type.UPPER)
-            .requiredBody("gradeCode", Type.UPPER)
-            .requiredBody("volumePerHectare", Type.NUMBER)
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .build(),
-        // P383 grid row change (legacy deleted + re-inserted every row; the store proc keeps the row)
-        CommandDefinition.builder("profiles.cruiseBased.ratio.update")
-            .legacy("P383")
-            .capability(Capability.PROFILE_BILLING_ADMIN)
-            .procedure("HBS_STORE_CB_SP_GRD_RATIO")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM cruise_based_sp_grd_ratio"
-                + " WHERE timber_mark = UPPER(:timberMark)"
-                + " AND app_effective_date = TO_DATE(SUBSTR(:effectiveDate, 1, 10), 'YYYY-MM-DD')"
-                + " AND scale_species_code = UPPER(:speciesCode) AND scale_grade_code = UPPER(:gradeCode)")
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("speciesCode", Type.UPPER)
-            .requiredBody("gradeCode", Type.UPPER)
-            .requiredBody("volumePerHectare", Type.NUMBER)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-        // P383 "Delete?" checkbox — removeCruiseBasedSpGrRatio
+        // P383 "Delete?" checkbox — removeCruiseBasedSpGrRatio (deleted rows skip validateInputs)
         CommandDefinition.builder("profiles.cruiseBased.ratio.delete")
             .legacy("P383")
             .capability(Capability.PROFILE_BILLING_ADMIN)

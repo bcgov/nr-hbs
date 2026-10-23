@@ -1,6 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.submission;
 
 import ca.bc.gov.nrs.hbs.api.query.Capability;
+import ca.bc.gov.nrs.hbs.api.security.HbsRoles;
 import ca.bc.gov.nrs.hbs.api.service.v1.VirusScanner;
 import ca.bc.gov.nrs.hbs.api.util.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,9 @@ import java.util.List;
  *   <li>mark receiving complete — status CSA via
  *       {@code HBS_STORE_DTL_SCL_DOC_TRANS} (legacy {@code receivingComplete()}).</li>
  * </ol>
- * Unpacking, edits, summarization and billing remain asynchronous (batch).
+ * Unpacking is this app's {@code intake.UnpackJob} (B1012 port); edits,
+ * summarization and billing stay in the legacy batch, which picks the
+ * transmission up at UNPACKING/SUCCESS.
  */
 @Service
 @Slf4j
@@ -72,6 +75,8 @@ public class SubmissionService {
     Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
     String key = storage.store(SubmissionStorage.Area.INPUT, client, transmissionId, new ByteArrayInputStream(bytes));
+    // For the unpack's edit FXA04 (no production files from software vendors on the web).
+    storage.storeSubmitter(client, transmissionId, RequestUtil.getCurrentRoles().contains(HbsRoles.SPC_SFTWR_VNDR));
 
     callTransmissionProc("HBS_CREATE_DTL_SCL_DOC_TRANS", transmissionId, STATUS_PROCESSING,
         fileName, user, now, key, client, null, null);

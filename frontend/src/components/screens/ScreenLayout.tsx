@@ -8,6 +8,8 @@ import PageLayout from '@/pages/PageLayout';
 import { AREAS_BY_ID } from '@/screens/registry';
 import type { ScreenDef } from '@/screens/types';
 
+import { useScreenApi } from './screenApi';
+
 interface ScreenLayoutProps {
   screen: ScreenDef;
   /** Screen-level buttons, level with the title (e.g. "Add Scale Site Profile"). */
@@ -30,9 +32,10 @@ interface ScreenLayoutProps {
  */
 export const ScreenLayout: FC<ScreenLayoutProps> = ({ screen, actions, backDisabled, children }) => {
   const origin = useNavOrigin();
+  const { home } = useScreenApi();
   const area = AREAS_BY_ID.get(screen.area);
-  const back: NavOrigin | null =
-    origin ?? (screen.kind === 'search' || !area ? null : { path: `/${area.id}`, label: area.label });
+  const fallback = home ?? (area ? { path: `/${area.id}`, label: area.label } : null);
+  const back: NavOrigin | null = origin ?? (screen.kind === 'search' ? null : fallback);
 
   const subtitle = screen.description;
 

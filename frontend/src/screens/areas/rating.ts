@@ -6,21 +6,15 @@ import type { ActionDef, FieldDef, ScreenDef } from '../types';
  * Mapping + unported logic: docs/areas/rating-and-sampling.md.
  */
 
+/** Status changes re-read the rule; the SPA only sends its id and the UPDATE_TIMESTAMP it loaded (RowLock). */
 const RULE_RECORD: Record<string, string> = {
   overrideRatingRuleId: 'overrideRatingRuleId',
-  ovrrdrtrlType: 'ovrrdrtrlType',
-  overrideRuleCategoryCode: 'overrideRuleCategoryCode',
-  timberMark: 'timberMark',
-  processingEffectiveDate: 'processingEffectiveDate',
-  processingExpiryDate: 'processingExpiryDate',
-  scaleEffectiveDate: 'scaleEffectiveDate',
-  scaleExpiryDate: 'scaleExpiryDate',
-  ovrrdrtrlComment: 'ovrrdrtrlComment',
-  overrideRateDate: 'overrideRateDate',
-  entryUserid: 'entryUserid',
-  entryTimestamp: 'entryTimestamp',
-  fieldScaleDeckId: 'fieldScaleDeckId',
+  updateTimestamp: 'updateTimestamp',
 };
+
+/** SCALE_PRODUCT_CODE for logs is a single space — a "required" check in the form would trim it away, so the backend checks it. */
+const PRODUCT_HELP = 'Logs, or a product. Required.';
+
 
 /** Header fields shared by P203 (date rule) and P204 (rate rule). */
 const ruleHeaderFields = (): FieldDef[] => [
@@ -42,9 +36,10 @@ const deactivateRule: ActionDef = {
   id: 'deactivate-rule',
   label: 'De-activate Rule',
   command: 'rating.overrideRule.deactivate',
+  showWhen: { field: 'overrideRuleStatusCode', values: ['ACT'] },
   capability: 'RATE_ADMIN',
   params: RULE_RECORD,
-  confirm: 'De-activate this override rule? (Only Active rules should be de-activated.)',
+  confirm: 'De-activate this override rule? Only Active rules can be de-activated.',
   danger: true,
 };
 
@@ -52,23 +47,25 @@ const activateRule: ActionDef = {
   id: 'activate-rule',
   label: 'Activate Rule',
   command: 'rating.overrideRule.activate',
+  showWhen: { field: 'overrideRuleStatusCode', values: ['PND'] },
   capability: 'RATE_ADMIN',
   params: RULE_RECORD,
   confirm:
-    'Activate this pending rule? Its scaling and processing intervals must not overlap another active rule for this timber mark (and field scale deck ID).',
+    'Activate this pending rule? It needs at least one override rate, a process From date of today or later, and its scaling and processing intervals must not both overlap another active rule for this timber mark (and field scale deck ID).',
 };
 
 const addOverrideRate: ActionDef = {
   id: 'add-override-rate',
   label: 'Save and Add More Rate Details',
   command: 'rating.overrideRate.create',
+  showWhen: { field: 'overrideRuleStatusCode', values: ['PND'] },
   capability: 'RATE_ADMIN',
   params: { overrideRatingRuleId: 'overrideRatingRuleId' },
   fields: [
     { name: 'scaleSpeciesCode', label: 'Species', type: 'select', codeList: 'codes.rating.species', helperText: 'Blank = All (Logs only)' },
-    { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', required: true },
+    { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', helperText: PRODUCT_HELP },
     { name: 'scaleGradeCode', label: 'Grade', type: 'select', codeList: 'codes.rating.grades', helperText: 'Blank = All (Logs only)' },
-    { name: 'overrideRate', label: 'Override Rate ($)', type: 'number', required: true, helperText: '> 0.00 and <= 9,999.99' },
+    { name: 'overrideRate', label: 'Override Rate ($)', type: 'number', required: true, helperText: '0.00 to 9,999.99, 2 decimals' },
   ],
 };
 
@@ -168,13 +165,30 @@ export const screens: ScreenDef[] = [
         ],
       },
       {
+        // P202 count links → the summary scale return search (confirmed: by rule number;
+        // candidate: the mark's returns still open to the rule, legacy status "OvrRule").
         title: 'Returns',
-        fields: [
-          { key: 'pieceReturnCount', label: 'Confirmed Returns ==> Piece Scale', format: 'number' },
-          { key: 'weightReturnCount', label: 'Confirmed Returns ==> Weight Scale', format: 'number' },
-          { key: 'pieceFutureReturnCount', label: 'Candidate Returns ==> Piece Scale', format: 'number' },
-          { key: 'weightFutureReturnCount', label: 'Candidate Returns ==> Weight Scale', format: 'number' },
-        ],
+        table: {
+          query: 'rating.overrideRules.returnCounts',
+          params: { overrideRatingRuleId: 'overrideRatingRuleId' },
+          columns: [
+            { key: 'returnKind', header: 'Returns' },
+            { key: 'scaleType', header: 'Scale Type' },
+            { key: 'returnCount', header: 'Count', format: 'number' },
+          ],
+          rowLink: {
+            screen: 'summary-returns',
+            params: {
+              returnType: 'returnType',
+              overrideRatingRuleId: 'linkRuleId',
+              timberMark: 'linkTimberMark',
+              status: 'linkStatus',
+              scaleDateFrom: 'scaleDateFrom',
+              scaleDateTo: 'scaleDateTo',
+              fieldScaleDeckId: 'fieldScaleDeckId',
+            },
+          },
+        },
       },
       {
         title: 'Override Rate Details',
@@ -186,9 +200,15 @@ export const screens: ScreenDef[] = [
         },
       },
     ],
+    editLink: {
+      screen: 'override-rule-edit',
+      params: { overrideRatingRuleId: 'overrideRatingRuleId' },
+      label: 'Update Rule',
+      capability: 'RATE_ADMIN',
+    },
     actions: [addOverrideRate, activateRule, deactivateRule],
     notes:
-      'Rate details can be added and the rule activated only while the rule is Pending (rate rules). De-activate applies to Active rules.',
+      'Rate details can be added or changed, the rule updated and activated only while the rule is Pending (rate rules). De-activate applies to Active rules.',
   },
   // P204/P207 one override rate detail row (view → edit / delete).
   {
@@ -221,8 +241,8 @@ export const screens: ScreenDef[] = [
         label: 'Delete',
         command: 'rating.overrideRate.remove',
         capability: 'RATE_ADMIN',
-        params: { overrideRateId: 'overrideRateId' },
-        confirm: 'Delete this override rate detail row?',
+        params: { overrideRateId: 'overrideRateId', updateTimestamp: 'updateTimestamp' },
+        confirm: 'Delete this override rate detail row? (Pending rules only.)',
         danger: true,
         then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
       },
@@ -242,14 +262,44 @@ export const screens: ScreenDef[] = [
     fields: [
       { name: 'overrideRatingRuleId', label: 'Rule Number', readOnlyOnEdit: true },
       { name: 'scaleSpeciesCode', label: 'Species', type: 'select', codeList: 'codes.rating.species', helperText: 'Blank = All (Logs only)' },
-      { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', required: true },
+      { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', helperText: PRODUCT_HELP },
       { name: 'scaleGradeCode', label: 'Grade', type: 'select', codeList: 'codes.rating.grades', helperText: 'Blank = All (Logs only)' },
-      { name: 'overrideRate', label: 'Override Rate ($)', type: 'number', required: true },
+      { name: 'overrideRate', label: 'Override Rate ($)', type: 'number', required: true, helperText: '0.00 to 9,999.99, 2 decimals' },
       { name: 'entryUserid', label: 'Created By', readOnlyOnEdit: true },
       { name: 'entryTimestamp', label: 'Created On', type: 'date', readOnlyOnEdit: true },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true },
     ],
     then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
     submitLabel: 'Save',
+  },
+  // ── P207 Update Override Rate Rule (header of a Pending rate rule) ──
+  {
+    kind: 'form',
+    id: 'override-rule-edit',
+    legacy: 'P207',
+    area: 'rating',
+    title: 'Update Override Rate Rule',
+    nav: false,
+    capability: 'RATE_ADMIN',
+    command: 'rating.overrideRule.update',
+    loadQuery: 'rating.overrideRules.detail',
+    keys: ['overrideRatingRuleId'],
+    fields: [
+      { name: 'overrideRatingRuleId', label: 'Rule Number', readOnlyOnEdit: true },
+      { name: 'timberMark', label: 'Timber Mark', readOnlyOnEdit: true },
+      { name: 'fieldScaleDeckId', label: 'Field Scale Deck ID', readOnlyOnEdit: true },
+      { name: 'ruleStatus', label: 'Rule Status', readOnlyOnEdit: true },
+      { name: 'scaleEffectiveDate', label: 'From Scale Date', type: 'date', required: true },
+      { name: 'scaleExpiryDate', label: 'To Scale Date', type: 'date', required: true },
+      { name: 'processingEffectiveDate', label: 'From Process Date', type: 'date', required: true },
+      { name: 'processingExpiryDate', label: 'To Process Date', type: 'date', required: true },
+      { name: 'ovrrdrtrlComment', label: 'Reason', type: 'textarea', maxLength: 240, span: 4 },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true },
+    ],
+    then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
+    submitLabel: 'Save',
+    notes:
+      'The rule stays Pending. Scale From must be within the last 7 years and the From Process Date today or later. Use "Activate Rule" on the rule to activate it.',
   },
   // ── P203 Add Override Date Rule ──
   {
@@ -269,7 +319,7 @@ export const screens: ScreenDef[] = [
     then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
     submitLabel: 'Activate Rule',
     notes:
-      'The rule is saved as Active. Scale dates must be within the last 7 years; the From Process Date must be today or later; intervals must not overlap another active rule for the timber mark.',
+      'The rule is saved as Active. The From Scale Date and Override Rate Date must be within the last 7 years; the From Process Date must be today or later; the scaling and processing intervals must not both overlap another active rule for the timber mark (and field scale deck ID).',
   },
   // ── P204 Add Override Rate Rule (header; rate rows are added on the rule screen) ──
   {
@@ -284,7 +334,8 @@ export const screens: ScreenDef[] = [
     fields: [...ruleHeaderFields(), { name: 'ovrrdrtrlComment', label: 'Reason', type: 'textarea', maxLength: 240, span: 4 }],
     then: { screen: 'override-rule', params: { overrideRatingRuleId: 'overrideRatingRuleId' } },
     submitLabel: 'Save and Add More Rate Details',
-    notes: 'The rule is saved as Pending. Add at least one override rate detail, then Activate Rule.',
+    notes:
+      'The rule is saved as Pending (the overlap check applies here too). Add at least one override rate detail, then Activate Rule.',
   },
 
   // ── P210/P211 District Default Rates ──
@@ -350,14 +401,14 @@ export const screens: ScreenDef[] = [
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
       { name: 'scaleSpeciesCode', label: 'Species', type: 'select', codeList: 'codes.rating.species', helperText: 'Blank = All' },
-      { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', required: true },
+      { name: 'scaleProductCode', label: 'Product', type: 'select', codeList: 'codes.rating.products', helperText: PRODUCT_HELP },
       { name: 'scaleGradeCode', label: 'Grade', type: 'select', codeList: 'codes.rating.grades', required: true },
-      { name: 'rate', label: 'Rate ($)', type: 'number', required: true, helperText: '> 0.00 and <= 9,999.99' },
+      { name: 'rate', label: 'Rate ($)', type: 'number', required: true, helperText: '0.00 to 9,999.99, 2 decimals' },
     ],
     then: { screen: 'district-default-rates', params: { orgUnitNo: 'orgUnitNo', appraisalMethod: 'appraisalMthdCode', effectiveFrom: 'effectiveDate', effectiveTo: 'expiryDate' } },
     submitLabel: 'Add Default Rate',
     notes:
-      'Dates cannot predate today by more than 7 years and must not overlap an existing rate for the same district / method / species-product-grade (legacy checks — not yet enforced here).',
+      'Dates cannot predate today by more than 7 years and must not overlap an active rate for the same district / method / species-product-grade. The grade must be a Coast or Interior grade matching the method (for logs, in effect on both dates).',
   },
   // ── P213 Update Default Rate ──
   {
@@ -383,9 +434,12 @@ export const screens: ScreenDef[] = [
       { name: 'activeInd', label: 'Active', type: 'yesno', readOnlyOnEdit: true },
       { name: 'entryUserid', label: 'Created By', readOnlyOnEdit: true },
       { name: 'entryTimestamp', label: 'Created On', type: 'date', readOnlyOnEdit: true },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true },
     ],
+    then: { screen: 'district-default-rates', params: { effectiveFrom: 'effectiveDate', effectiveTo: 'expiryDate' } },
     submitLabel: 'Save',
-    notes: 'Saving requires the Rate Administrator role. Dates on file older than 7 years cannot be changed.',
+    notes:
+      'Saving requires the Rate Administrator role. Dates on file older than 7 years cannot be changed, and the new interval must not overlap another active rate for the same district / method / species-product-grade.',
   },
 
   // ── P220/P221 Waste & Residue Rates ──
@@ -461,25 +515,40 @@ export const screens: ScreenDef[] = [
         label: 'Delete',
         command: 'rating.wasteRate.deactivate',
         capability: 'WASTE_RATE_ADMIN',
-        params: {
-          wstrtId: 'wstrtId',
-          timberMark: 'timberMark',
-          cutBlockId: 'cutBlockId',
-          scaleSpeciesCode: 'scaleSpeciesCode',
-          scaleGradeCode: 'scaleGradeCode',
-          avoidableInd: 'avoidableInd',
-          rate: 'rate',
-          effectiveDate: 'effectiveDate',
-          expiryDate: 'expiryDate',
-          entryUserid: 'entryUserid',
-          entryTimestamp: 'entryTimestamp',
-          wasteRateSourceCode: 'wasteRateSourceCode',
-        },
+        params: { wstrtId: 'wstrtId', updateTimestamp: 'updateTimestamp' },
         confirm: 'Delete (de-activate) this waste & residue rate? Inactive rates cannot be updated.',
         danger: true,
       },
     ],
-    notes: 'Updating a waste & residue rate (P223 Save) is not yet available in this application; add a new rate and delete the old one.',
+    editLink: { screen: 'waste-residue-rate-edit', params: { wstrtId: 'wstrtId' }, label: 'Update', capability: 'WASTE_RATE_ADMIN' },
+    notes: 'Inactive waste & residue rates cannot be updated or deleted.',
+  },
+  // ── P223 Update A Waste & Residue Rate (Save) ──
+  {
+    kind: 'form',
+    id: 'waste-residue-rate-edit',
+    legacy: 'P223',
+    area: 'rating',
+    title: 'Update A Waste & Residue Rate',
+    nav: false,
+    capability: 'WASTE_RATE_ADMIN',
+    command: 'rating.wasteRate.update',
+    loadQuery: 'rating.wasteRates.detail',
+    keys: ['wstrtId'],
+    fields: [
+      { name: 'timberMark', label: 'Timber Mark', readOnlyOnEdit: true },
+      { name: 'cutBlockId', label: 'Cut Block', readOnlyOnEdit: true },
+      { name: 'effectiveDate', label: 'Scale Date', type: 'date', required: true },
+      { name: 'scaleSpeciesCode', label: 'Species', type: 'select', codeList: 'codes.rating.species', required: true },
+      { name: 'scaleGradeCode', label: 'Grade', type: 'select', codeList: 'codes.rating.grades', required: true },
+      { name: 'rate', label: 'Rate ($)', type: 'number', required: true, helperText: '0.00 to 999.99, 2 decimals' },
+      { name: 'wasteRateSourceCode', label: 'Rate Source', type: 'select', codeList: 'codes.rating.wasteRateSources', required: true },
+      { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true },
+    ],
+    then: { screen: 'waste-residue-rate', params: { wstrtId: 'wstrtId' } },
+    submitLabel: 'Save',
+    notes:
+      'A scale date on file older than 7 years cannot be changed. Saving de-activates the first other active rate of this mark / cut block / species / grade in effect on the new scale date (legacy P223 behaviour).',
   },
   // ── P222 Add A Waste & Residue Rate ──
   {
@@ -497,7 +566,7 @@ export const screens: ScreenDef[] = [
       { name: 'effectiveDate', label: 'Scale Date', type: 'date', required: true },
       { name: 'scaleSpeciesCode', label: 'Species', type: 'select', codeList: 'codes.rating.species', required: true },
       { name: 'scaleGradeCode', label: 'Grade', type: 'select', codeList: 'codes.rating.grades', required: true },
-      { name: 'rate', label: 'Rate ($)', type: 'number', required: true, helperText: '> 0.00 and <= 999.99; see Compute Waste & Residue Average Rate' },
+      { name: 'rate', label: 'Rate ($)', type: 'number', required: true, helperText: '0.00 to 999.99, 2 decimals; see Compute Waste & Residue Average Rate' },
       { name: 'wasteRateSourceCode', label: 'Rate Source', type: 'select', codeList: 'codes.rating.wasteRateSources', required: true },
     ],
     then: { screen: 'waste-residue-rates', params: { timberMark: 'timberMark', cutBlock: 'cutBlockId', scaleDateFrom: 'effectiveDate', scaleDateTo: 'effectiveDate' } },
@@ -506,7 +575,8 @@ export const screens: ScreenDef[] = [
       'The cut block must belong to the timber mark, the date cannot predate today by more than 7 years and duplicates are not allowed.',
   },
 
-  // ── P230/P231 Stumpage Rate search is not carried over yet (HBS_RATES OUT-parameter procs). ──
+  // ── P230/P231 Search for Stumpage Rate: bespoke page (pages/StumpageRatePage.tsx, /rating/stumpage-rate) —
+  //    the HBS_RATES OUT-parameter procedures are not a registry query. ──
 
   // ── P240/P241 Compute Waste & Residue Average Rate ──
   {

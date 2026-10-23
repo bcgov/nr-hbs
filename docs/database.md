@@ -61,10 +61,9 @@ assumed, so the SQL reads them the way the legacy app did:
 | `PKG_SIL21_CLIENT_SEARCH` | nr-forest-client-api ([forest-client-integration.md](forest-client-integration.md)) |
 
 Worth asking the DBA for: `SELECT` on `APP_WEIGHT_VOL` (exact Coastal cruise
-volumes). The only other objects the user can't see are the new ones below
-(`HBS_SHEDLOCK`, `HBS_APP_SETTING`), which don't exist yet — until they do,
-the Processing Parameters / App Settings / home alert banner queries fail and
-the batch jobs can't take a lock.
+volumes). The only other object the user can't see is the new `HBS_SHEDLOCK`
+below, which doesn't exist yet — until it does, the batch jobs can't take a
+lock.
 
 ## Transactions
 
@@ -81,8 +80,11 @@ intent, but each ported workflow needs a regression test.
 There is **no optimistic locking** in the schema (no `REVISION_COUNT`); the
 legacy Java compared state codes before updating, racily — the cause of ~100
 "duplicate active version" data fixes. Planned: `UPDATE_TIMESTAMP`-based ETag
-checks in the services + a DBA-added unique index on the active version
-(`docs/pinch-points.md` §12).
+checks in the services (`workflow/RowLock`, done) and a periodic duplicate
+check ([db/active-version-duplicates.sql](db/active-version-duplicates.sql)).
+A unique index on the active version is not possible while the legacy batch
+runs: legacy briefly holds two active versions inside one workflow and
+autocommits each proc call ([db/README.md](db/README.md)).
 
 ## The two state machines
 
@@ -102,8 +104,9 @@ Full transition tables: the legacy data-layer analysis summarised in
 | Object | Why | DDL |
 |---|---|---|
 | `THE.HBS_SHEDLOCK` | ShedLock for the batch jobs | [db/hbs-shedlock.sql](db/hbs-shedlock.sql) |
-| App-setting table + store proc | Replaces the ProcessParam share files (alert banner, processing parameters, printer names) | [db/proposed-ddl.sql](db/proposed-ddl.sql) |
-| Grants/synonyms for the new proxy user | Mirror the legacy application role | DBA |
+| Grants for the backend's user | None beyond the new objects: `PROXY_FSA_HBS_READ_WRITE_USER` holds `FSA_HBS_READ_WRITE_ROLE` (nr-mof-db PR #582), which grants every object the backend reads or calls | — |
+
+Run order, backouts and checks: [db/README.md](db/README.md).
 
 ## Known gaps between the legacy code and the DB
 

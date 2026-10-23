@@ -57,6 +57,11 @@ export function exportQueryXml(queryId: string, criteria: Criteria, path?: strin
   return getBlob(`${url}${toQuery(criteria)}`, 'XML download');
 }
 
+/** PDF of a search's results from another API path taking the same criteria (P451 "Generate PDF"). */
+export function exportQueryPdf(path: string, criteria: Criteria) {
+  return getBlob(`${HBS_API}/${path}${toQuery(criteria)}`, 'PDF download');
+}
+
 export function runCommand(commandId: string, body: Record<string, unknown>): Promise<Row> {
   return sendJson<Row>('POST', `${HBS_API}/commands/${encodeURIComponent(commandId)}`, body, 'Save');
 }

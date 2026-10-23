@@ -2,8 +2,6 @@ package ca.bc.gov.nrs.hbs.api.query;
 
 import ca.bc.gov.nrs.hbs.api.exception.EntityNotFoundException;
 import ca.bc.gov.nrs.hbs.api.struct.v1.PageableResponse;
-import ca.bc.gov.nrs.hbs.api.util.RequestUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -35,22 +33,36 @@ import java.util.Map;
  * to camelCase JSON objects (dates as ISO strings, as the SPA expects).
  */
 @Service
-@Slf4j
 public class QueryService {
 
   private final NamedParameterJdbcTemplate jdbc;
   private final QueryRegistry registry;
+  private final List<QueryBinds> serverBinds;
 
   public QueryService(NamedParameterJdbcTemplate jdbc, QueryRegistry registry) {
+    this(jdbc, registry, List.of());
+  }
+
+  @org.springframework.beans.factory.annotation.Autowired
+  public QueryService(NamedParameterJdbcTemplate jdbc, QueryRegistry registry, List<QueryBinds> serverBinds) {
     this.jdbc = jdbc;
     this.registry = registry;
+    this.serverBinds = serverBinds;
   }
 
   /** Paged search. */
   public PageableResponse<Map<String, Object>> search(String queryId, Map<String, String> params,
       int page, int size, String sortBy, String sortDir) {
-    QueryDefinition q = authorized(queryId);
-    Built built = build(q, params);
+    return search(authorized(queryId), Viewer.current(), params, page, size, sortBy, sortDir);
+  }
+
+  /**
+   * Paged search of an already-authorized definition for an explicit viewer —
+   * the public read-only area runs registry SQL as {@link Viewer#ANONYMOUS}.
+   */
+  public PageableResponse<Map<String, Object>> search(QueryDefinition q, Viewer viewer, Map<String, String> params,
+      int page, int size, String sortBy, String sortDir) {
+    Built built = build(q, params, viewer);
     int pageSize = Math.max(1, Math.min(size <= 0 ? 20 : size, 500));
     int offset = Math.max(0, page) * pageSize;
     if (offset >= q.maxRows()) {
@@ -67,8 +79,12 @@ public class QueryService {
 
   /** Every row (up to maxRows) — lookups, detail child tables. */
   public List<Map<String, Object>> list(String queryId, Map<String, String> params) {
-    QueryDefinition q = authorized(queryId);
-    Built built = build(q, params);
+    return list(authorized(queryId), Viewer.current(), params);
+  }
+
+  /** {@link #list(String, Map)} of an already-authorized definition for an explicit viewer. */
+  public List<Map<String, Object>> list(QueryDefinition q, Viewer viewer, Map<String, String> params) {
+    Built built = build(q, params, viewer);
     built.params.addValue("hbsLimit", q.maxRows());
     String sql = built.sql + " ORDER BY " + q.defaultOrderBy() + " FETCH FIRST :hbsLimit ROWS ONLY";
     return jdbc.query(sql, built.params, (rs, n) -> mapRow(rs));
@@ -85,15 +101,23 @@ public class QueryService {
 
   /** Number of rows a search matches (uncapped). */
   public long count(String queryId, Map<String, String> params) {
-    QueryDefinition q = authorized(queryId);
-    Built built = build(q, params);
+    return count(authorized(queryId), Viewer.current(), params);
+  }
+
+  /** {@link #count(String, Map)} of an already-authorized definition for an explicit viewer. */
+  public long count(QueryDefinition q, Viewer viewer, Map<String, String> params) {
+    Built built = build(q, params, viewer);
     Long total = jdbc.queryForObject("SELECT COUNT(*) FROM (" + built.sql + ")", built.params, Long.class);
     return total == null ? 0 : total;
   }
 
   /** CSV export of a search (the legacy screens' "Export"/"Download" buttons). */
   public String exportCsv(String queryId, Map<String, String> params) {
-    List<Map<String, Object>> rows = list(queryId, params);
+    return toCsv(list(queryId, params));
+  }
+
+  /** CSV of rows already fetched (e.g. by {@link #list(QueryDefinition, Viewer, Map)}). */
+  public static String toCsv(List<Map<String, Object>> rows) {
     StringWriter out = new StringWriter();
     try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT)) {
       if (!rows.isEmpty()) {
@@ -116,7 +140,7 @@ public class QueryService {
 
   private record Built(String sql, MapSqlParameterSource params) {}
 
-  private Built build(QueryDefinition q, Map<String, String> raw) {
+  private Built build(QueryDefinition q, Map<String, String> raw, Viewer viewer) {
     Map<String, String> in = raw == null ? Map.of() : raw;
     StringBuilder sql = new StringBuilder(q.sql());
     MapSqlParameterSource params = new MapSqlParameterSource();
@@ -124,15 +148,20 @@ public class QueryService {
     //   CASE WHEN :hbsIsMinistry = 'Y' OR fc.client_type_code <> 'I'
     //          OR fc.client_number = :hbsViewerClient
     //        THEN fc.client_name ELSE 'Not Releasable' END
-    boolean ministry = RequestUtil.isMinistryUser();
-    params.addValue("hbsIsMinistry", ministry ? "Y" : "N");
-    params.addValue("hbsViewerClient", ministry ? "" : RequestUtil.getCurrentClientNumber());
-    params.addValue("hbsUserType", RequestUtil.getLegacyUserType());
+    params.addValue("hbsIsMinistry", viewer.ministry() ? "Y" : "N");
+    params.addValue("hbsViewerClient", viewer.ministry() ? "" : viewer.clientNumber());
+    params.addValue("hbsUserType", viewer.userType());
     // Legacy HBS_USER.USER_ID form (IDIR\NAME / BCEID\NAME, upper-cased) —
     // for the "associated sites / districts" data-domain filters, e.g.
     //   AND ss.scale_site_id IN (SELECT scale_site_id FROM hbs_user_site_data_domain
     //                             WHERE user_id = :hbsUserId)
-    params.addValue("hbsUserId", RequestUtil.getCurrentAuditUserId().toUpperCase());
+    params.addValue("hbsUserId", viewer.userId());
+    // Server-side values from outside the database (QueryBinds), only for the queries that select them.
+    for (QueryBinds b : serverBinds) {
+      if (q.sql().contains(":" + b.prefix())) {
+        params.addValues(b.values());
+      }
+    }
     for (QueryFilter f : q.filters()) {
       String value = in.get(f.param());
       if (!StringUtils.hasText(value)) {
@@ -144,8 +173,8 @@ public class QueryService {
       params.addValue(f.param(), convert(f.param(), value.trim(), f.type()));
       sql.append('\n').append(f.fragment());
     }
-    if (q.clientScope() != null && !RequestUtil.isMinistryUser()) {
-      String client = RequestUtil.getCurrentClientNumber();
+    if (q.clientScope() != null && !viewer.ministry()) {
+      String client = viewer.clientNumber();
       if (!StringUtils.hasText(client)) {
         throw new AccessDeniedException("hbs.no_access_right: no client scope on token");
       }

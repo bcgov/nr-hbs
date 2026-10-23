@@ -16,18 +16,17 @@ import java.util.List;
  * <p>Ported from {@code hbs-ejb/.../hbs/plu} ({@code OverrideRateRuleQuery},
  * {@code HbsDistrictDefaultRateQuery}, {@code WasteResidueRateQuery},
  * {@code RateManagerBean}) and the report procs HBS2R201 / HBS3R211 / HBS3R221.
- * Writes call the legacy table-API procs (HBS_CREATE_/HBS_STORE_/HBS_REMOVE_
- * OVERRIDE_RULE, OVERRIDE_RATE, HBS_DISTRICT_RATE, WASTE_RESIDUE_RATE).
  *
- * <p>The validations the legacy Struts actions ran before these procs (rule /
- * rate interval overlap, 7-year back-dating limit, SPG validity, cut block
- * cross-reference) are not single proc calls and are listed in
- * docs/areas/rating-and-sampling.md, "Legacy logic not yet ported".
+ * <p>Read side only. The writes (with the validations the legacy Struts
+ * actions ran before the procs: rule / rate interval overlap, 7-year
+ * back-dating limit, SPG validity, cut block cross-reference, status gating)
+ * are workflow commands in {@code ca.bc.gov.nrs.hbs.api.rating}; the P230
+ * stumpage rate lookup is {@code StumpageRateController}.
  */
 @Component
 public class RatingCatalog implements QueryCatalog {
 
-  /** Override rule columns shared by the list, the detail and the STORE-based commands. */
+  /** Override rule columns shared by the list and the detail (updateTimestamp for the workflows' RowLock). */
   private static final String RULE_COLUMNS = """
       SELECT orr.override_rating_rule_id,
              orr.timber_mark,
@@ -44,7 +43,8 @@ public class RatingCatalog implements QueryCatalog {
              orr.override_rate_date,
              orr.ovrrdrtrl_comment,
              orr.entry_userid,
-             orr.entry_timestamp""";
+             orr.entry_timestamp,
+             orr.update_timestamp""";
 
   private static final String RULE_FROM = """
         FROM override_rating_rule orr
@@ -141,6 +141,54 @@ public class RatingCatalog implements QueryCatalog {
             .maxRows(1)
             .build(),
 
+        // P202 return counts as rows, each with the parameters of the legacy drill-down link
+        // ($W/plu/P202.jsp → summaryScaleReturnSearch.do?actionType=FilterSearch): confirmed
+        // returns by override rule id (+ scale dates, field deck), candidate returns by timber
+        // mark with chcStatus=OvrRule (HBS2R051/HBS2R101 strAndVersionStatusCodeOvr: not LCK /
+        // ISS / CAN / DEL, category not WA) — summaryReturns.search status OVRRULE.
+        QueryDefinition.builder("rating.overrideRules.returnCounts")
+            .legacy("P202")
+            .capability(Capability.RATING_MINISTRY_VIEW)
+            .sql("""
+                SELECT c.* FROM (
+                  SELECT orr.override_rating_rule_id, 1 AS row_order, 'Confirmed Returns' AS return_kind,
+                         'P' AS return_type, 'Piece Scale' AS scale_type,
+                         hbs_get_ovrrate_return_count(TO_CHAR(orr.override_rating_rule_id), orr.timber_mark,
+                           orr.scale_effective_date, orr.scale_expiry_date, 'PRC', orr.field_scale_deck_id) AS return_count,
+                         orr.override_rating_rule_id AS link_rule_id, CAST(NULL AS VARCHAR2(6)) AS link_timber_mark,
+                         CAST(NULL AS VARCHAR2(7)) AS link_status,
+                         orr.scale_effective_date AS scale_date_from, orr.scale_expiry_date AS scale_date_to,
+                         orr.field_scale_deck_id
+                    FROM override_rating_rule orr
+                  UNION ALL
+                  SELECT orr.override_rating_rule_id, 2, 'Confirmed Returns', 'W', 'Weight Scale',
+                         hbs_get_ovrrate_return_count(TO_CHAR(orr.override_rating_rule_id), orr.timber_mark,
+                           orr.scale_effective_date, orr.scale_expiry_date, 'WRC', orr.field_scale_deck_id),
+                         orr.override_rating_rule_id, NULL, NULL,
+                         orr.scale_effective_date, orr.scale_expiry_date, orr.field_scale_deck_id
+                    FROM override_rating_rule orr
+                  UNION ALL
+                  SELECT orr.override_rating_rule_id, 3, 'Candidate Returns', 'P', 'Piece Scale',
+                         hbs_get_ovrrate_return_count(TO_CHAR(orr.override_rating_rule_id), orr.timber_mark,
+                           orr.scale_effective_date, orr.scale_expiry_date, 'PRFC', orr.field_scale_deck_id),
+                         NULL, orr.timber_mark, 'OVRRULE',
+                         orr.scale_effective_date, orr.scale_expiry_date, orr.field_scale_deck_id
+                    FROM override_rating_rule orr
+                  UNION ALL
+                  SELECT orr.override_rating_rule_id, 4, 'Candidate Returns', 'W', 'Weight Scale',
+                         hbs_get_ovrrate_return_count(TO_CHAR(orr.override_rating_rule_id), orr.timber_mark,
+                           orr.scale_effective_date, orr.scale_expiry_date, 'WRFC', orr.field_scale_deck_id),
+                         NULL, orr.timber_mark, 'OVRRULE',
+                         orr.scale_effective_date, orr.scale_expiry_date, orr.field_scale_deck_id
+                    FROM override_rating_rule orr
+                ) c
+                 WHERE 1=1""")
+            .filter(QueryFilter.required("overrideRatingRuleId",
+                "AND c.override_rating_rule_id = :overrideRatingRuleId", Type.NUMBER))
+            .orderBy("c.row_order")
+            .maxRows(4)
+            .build(),
+
         // P202 "Override Rate Details" table (null species / grade shown as "All").
         QueryDefinition.builder("rating.overrideRates.list")
             .legacy("P202/P204/P207")
@@ -156,8 +204,11 @@ public class RatingCatalog implements QueryCatalog {
                        NVL(sgc.description, 'All') AS grade,
                        ort.override_rate,
                        ort.entry_userid,
-                       ort.entry_timestamp
+                       ort.entry_timestamp,
+                       ort.update_timestamp,
+                       orr.override_rule_status_code
                   FROM override_rate ort
+                  JOIN override_rating_rule orr ON orr.override_rating_rule_id = ort.override_rating_rule_id
                   LEFT JOIN scale_species_code ssc ON ssc.scale_species_code = ort.scale_species_code
                   LEFT JOIN scale_product_code spc ON spc.scale_product_code = ort.scale_product_code
                   LEFT JOIN scale_grade_code sgc ON sgc.scale_grade_code = ort.scale_grade_code
@@ -262,214 +313,14 @@ public class RatingCatalog implements QueryCatalog {
     );
   }
 
+  /**
+   * No registry commands: every Rating write is a {@code WorkflowCommand} in
+   * {@code ca.bc.gov.nrs.hbs.api.rating} (the legacy validations, overlap
+   * checks and status gating run before the procs).
+   */
   @Override
   public List<CommandDefinition> commands() {
-    return List.of(
-        // P203 Add Override Date Rule — "Activate Rule" saves it directly as ACT.
-        CommandDefinition.builder("rating.overrideRule.createDateRule")
-            .legacy("P203")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_CREATE_OVERRIDE_RULE")
-            .sequence("OVERRIDE_RATING_RULE_SEQ")      // i_override_rating_rule_id
-            .constant("RTDTRL")                         // i_ovrrdrtrl_type
-            .constant("PR")                             // i_override_rule_category_code (hidden prodType)
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("processingEffectiveDate", Type.DATE)
-            .requiredBody("processingExpiryDate", Type.DATE)
-            .requiredBody("scaleEffectiveDate", Type.DATE)
-            .requiredBody("scaleExpiryDate", Type.DATE)
-            .text("ovrrdrtrlComment")
-            .requiredBody("overrideRateDate", Type.DATE)
-            .constant("ACT")                            // i_override_rule_status_code
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .upper("fieldScaleDeckId")
-            .build(),
-        // P204 Add Override Rate Rule — first "Save and Add More Rate Details" creates it as PND.
-        CommandDefinition.builder("rating.overrideRule.createRateRule")
-            .legacy("P204")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_CREATE_OVERRIDE_RULE")
-            .sequence("OVERRIDE_RATING_RULE_SEQ")
-            .constant("OVRRDRULE")
-            .constant("PR")
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("processingEffectiveDate", Type.DATE)
-            .requiredBody("processingExpiryDate", Type.DATE)
-            .requiredBody("scaleEffectiveDate", Type.DATE)
-            .requiredBody("scaleExpiryDate", Type.DATE)
-            .text("ovrrdrtrlComment")
-            .date("overrideRateDate")                   // always null for rate rules
-            .constant("PND")
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .upper("fieldScaleDeckId")
-            .build(),
-        // P204/P207 "Activate Rule" (PND -> ACT) — RateManager.updateOverrideRateRule.
-        storeRuleStatus("rating.overrideRule.activate", "P204/P207", "ACT"),
-        // P202/P206 "De-activate Rule" — RateManager.disableOverrideRule (-> INA).
-        storeRuleStatus("rating.overrideRule.deactivate", "P202/P206", "INA"),
-
-        // P204/P207 override rate detail rows.
-        CommandDefinition.builder("rating.overrideRate.create")
-            .legacy("P204/P207")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_CREATE_OVERRIDE_RATE")
-            .sequence("OVERRIDE_RATE_SEQ")
-            .requiredBody("overrideRatingRuleId", Type.NUMBER)
-            .upper("scaleSpeciesCode")                  // blank = All
-            .requiredBody("scaleProductCode", Type.UPPER)
-            .upper("scaleGradeCode")                    // blank = All
-            .requiredBody("overrideRate", Type.NUMBER)
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .build(),
-        CommandDefinition.builder("rating.overrideRate.update")
-            .legacy("P204/P207")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_STORE_OVERRIDE_RATE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM override_rate WHERE override_rate_id = :overrideRateId")
-            .requiredBody("overrideRateId", Type.NUMBER)
-            .requiredBody("overrideRatingRuleId", Type.NUMBER)
-            .upper("scaleSpeciesCode")
-            .requiredBody("scaleProductCode", Type.UPPER)
-            .upper("scaleGradeCode")
-            .requiredBody("overrideRate", Type.NUMBER)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .build(),
-        // P204/P207: a row with every field cleared is deleted.
-        CommandDefinition.builder("rating.overrideRate.remove")
-            .legacy("P204/P207")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_REMOVE_OVERRIDE_RATE")
-            .requiredBody("overrideRateId", Type.NUMBER)
-            .build(),
-
-        // P212 Add Default Rate — RateManager.createAndStoreHbsDistrictDefaultRate.
-        CommandDefinition.builder("rating.districtRate.create")
-            .legacy("P212")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_CREATE_HBS_DISTRICT_RATE")
-            .sequence("HBS_DISTRICT_DEFAULT_RATE_SEQ")
-            .requiredBody("orgUnitNo", Type.NUMBER)
-            .upper("scaleSpeciesCode")                  // blank = All (stored null)
-            .requiredBody("scaleProductCode", Type.UPPER)
-            .requiredBody("scaleGradeCode", Type.UPPER)
-            .requiredBody("rate", Type.NUMBER)
-            .constant("Y")                              // i_active_ind
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .requiredBody("appraisalMthdCode", Type.UPPER)
-            .build(),
-        // P213 Update Default Rate — RateManager.updateHbsDistrictDefaultRate (full-row STORE).
-        CommandDefinition.builder("rating.districtRate.update")
-            .legacy("P213")
-            .capability(Capability.RATE_ADMIN)
-            .procedure("HBS_STORE_HBS_DISTRICT_RATE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM hbs_district_default_rate WHERE distrt_id = :distrtId")
-            .requiredBody("distrtId", Type.NUMBER)
-            .requiredBody("orgUnitNo", Type.NUMBER)
-            .upper("scaleSpeciesCode")
-            .requiredBody("scaleProductCode", Type.UPPER)
-            .requiredBody("scaleGradeCode", Type.UPPER)
-            .requiredBody("rate", Type.NUMBER)
-            .requiredBody("activeInd", Type.UPPER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .requiredBody("appraisalMthdCode", Type.UPPER)
-            .build(),
-
-        // P222 Add Waste & Residue Rate "Activate" — RateHelper.createWasteResidueRate.
-        // Product is always ' ' (P222Form.chcProduct), avoidable Y (issue #2989),
-        // expiry = effective (BT 5705: the "To Scale Date" field was removed).
-        CommandDefinition.builder("rating.wasteRate.create")
-            .legacy("P222")
-            .capability(Capability.WASTE_RATE_ADMIN)
-            .procedure("HBS_CREATE_WASTE_RESIDUE_RATE")
-            .sequence("WASTE_RESIDUE_RATE_SEQ")
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("cutBlockId", Type.UPPER)
-            .requiredBody("scaleSpeciesCode", Type.UPPER)
-            .constant(" ")                              // i_scale_product_code
-            .requiredBody("scaleGradeCode", Type.UPPER)
-            .constant("Y")                              // i_active_ind
-            .constant("Y")                              // i_avoidable_ind
-            .requiredBody("rate", Type.NUMBER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("effectiveDate", Type.DATE)   // i_expiry_date
-            .auditUser()
-            .now()
-            .auditUser()
-            .now()
-            .requiredBody("wasteRateSourceCode", Type.UPPER)
-            .build(),
-        // P223 "Delete" — soft delete: the row is re-stored with ACTIVE_IND = 'N'.
-        CommandDefinition.builder("rating.wasteRate.deactivate")
-            .legacy("P223")
-            .capability(Capability.WASTE_RATE_ADMIN)
-            .procedure("HBS_STORE_WASTE_RESIDUE_RATE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM waste_residue_rate WHERE wstrt_id = :wstrtId")
-            .requiredBody("wstrtId", Type.NUMBER)
-            .requiredBody("timberMark", Type.UPPER)
-            .requiredBody("cutBlockId", Type.UPPER)
-            .requiredBody("scaleSpeciesCode", Type.UPPER)
-            .constant(" ")                              // i_scale_product_code (P223Form.chcProduct)
-            .requiredBody("scaleGradeCode", Type.UPPER)
-            .constant("N")                              // i_active_ind
-            .requiredBody("avoidableInd", Type.UPPER)
-            .requiredBody("rate", Type.NUMBER)
-            .requiredBody("effectiveDate", Type.DATE)
-            .requiredBody("expiryDate", Type.DATE)
-            .existing("entryUserid")
-            .existing("entryTimestamp")
-            .auditUser()
-            .now()
-            .text("wasteRateSourceCode")
-            .build()
-    );
-  }
-
-  /** Full-row HBS_STORE_OVERRIDE_RULE that only changes the status (values come from the viewed rule). */
-  private static CommandDefinition storeRuleStatus(String id, String legacy, String status) {
-    return CommandDefinition.builder(id)
-        .legacy(legacy)
-        .capability(Capability.RATE_ADMIN)
-        .procedure("HBS_STORE_OVERRIDE_RULE")
-            .existingRow("SELECT entry_userid, entry_timestamp FROM override_rating_rule WHERE override_rating_rule_id = :overrideRatingRuleId")
-        .requiredBody("overrideRatingRuleId", Type.NUMBER)
-        .requiredBody("ovrrdrtrlType", Type.UPPER)
-        .requiredBody("overrideRuleCategoryCode", Type.UPPER)
-        .requiredBody("timberMark", Type.UPPER)
-        .requiredBody("processingEffectiveDate", Type.DATE)
-        .requiredBody("processingExpiryDate", Type.DATE)
-        .requiredBody("scaleEffectiveDate", Type.DATE)
-        .requiredBody("scaleExpiryDate", Type.DATE)
-        .text("ovrrdrtrlComment")
-        .date("overrideRateDate")
-        .constant(status)
-        .existing("entryUserid")
-        .existing("entryTimestamp")
-        .auditUser()
-        .now()
-        .upper("fieldScaleDeckId")
-        .build();
+    return List.of();
   }
 
   private static String districtRateSql() {
@@ -491,7 +342,8 @@ public class RatingCatalog implements QueryCatalog {
                ddr.effective_date,
                ddr.expiry_date,
                ddr.entry_userid,
-               ddr.entry_timestamp
+               ddr.entry_timestamp,
+               ddr.update_timestamp
           FROM hbs_district_default_rate ddr
           JOIN org_unit ou ON ou.org_unit_no = ddr.org_unit_no
           LEFT JOIN scale_species_code ssc ON ssc.scale_species_code = ddr.scale_species_code
@@ -520,7 +372,8 @@ public class RatingCatalog implements QueryCatalog {
                wrr.waste_rate_source_code,
                wrsc.description AS rate_source,
                wrr.entry_userid,
-               wrr.entry_timestamp
+               wrr.entry_timestamp,
+               wrr.update_timestamp
           FROM waste_residue_rate wrr
           LEFT JOIN scale_species_code ssc ON ssc.scale_species_code = wrr.scale_species_code
           LEFT JOIN scale_grade_code sgc ON sgc.scale_grade_code = wrr.scale_grade_code

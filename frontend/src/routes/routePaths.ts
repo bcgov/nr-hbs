@@ -8,6 +8,7 @@ import {
   DocumentTasks,
   Home,
   ListChecked,
+  Password,
   Location,
   Receipt,
   RecentlyViewed,
@@ -100,6 +101,33 @@ const EXTRA_LEAVES: Partial<Record<ScreenArea, MenuLeaf[]>> = {
       path: '/scale-returns/submit',
       icon: DocumentImport,
       capability: 'XML_SUBMIT',
+    },
+    {
+      // P002 "HBS Public Key" (legacy DownloadPublicKeyServlet).
+      id: 'hbs-public-key',
+      label: 'Download HBS Public Key',
+      path: '/scale-returns/public-key',
+      icon: Password,
+      capability: 'ANY_USER',
+    },
+  ],
+  profiles: [
+    {
+      // P362 Submit / P363 (legacy P002 "Scaler Profile" link for self service).
+      id: 'scaler-key-request',
+      label: 'Request Authentication Key',
+      path: '/profiles/scaler-key-request',
+      icon: Password,
+      capability: 'SCALER_PROFILE_EDIT',
+    },
+  ],
+  rating: [
+    {
+      id: 'stumpage-rate',
+      label: 'Search for Stumpage Rate',
+      path: '/rating/stumpage-rate',
+      icon: Calculator,
+      capability: 'RATING_VIEW',
     },
   ],
 };

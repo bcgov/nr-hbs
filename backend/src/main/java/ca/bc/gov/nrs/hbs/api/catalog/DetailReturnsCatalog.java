@@ -95,6 +95,31 @@ public class DetailReturnsCatalog implements QueryCatalog {
         .filter(QueryFilter.upper("cutBlock", "AND UPPER(d.cut_block_id) LIKE REPLACE(:cutBlock, '*', '%')"))
         .filter(QueryFilter.number("markOrgUnit",
             "AND (d.mark_district_no = :markOrgUnit OR d.mark_region_no = :markOrgUnit)"))
+        // HBS2R551 PSR_SearchByMarks = 'marksinassociateddistricts' (strAndAssDisForMSAMark):
+        // the mark's district is in the user's HBS_USER_DIST_DATA_DOMAIN.
+        .filter(QueryFilter.upper("markScope", """
+            AND (:markScope <> 'ASSOCIATED_DISTRICTS' OR d.mark_district_no IN
+                 (SELECT dd.org_unit_no FROM hbs_user_dist_data_domain dd WHERE dd.user_id = :hbsUserId))"""))
+        // HBS2R551 PSR_SearchBySites data-domain scopes on the legacy user id (P046Action
+        // setSearchCriteriaForHome / setCriteriaForErrorcategory role defaults):
+        //   ASSOCIATED_SITES      'associatedsites'            (strAndAssociatedSites)
+        //   ASSOCIATED_DISTRICTS  'sitesinassociateddistricts' (strAndAssociatedDistrictForMSA)
+        //   OWN_LICENCE           'mofscalerscaledata' / CLI_SCALER_SCALEDATA: the user's scaler
+        //                         licence, scale date inside the HBS_SCALER_AUTH_KEY period
+        //   MOF_DUAL / CLIENT_DUAL 'mofdualrolesscaledata' / 'clientdualrolesscaledata': the
+        //                         district / site domain UNION the own-licence returns
+        //                         (strWhereForMSCAndISC, BT 3268).
+        .filter(QueryFilter.upper("scope", """
+            AND (:scope NOT IN ('ASSOCIATED_SITES', 'ASSOCIATED_DISTRICTS', 'OWN_LICENCE', 'MOF_DUAL', 'CLIENT_DUAL')
+              OR (:scope IN ('ASSOCIATED_SITES', 'CLIENT_DUAL') AND d.scale_site IN
+                   (SELECT sd.scale_site_id_nmbr FROM hbs_user_site_data_domain sd WHERE sd.user_id = :hbsUserId))
+              OR (:scope IN ('ASSOCIATED_DISTRICTS', 'MOF_DUAL') AND d.site_org_unit_no IN
+                   (SELECT dd.org_unit_no FROM hbs_user_dist_data_domain dd WHERE dd.user_id = :hbsUserId))
+              OR (:scope IN ('OWN_LICENCE', 'MOF_DUAL', 'CLIENT_DUAL') AND EXISTS
+                   (SELECT 1 FROM quant_license ql
+                      JOIN hbs_scaler_auth_key k ON k.client_number = ql.client_number
+                     WHERE ql.license_number = d.primary_licence AND k.user_id = :hbsUserId
+                       AND d.event_date BETWEEN k.effective_date AND k.expiry_date)))"""))
         // Primary Scaler Licence
         .filter(QueryFilter.upper("scalerLicence", "AND d.primary_licence = :scalerLicence"))
         // Range of Numbers (BT7857)

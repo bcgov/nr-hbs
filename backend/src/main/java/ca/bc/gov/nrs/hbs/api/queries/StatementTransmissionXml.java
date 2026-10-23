@@ -5,7 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.XMLConstants;
@@ -73,18 +73,22 @@ final class StatementTransmissionXml {
       child(out, header, "requestor-client", who.client());
       child(out, header, "fine-print", FINE_PRINT);
 
-      Map<String, Element> wrappers = new LinkedHashMap<>();
-      Map<String, Integer> counts = new LinkedHashMap<>();
+      // Legacy collected the batches in a HashMap keyed by type and wrote values():
+      // the same HashMap gives the same batch order (see DeliveryTransmissionXml).
+      Map<String, Element> wrappers = new HashMap<>();
+      Map<String, Integer> counts = new HashMap<>();
       for (Item item : items) {
         Element source = firstWrapper(builder().parse(new InputSource(new StringReader(item.xml()))));
         if (source == null) {
           continue;
         }
-        Element wrapper = wrappers.computeIfAbsent(item.type(), type -> {
-          Element batch = child(out, root, "hbs-batch", null);
-          batch.setAttribute("batch-type-code", type);
-          return child(out, batch, source.getLocalName(), null);
-        });
+        Element wrapper = wrappers.get(item.type());
+        if (wrapper == null) { // get/put keeps legacy's bucket order (see DeliveryTransmissionXml)
+          Element batch = out.createElementNS(NAMESPACE, "hbs-batch");
+          batch.setAttribute("batch-type-code", item.type());
+          wrapper = child(out, batch, source.getLocalName(), null);
+          wrappers.put(item.type(), wrapper);
+        }
         for (Node n = source.getFirstChild(); n != null; n = n.getNextSibling()) {
           if (n instanceof Element statement) {
             wrapper.appendChild(out.importNode(statement, true));
@@ -92,8 +96,11 @@ final class StatementTransmissionXml {
           }
         }
       }
-      wrappers.forEach((type, wrapper) ->
-          ((Element) wrapper.getParentNode()).setAttribute("document-count", Integer.toString(counts.get(type))));
+      wrappers.forEach((type, wrapper) -> {
+        Element batch = (Element) wrapper.getParentNode();
+        batch.setAttribute("document-count", Integer.toString(counts.getOrDefault(type, 0)));
+        root.appendChild(batch);
+      });
       root.setAttribute("batch-count", Integer.toString(wrappers.size()));
       return write(out);
     } catch (ParserConfigurationException | SAXException | IOException | TransformerException ex) {

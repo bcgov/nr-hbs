@@ -1,8 +1,8 @@
 import { Login } from '@carbon/icons-react';
 import { Button, Column, Grid, InlineNotification } from '@carbon/react';
 import { type FC, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Modal } from '@/components/Modal';
 import { SESSION_EXPIRED_FLAG } from '@/components/SessionTimeout';
 import { useAuth } from '@/context/auth/useAuth';
 import { useTheme } from '@/context/theme/useTheme';
@@ -18,7 +18,6 @@ const LandingPage: FC = () => {
   // inactivity logout (SessionTimeout sets the flag before signing out).
   // Read-and-clear so a manual page refresh doesn't resurface it.
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [requestAccessOpen, setRequestAccessOpen] = useState(false);
   useEffect(() => {
     try {
       if (sessionStorage.getItem(SESSION_EXPIRED_FLAG) === '1') {
@@ -86,13 +85,17 @@ const LandingPage: FC = () => {
               </div>
 
               <div className="landing-request-access">
-                <button
-                  type="button"
-                  className="landing-request-access__link"
-                  onClick={() => setRequestAccessOpen(true)}
-                >
+                {/* Legacy public menu (mainmenu_public.jsp): the public queries
+                    need no login; "Register" became "How to get access". */}
+                <Link to="/public" className="landing-request-access__link" data-testid="landing-public-link">
+                  Public queries — no login required
+                </Link>
+                <p className="landing-request-access__note">
+                  Harvest reports, invoice and statement copies, timber mark information and sampling plans
+                </p>
+                <Link to="/public/access" className="landing-request-access__link">
                   Request access to HBS
-                </button>
+                </Link>
                 <p className="landing-request-access__note">
                   An active IDIR or Business BCeID account is required
                 </p>
@@ -105,40 +108,6 @@ const LandingPage: FC = () => {
           <img src="/landing.jpg" alt="Ponderosa pine forest, British Columbia" className="landing-img" />
         </Column>
       </Grid>
-
-      <Modal
-        open={requestAccessOpen}
-        modalHeading="Request access to HBS"
-        passiveModal
-        size="sm"
-        onRequestClose={() => setRequestAccessOpen(false)}
-      >
-        <div className="landing-request-modal">
-          <p>
-            To request access, email{' '}
-            <a href="mailto:HBS.Admin@gov.bc.ca">HBS.Admin@gov.bc.ca</a> and
-            include:
-          </p>
-
-          <p className="landing-request-modal__group-title">
-            Business BCeID users
-          </p>
-          <ul>
-            <li>Name</li>
-            <li>Email address</li>
-            <li>Company</li>
-            <li>Phone number</li>
-            <li>Business BCeID username</li>
-            <li>Client numbers</li>
-            <li>Requested roles — Submitter, Reviewer, or Approver</li>
-          </ul>
-
-          <p className="landing-request-modal__group-title">IDIR users</p>
-          <ul>
-            <li>First and last name, or IDIR username</li>
-          </ul>
-        </div>
-      </Modal>
     </div>
   );
 };

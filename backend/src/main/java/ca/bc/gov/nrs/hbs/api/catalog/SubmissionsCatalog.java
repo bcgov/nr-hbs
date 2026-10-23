@@ -141,6 +141,25 @@ public class SubmissionsCatalog implements QueryCatalog {
            OR t.recd_client_number = :scopeClientNumber
            OR ss.owner_cli_number = :scopeClientNumber)""";
 
+  /**
+   * P041 / P024 "Associated Sites" / "Sites in Associated Districts"
+   * (legacy radSearchBySites {@code A<userId>} / {@code S<userId>} prompts of
+   * HBS2R041 / HBS2R027): the caller's HBS_USER_SITE_DATA_DOMAIN /
+   * HBS_USER_DIST_DATA_DOMAIN rows, through the {@code :hbsUserId} viewer bind.
+   * Values: ASSOCIATED_SITES, ASSOCIATED_DISTRICTS (anything else = no filter).
+   */
+  static String siteScopeFilter(String siteExpr, String orgExpr) {
+    return "AND (:siteScope NOT IN ('ASSOCIATED_SITES', 'ASSOCIATED_DISTRICTS')"
+        + " OR (:siteScope = 'ASSOCIATED_SITES' AND " + siteExpr + " IN"
+        + " (SELECT sd.scale_site_id_nmbr FROM hbs_user_site_data_domain sd WHERE sd.user_id = :hbsUserId))"
+        + " OR (:siteScope = 'ASSOCIATED_DISTRICTS' AND " + orgExpr + " IN"
+        + " (SELECT dd.org_unit_no FROM hbs_user_dist_data_domain dd WHERE dd.user_id = :hbsUserId)))";
+  }
+
+  /** inputUserScope=Y: "Input User ID = the caller" (legacy role default for MOF_SCALER / HBS_DTL_DATA_ENT / CLI_SCALER). */
+  static final String INPUT_USER_SELF =
+      "AND (:inputUserScope <> 'Y' OR UPPER(t.input_userid) = :hbsUserId)";
+
   static final String REJECTED = "(b.return_count - (b.in_error_count + b.other_count + b.ready_count))";
 
   @Override
@@ -175,6 +194,12 @@ public class SubmissionsCatalog implements QueryCatalog {
                 "AND (t.client_number = :clientNumber OR t.recd_client_number = :clientNumber)"))
             .filter(QueryFilter.eq("clientLocnCode", "AND t.client_locn_code = :clientLocnCode"))
             .filter(QueryFilter.upper("inputUserId", "AND UPPER(t.input_userid) = :inputUserId"))
+            .filter(QueryFilter.upper("inputUserScope", INPUT_USER_SELF))
+            // Like the site filters above: batch-less transmissions are kept (HBS2R041 UNION).
+            .filter(QueryFilter.upper("siteScope", "AND (t.batch_count = 0 OR EXISTS (SELECT 1 FROM dtl_doc_batch xb"
+                + " JOIN scale_site xs ON xs.scale_site_id_nmbr = xb.scale_site_id_nmbr"
+                + " WHERE xb.transmission_id = t.transmission_id "
+                + siteScopeFilter("xb.scale_site_id_nmbr", "xs.org_unit_no") + "))"))
             .sort("receivedTimestamp", "t.entry_timestamp")
             .sort("transmissionId", "t.transmission_id")
             .sort("fileName", "t.file_name")
@@ -213,6 +238,8 @@ public class SubmissionsCatalog implements QueryCatalog {
             .filter(QueryFilter.eq("clientNumber", "AND t.client_number = :clientNumber"))
             .filter(QueryFilter.eq("clientLocnCode", "AND t.client_locn_code = :clientLocnCode"))
             .filter(QueryFilter.upper("inputUserId", "AND UPPER(t.input_userid) = :inputUserId"))
+            .filter(QueryFilter.upper("inputUserScope", INPUT_USER_SELF))
+            .filter(QueryFilter.upper("siteScope", siteScopeFilter("b.scale_site_id_nmbr", "ss.org_unit_no")))
             // "Batches" radio (BT630).
             .filter(QueryFilter.eq("batchType", """
                 AND (:batchType = 'allbatches'

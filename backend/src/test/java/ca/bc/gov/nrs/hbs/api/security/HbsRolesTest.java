@@ -37,10 +37,19 @@ class HbsRolesTest {
     for (String role : HbsRoles.ALL) {
       int buckets = (HbsRoles.MINISTRY.contains(role) ? 1 : 0)
           + (HbsRoles.CLIENT.contains(role) ? 1 : 0)
-          + (HbsRoles.SPECIAL.contains(role) ? 1 : 0);
+          + (HbsRoles.SPECIAL.contains(role) ? 1 : 0)
+          + (HbsRoles.SERVICE.contains(role) ? 1 : 0);
       assertThat(buckets).as(role).isEqualTo(1);
     }
-    assertThat(HbsRoles.ALL).hasSize(28);
+    assertThat(HbsRoles.ALL).hasSize(29);
+  }
+
+  @Test
+  void legacyBridge_isAServiceRole_notMinistryNorClient() {
+    assertThat(HbsRoles.canonicalRoleFor("HBS_LEGACY_BRIDGE")).isEqualTo(HbsRoles.LEGACY_BRIDGE);
+    assertThat(HbsRoles.isMinistry(HbsRoles.LEGACY_BRIDGE)).isFalse();
+    assertThat(HbsRoles.isClientScoped(HbsRoles.LEGACY_BRIDGE)).isFalse();
+    assertThat(HbsRoles.legacyUserType(List.of(HbsRoles.LEGACY_BRIDGE))).isEqualTo("PUB");
   }
 
   @Test

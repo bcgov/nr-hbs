@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hbs-transmission xmlns="gov.bc.ca/forests/hbs/statement/v1" transmission-id="1" batch-count="1" date-created="2026-09-15" time-created="10:15:00">
+  <hbs-batch batch-type-code="RS" document-count="1">
+    <ratio-statements>
+      <ratio-statement>
+        <header>
+          <statement-number>1000001</statement-number>
+          <issue-date>2026-09-03</issue-date>
+          <population-owner>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </population-owner>
+          <stratum-owner>
+            <client-number>00012345</client-number>
+            <client-code>CL</client-code>
+            <name>WESTERN FOREST PRODUCTS INC</name>
+            <location-name>LOCATION NAME</location-name>
+            <address1>1500 TIMBER WAY</address1>
+            <address2>SUITE 200</address2>
+            <address3>PO BOX 99</address3>
+            <city>NANAIMO</city>
+            <province>BC</province>
+            <country>CANADA</country>
+            <postal-code>V9R5K2</postal-code>
+          </stratum-owner>
+          <population-region org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <population-district org-unit-code="ORG UN" org-unit-name="ORG UNIT NAME"/>
+          <population-number>POPU</population-number>
+          <stratum-number>ST</stratum-number>
+          <stratum-name>STRATUM NAME</stratum-name>
+          <sampling-year>417</sampling-year>
+          <effective-date>EFFECTIVE DATE</effective-date>
+          <from-date>2026-09-07</from-date>
+          <to-date>TO DATE</to-date>
+          <ytd-sample-count>469</ytd-sample-count>
+          <ytd-sample-volume>1493.369</ytd-sample-volume>
+          <ytd-sample-weight>495</ytd-sample-weight>
+          <ytd-sample-ratio>7.01443</ytd-sample-ratio>
+          <prev-statement-number>1000004</prev-statement-number>
+        </header>
+        <segregation-details>
+          <segregation-detail period-sample-volume="1521.517" ytd-sample-volume="1528.554" ytd-sample-ratio="5.01591" species="SPECIES" species-code="SP" product="PRODUCT" product-code="PR" grade="GRADE" grade-code="G"/>
+          <segregation-totals period-sample-volume="1584.850" ytd-sample-volume="1591.887" ytd-sample-ratio="8.01924"/>
+        </segregation-details>
+        <compiled-samples>
+          <compiled-sample statement-number="1000008" scale-site="SCAL" scale-date="2026-09-28" scaler-license="SCAL" scaler-name="SCALER NAME" return-number="RETU" transaction-type="ORG" return-category="RETURN CATEGORY" return-category-code="RET" weigh-slip-number="WEIGH SLIP" LDS-number="LDS NUMBER" timber-mark="TIMBER" sample-volume="1689.405" sample-weight="859" sample-ratio="3.02479"/>
+          <sample-totals sample-volume="1710.516" sample-weight="898"/>
+        </compiled-samples>
+        <fine-print>Payment is due within 30 days of the issue date. Interest is charged on overdue accounts.</fine-print>
+      </ratio-statement>
+    </ratio-statements>
+  </hbs-batch>
+</hbs-transmission>

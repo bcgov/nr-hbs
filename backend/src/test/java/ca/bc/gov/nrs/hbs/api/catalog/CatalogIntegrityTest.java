@@ -5,6 +5,7 @@ import ca.bc.gov.nrs.hbs.api.query.QueryCatalog;
 import ca.bc.gov.nrs.hbs.api.query.QueryDefinition;
 import ca.bc.gov.nrs.hbs.api.query.QueryFilter;
 import ca.bc.gov.nrs.hbs.api.query.QueryRegistry;
+import ca.bc.gov.nrs.hbs.api.workflow.ProcSignatures;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AssignableTypeFilter;
@@ -69,5 +70,29 @@ class CatalogIntegrityTest {
         assertThat(cmd.capability()).as(cmd.id()).isNotNull();
       }
     }
+  }
+
+  /**
+   * Every command calls a proc that exists in nr-mof-db with exactly as many
+   * positional arguments as it has parameters (all HBS table-API params are IN).
+   */
+  @Test
+  void everyCommandMatchesItsProcSignature() throws Exception {
+    ProcSignatures sigs = ProcSignatures.load();
+    List<String> problems = new ArrayList<>();
+    for (QueryCatalog c : catalogs()) {
+      for (CommandDefinition cmd : c.commands()) {
+        if (!sigs.exists(cmd.procedure())) {
+          problems.add(cmd.id() + ": " + cmd.procedure() + " is not in nr-mof-db");
+          continue;
+        }
+        var sig = sigs.get(cmd.procedure());
+        if (sig.params().size() != cmd.args().size()) {
+          problems.add(cmd.id() + ": " + cmd.procedure() + " takes " + sig.params().size()
+              + " arguments, the command passes " + cmd.args().size());
+        }
+      }
+    }
+    assertThat(problems).isEmpty();
   }
 }

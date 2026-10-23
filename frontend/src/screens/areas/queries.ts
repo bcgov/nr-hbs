@@ -404,6 +404,8 @@ export const screens: ScreenDef[] = [
     query: 'issuedDocuments.search',
     // P451/P456 "Generate XML": the listed statements merged into one transmission (≤ 200).
     xmlExport: 'statements/export.xml',
+    // P451/P456 "Generate PDF": the same transmission rendered with the statement stylesheets.
+    pdfExport: 'statements/export.pdf',
     criteria: [
       {
         name: 'documentType',
@@ -449,6 +451,17 @@ export const screens: ScreenDef[] = [
     query: 'statementTransmissions.search',
     criteria: [
       { name: 'clientNumber', label: 'Client Number', type: 'client' },
+      {
+        name: 'clientLocationOption',
+        label: 'Client Locations',
+        type: 'select',
+        defaultValue: 'S',
+        options: [
+          { value: 'S', label: 'All / Single Location' },
+          { value: 'A', label: 'Associated Locations' },
+        ],
+        helperText: 'Associated: the locations you receive documents for',
+      },
       { name: 'clientLocation', label: 'Client Location', maxLength: 2, helperText: 'Blank for All Locations' },
       { name: 'recent', label: 'Recently Issued (last 30 days)', type: 'checkbox', align: 'center' },
       { name: 'fromDate', label: 'From Date', type: 'date', group: 'Transmissions Between ...' },
@@ -490,7 +503,7 @@ export const screens: ScreenDef[] = [
         params: {
           RB_CLIENT_NUMBER: 'clientNumber',
           RB_CLIENT_LOC_CODE: 'clientLocation',
-          RB_CLI_LOC_OPTION: '=S',
+          RB_CLI_LOC_OPTION: 'clientLocationOption',
           RB_FROM_DATE: 'fromDate',
           RB_TO_DATE: 'toDate',
           RB_RECIPIENT_TYPE: 'recipientType',
@@ -745,7 +758,8 @@ export const screens: ScreenDef[] = [
       { name: 'forestFileId', label: 'Forest File ID', upper: true, maxLength: 10 },
       { name: 'clientNumber', label: 'Client', type: 'client' },
       { name: 'clientLocation', label: 'Loc', maxLength: 2 },
-      { name: 'expiryDate', label: 'Exclude Marks Expiring On or Before', type: 'date', required: true },
+      // validation.xml P490Form: optional, not with a timber mark, not in the future (BT11752).
+      { name: 'expiryDate', label: 'Exclude Marks Expiring On or Before', type: 'date' },
     ],
     requireOneOf: ['timberMark', 'forestFileId', 'clientNumber'],
     columns: [
@@ -850,6 +864,7 @@ export const screens: ScreenDef[] = [
           { key: 'mgmtUnitTypeDescription', label: 'MGU Type' },
           { key: 'tenureExtendedDate', label: 'Extended Date', format: 'date' },
           { key: 'mgmtUnitId', label: 'MGU Id' },
+          { key: 'mgmtUnitDescription', label: 'MGU Description' },
           { key: 'extensions', label: 'Extensions', format: 'number' },
         ],
       },

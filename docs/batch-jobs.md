@@ -15,7 +15,7 @@ Inferred pipeline:
 
 ```
 B1011 receive + XSD-validate (FTP inbound → XMLinput)
-  → B1012 unpack (Castor, scaler signature check)   → B1021 detail edits
+  → B1012 unpack (Castor; signatures stored only)   → B1021 detail edits (+ signature check)
   → B1031* summarize detail → summary returns (9 variants)
   → B19xx anomaly audits (gaps/duplicates/mismatches → SCALE_ANOMALY_LOG)
   → B0013 waste → summary returns
@@ -45,7 +45,7 @@ second JVM, no SMB.
 | Legacy job | What it does | Status |
 |---|---|---|
 | B1011 receive/validate | FTP inbound → XSD validate → XMLinput | ✅ web path ported (`submission/`, P505); 🔴 machine-to-machine channel open (pinch point 5). `XmlIntakeMonitorJob` alerts on stranded files |
-| B1012 unpack | XML → transmission/batch/document/version rows, signature verification | 🔴 not ported (2.7K LOC, DBMS_CRYPTO — pinch points 1, 6) |
+| B1012 unpack | XML → transmission/batch/document/version rows (signatures stored, verified later by B1021) | ✅ **UI uploads ported; FTP stays legacy.** `intake.UnpackJob` (`HBS_B1012_UNPACK`, switches `hbs.batch.enabled` + `hbs.batch.unpack.enabled`, cron `hbs.batch.unpack.cron`) unpacks P505 uploads of this app (RECD_DIRECTORY = `input/<client>/<id>.xml`), one transaction per transmission, ending at UNP/CSA or UNP/CUS exactly like legacy; file moved to `archive/` after commit. Needs a TEST regression pass |
 | B1021 detail edits | business edits per version → RDY/ERR | 🔴 not ported |
 | B1031 A–J summarize | detail → summary returns, re-edit errors | 🔴 not ported |
 | B1912…B1953 anomaly audits | write `SCALE_ANOMALY_LOG` | 🔴 not ported (the anomaly *screens* and reports are) |

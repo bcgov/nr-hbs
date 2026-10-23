@@ -16,6 +16,7 @@ import { useAuth } from '@/context/auth/useAuth';
 import { useOrg } from '@/context/org/useOrg';
 import { useTheme } from '@/context/theme/useTheme';
 import { defaultRouteForUser } from '@/routes/access';
+import { peekReturnTo } from '@/routes/returnTo';
 import { getClient } from '@/services/clientSearch';
 
 // Reuses the Landing/Unauthorized split-screen stylesheet so all three
@@ -75,8 +76,9 @@ const OrgSelectionPage: FC = () => {
     return map;
   }, [user?.privileges]);
 
-  // Post-pick landing is the Home dashboard.
-  const landingRoute = defaultRouteForUser(user);
+  // Post-pick landing is the Home dashboard — or the StatementDelivery link
+  // that brought the user here (routes/returnTo).
+  const landingRoute = peekReturnTo() ?? defaultRouteForUser(user);
 
   const logoSrc = theme === 'g100' ? '/bc-gov-logo-rev.png' : '/bc-gov-logo.png';
 

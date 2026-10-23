@@ -59,6 +59,13 @@ public class CommandService {
 
   @Transactional
   public Map<String, Object> execute(String commandId, Map<String, Object> body) {
+    var workflow = registry.workflow(commandId);
+    if (workflow != null) {
+      workflow.capability().require();
+      Map<String, Object> result = workflow.execute(body == null ? Map.of() : body);
+      log.info("Workflow {} ({}) executed by {}", workflow.id(), workflow.legacy(), RequestUtil.getCurrentAuditUserId());
+      return result == null ? Map.of() : result;
+    }
     CommandDefinition cmd = registry.command(commandId);
     cmd.capability().require();
     Map<String, Object> in = body == null ? Map.of() : body;

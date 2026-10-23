@@ -271,6 +271,13 @@ public class QueriesCatalog implements QueryCatalog {
             .filter(QueryFilter.date("fromDate", "AND ddt.creation_date >= :fromDate"))
             .filter(QueryFilter.dateTo("toDate", "AND ddt.creation_date < :toDate"))
             .filter(QueryFilter.upper("recipientType", "AND ddt.recipient_type = :recipientType"))
+            // P452 "Associated Locations" (CLI_DOC_RCVR): HBS3R452 rb_cli_loc_option = 'A'
+            // (HBS_CONSTANTS.ASS_LOC) → the locations of HBS_USER_CLI_LOC_DATA_DOMAIN for the
+            // client and the viewer's user id; 'S' (single / blank = all) uses clientLocation.
+            .filter(QueryFilter.upper("clientLocationOption",
+                "AND (:clientLocationOption <> 'A' OR ddt.client_locn_code IN ("
+                    + "SELECT ld.client_locn_code FROM hbs_user_cli_loc_data_domain ld"
+                    + " WHERE ld.client_number = ddt.client_number AND ld.user_id = :hbsUserId))"))
             // Home "Recent Transmissions of Issued Statements" (P452 actionType=SearchFromHome):
             // last 30 days (Constants.WORKBENCH_DATE_RANGE) for the user's client.
             .filter(QueryFilter.upper("recent",

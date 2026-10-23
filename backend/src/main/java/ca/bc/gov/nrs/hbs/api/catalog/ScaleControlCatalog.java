@@ -308,8 +308,15 @@ public class ScaleControlCatalog implements QueryCatalog {
             'SCALING_DUP','D', 'WEIGHING_DUP','D', 'ARRIVAL_DUP','D',
             'ARR_DEP','M', 'DEP_ARR','M', 'WEIGH_SAMPLE','M', 'WEIGH_RED','M', 'RED_WEIGH','M', '%')""";
 
-  /** Industry fence: anomalies at scale sites owned by the active client. */
-  static final String ANOMALY_CLIENT_SCOPE = "AND ss.owner_cli_number = :scopeClientNumber";
+  /**
+   * Industry fence: anomalies at scale sites owned by the active client, or —
+   * P911 for a CLI_SCALER (BT 10641, {@code RetrieveScalerLicenseTag}) — whose
+   * primary scaler licence is one of the client's QUANT_LICENSEs. A company
+   * client holds no scaler licence, so site admins keep the site-only fence.
+   */
+  static final String ANOMALY_CLIENT_SCOPE = "AND (ss.owner_cli_number = :scopeClientNumber"
+      + " OR a.primary_license_number IN (SELECT ql.license_number FROM quant_license ql"
+      + " WHERE ql.client_number = :scopeClientNumber))";
 
   // ---------------------------------------------------------------------------
   // P908 — Anomaly Assessment Windows: ANOMALY_ASSESSMENT_CONTROL with the
@@ -351,7 +358,10 @@ public class ScaleControlCatalog implements QueryCatalog {
         .filter(QueryFilter.upper("primaryLicence", "AND a.primary_license_number = :primaryLicence"))
         .filter(QueryFilter.upper("scaleSite", "AND a.scale_site_id_nmbr = :scaleSite"))
         .filter(QueryFilter.number("orgUnitNo",
-            "AND (ss.org_unit_no = :orgUnitNo OR ou.rollup_region_no = :orgUnitNo)"));
+            "AND (ss.org_unit_no = :orgUnitNo OR ou.rollup_region_no = :orgUnitNo)"))
+        // P911 radSearchBySites "Associated Sites" / "Sites in Associated Districts".
+        .filter(QueryFilter.upper("siteScope",
+            SubmissionsCatalog.siteScopeFilter("a.scale_site_id_nmbr", "ss.org_unit_no")));
   }
 
   @Override
@@ -370,6 +380,8 @@ public class ScaleControlCatalog implements QueryCatalog {
             .filter(QueryFilter.upper("scaleSite", "AND x.scale_site = :scaleSite"))
             .filter(QueryFilter.number("orgUnitNo",
                 "AND (ss.org_unit_no = :orgUnitNo OR ou.rollup_region_no = :orgUnitNo)"))
+            // P901 radSearchBySites "Associated Sites" / "Sites in Associated Districts".
+            .filter(QueryFilter.upper("siteScope", SubmissionsCatalog.siteScopeFilter("x.scale_site", "ss.org_unit_no")))
             .sort("detailDocumentNumber", "x.detail_document_number")
             .sort("scaleSite", "x.scale_site")
             .sort("scaleDate", "x.scale_date")
@@ -438,29 +450,13 @@ public class ScaleControlCatalog implements QueryCatalog {
     );
   }
 
+  /**
+   * No registry commands: P908/P909 and P954 are workflows
+   * ({@code scalecontrol.UpdateAssessmentWindowCommand} — {@code scaleControl.anomalyWindows.update},
+   * {@code scalecontrol.ClearAnomalyCommand} — {@code scaleControl.anomalies.clear}).
+   */
   @Override
   public List<CommandDefinition> commands() {
-    return List.of(
-        // P908/P909 "Update Window Spans" → Confirm: AnomalyManagerBean
-        // .updateAssessmentControlParameter, which stored the row through the
-        // HBS_STORE_ANMLY_ASSESS_CONTROL table API (args in declared order).
-        // NOTE: the window-expansion follow-up (status WIP →
-        // HBS_UPDATE_STALE_ANOMALIES → WCM) and the P908 validations are NOT
-        // part of this single call — see docs/areas/scale-control.md.
-        CommandDefinition.builder("scaleControl.anomalyWindows.update")
-            .legacy("P908/P909")
-            .capability(Capability.PRODUCTION_CONTROL)
-            .procedure("HBS_STORE_ANMLY_ASSESS_CONTROL")
-            .requiredBody("scaleControlTypeCode", Type.UPPER)       // i_Scale_Control_Type_Code
-            .requiredBody("presentationSequence", Type.NUMBER)      // i_Presentation_Sequence
-            .requiredBody("assessmentBegin", Type.NUMBER)           // i_Assessment_Begin (From Days)
-            .requiredBody("assessmentEnd", Type.NUMBER)             // i_Assessment_End (To Days)
-            .requiredBody("anomalyAssessmentStatusCode", Type.UPPER) // i_Anmly_Assess_Status_Code
-            .requiredBody("previousAnomalyBatchId", Type.NUMBER)    // i_Previous_Anomaly_Batch_ID
-            .requiredBody("currentAnomalyBatchId", Type.NUMBER)     // i_Current_Anomaly_Batch_ID
-            .now()                                                  // i_Update_Timestamp
-            .auditUser()                                            // i_Update_UserID
-            .build()
-    );
+    return List.of();
   }
 }

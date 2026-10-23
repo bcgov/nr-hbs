@@ -13,8 +13,9 @@ import { useEffect, useState, type FC } from 'react';
 
 import ClientComboBox from '@/components/ClientComboBox';
 import type { CodeOption } from '@/services/common';
-import { codeList } from '@/services/screens';
 import type { FieldDef } from '@/screens/types';
+
+import { useScreenApi } from './screenApi';
 
 /** Local yyyy-mm-dd (toISOString would shift the day for Pacific users). */
 const toIsoDate = (d: Date | undefined): string => {
@@ -58,6 +59,7 @@ export const FieldInput: FC<FieldInputProps> = ({
   const id = `${idPrefix}-${field.name}`;
   const label = field.required ? `${field.label} *` : field.label;
   const [codes, setCodes] = useState<CodeOption[] | null>(null);
+  const { codeList } = useScreenApi();
 
   useEffect(() => {
     if (!field.codeList) return;
@@ -68,7 +70,7 @@ export const FieldInput: FC<FieldInputProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [field.codeList]);
+  }, [codeList, field.codeList]);
 
   const common = {
     id,
@@ -83,10 +85,13 @@ export const FieldInput: FC<FieldInputProps> = ({
   switch (field.type ?? (field.codeList ? 'select' : 'text')) {
     case 'date':
       return (
+        // Carbon's DatePicker copies its own `invalid` onto the input it wraps,
+        // so the flag must be set here too or the error never shows.
         <DatePicker
           datePickerType="single"
           dateFormat="Y-m-d"
           value={value ? [value] : []}
+          invalid={!!invalidText}
           onChange={(dates: Date[]) => onChange(toIsoDate(dates[0]))}
         >
           <DatePickerInput

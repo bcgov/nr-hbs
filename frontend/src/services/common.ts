@@ -52,11 +52,42 @@ export function toQuery(params: object): string {
   return out ? `?${out}` : '';
 }
 
+/**
+ * An API error that names the request fields it concerns (the backend's
+ * `subErrors[].field` — business-rule checks on search criteria and forms), so
+ * a screen can highlight them.
+ */
+export class ApiFieldError extends Error {
+  constructor(
+    message: string,
+    readonly fieldErrors: Record<string, string>,
+  ) {
+    super(message);
+    this.name = 'ApiFieldError';
+  }
+}
+
+/** `{ field: message }` from an ApiError body's subErrors (first message per field). */
+async function readFieldErrors(res: Response): Promise<Record<string, string>> {
+  try {
+    const body = (await res.json()) as { subErrors?: { field?: string; message?: string }[] };
+    const out: Record<string, string> = {};
+    for (const sub of body.subErrors ?? []) {
+      if (sub.field && sub.message && !out[sub.field]) out[sub.field] = sub.message;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 async function failWith(res: Response, label: string): Promise<never> {
+  const fieldErrors = res.status === 400 ? await readFieldErrors(res.clone()) : {};
   // readErrorMessage sanitises the body (drops raw SQL/stack/JSON), so
   // `detail` is a clean sentence or empty — never technical text.
   const detail = await readErrorMessage(res);
-  throw new Error(detail || `${label} failed (${res.status})`);
+  const message = detail || `${label} failed (${res.status})`;
+  throw Object.keys(fieldErrors).length ? new ApiFieldError(message, fieldErrors) : new Error(message);
 }
 
 export async function getJson<T>(path: string, label: string): Promise<T> {

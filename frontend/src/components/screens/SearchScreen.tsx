@@ -25,16 +25,19 @@ import { useScopedUser } from '@/context/org/useOrg';
 import { useSessionState, type LastSearch } from '@/hooks/useSessionState';
 import { originState, useHereAsOrigin } from '@/lib/navOrigin';
 import { can } from '@/routes/access';
-import { exportQuery, exportQueryXml, runQuery, type Row } from '@/services/screens';
+import { ApiFieldError } from '@/services/common';
+import type { Row } from '@/services/screens';
 import type { ColumnDef, SearchScreenDef } from '@/screens/types';
 
 import ActionButton from './ActionButton';
+import { BulkActionBar, SelectCell, rowSelectable, useBulkActions } from './BulkActions';
 import DownloadCell from './DownloadCell';
 import FieldGrid from './FieldGrid';
 import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
 import ScreenLayout from './ScreenLayout';
+import { useScreenApi } from './screenApi';
 
 const SearchingIcon = () => <Loading small withOverlay={false} description="" />;
 
@@ -75,14 +78,21 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
   const [searchParams] = useSearchParams();
   const { display } = useNotification();
   const here = useHereAsOrigin(screen.title);
+  const api = useScreenApi();
 
+  const roleKey = (user?.roles ?? []).join(',');
   const defaults = useMemo(() => {
     const d: Criteria = {};
+    const roles = roleKey ? roleKey.split(',') : [];
     screen.criteria.forEach((f) => {
-      if (f.defaultValue) d[f.name] = f.defaultValue;
+      const byRole = f.roleDefaults?.find(
+        (r) => r.roles.some((x) => roles.includes(x)) && !(r.unlessRoles ?? []).some((x) => roles.includes(x)),
+      );
+      const v = byRole ? byRole.value : f.defaultValue;
+      if (v) d[f.name] = v;
     });
     return d;
-  }, [screen.criteria]);
+  }, [screen.criteria, roleKey]);
 
   const fromUrl = useMemo(() => {
     const d: Criteria = {};
@@ -106,6 +116,8 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [searched, setSearched] = useState<Criteria | null>(null);
+  const bulk = useBulkActions(screen.bulkActions);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
 
   const validate = (criteria: Criteria): boolean => {
     const next: Record<string, string> = {};
@@ -125,6 +137,11 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
         })
         .join(', ');
       setFormError(`Enter at least one of: ${labels}.`);
+      // Highlight the candidates too, so the user sees where to type.
+      screen.requireOneOf.forEach((n) => {
+        next[n] = next[n] ?? 'Enter this or one of the other highlighted fields';
+      });
+      setErrors(next);
       return false;
     }
     setFormError(null);
@@ -147,19 +164,26 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
       scrollPending.current = scroll;
       setLoading(true);
       try {
-        const res = await runQuery(screen.query, criteria, {
+        const res = await api.runQuery(screen.query, criteria, {
           page: nextPage,
           size: nextSize,
           sortBy: nextSort.by,
           sortDir: nextSort.dir,
         });
         setRows(res.content);
+        setSelected(new Set());
         setTotal(res.page.totalElements);
         setPage(res.page.number);
         setPageSize(res.page.size);
         setSearched({ ...criteria });
         setLastSearch({ criteria, page: res.page.number, size: res.page.size, sort: nextSort });
       } catch (e) {
+        // Business-rule checks name the criteria they concern: mark those fields.
+        if (e instanceof ApiFieldError) {
+          const names = new Set(screen.criteria.map((f) => f.name));
+          const marked = Object.fromEntries(Object.entries(e.fieldErrors).filter(([k]) => names.has(k)));
+          if (Object.keys(marked).length) setErrors(marked);
+        }
         display({ kind: 'error', title: 'Search failed', subtitle: (e as Error).message, timeout: 7000 });
         setRows([]);
         setTotal(0);
@@ -167,7 +191,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
         setLoading(false);
       }
     },
-    [display, screen.query, setLastSearch],
+    [api, display, screen.query, screen.criteria, setLastSearch],
   );
 
   // On open: a deep link searches its criteria; coming back re-runs the last
@@ -221,9 +245,18 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
   const headers = screen.columns.map((c) => ({ key: c.key, header: c.header }));
   const tableRows = (rows ?? []).map((r, i) => ({ id: `row-${page}-${i}` })) as { id: string }[];
   const hasRowActions = (screen.rowActions?.length ?? 0) > 0;
+  const hasBulk = bulk.length > 0;
+  const selectableIdx = (rows ?? []).map((r, i) => (rowSelectable(bulk, r) ? i : -1)).filter((i) => i >= 0);
+  const toggle = (i: number, on: boolean) =>
+    setSelected((cur) => {
+      const next = new Set(cur);
+      if (on) next.add(i);
+      else next.delete(i);
+      return next;
+    });
 
   const createVisible = screen.createLink && can(user, screen.createLink.capability);
-  const createHref = screen.createLink ? linkHref(screen.createLink, form) : null;
+  const createHref = screen.createLink ? linkHref(screen.createLink, form, api.screenHref) : null;
   const open = (href: string) => navigate(href, { state: originState(here) });
 
   return (
@@ -242,7 +275,16 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
           <FieldGrid
             fields={screen.criteria}
             values={form}
-            onChange={(n, v) => setForm((p) => ({ ...p, [n]: v }))}
+            onChange={(n, v) => {
+              setForm((p) => ({ ...p, [n]: v }));
+              // A corrected field stops being flagged.
+              setErrors((p) => {
+                if (!(n in p)) return p;
+                const rest = { ...p };
+                delete rest[n];
+                return rest;
+              });
+            }}
             idPrefix={screen.id}
             errors={errors}
           />
@@ -265,6 +307,14 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
       {(loading || rows !== null) && (
         <div className="fsp-search__results-fullbleed" ref={resultsRef}>
           <div className="fsp-search__results">
+            {hasBulk && (
+              <BulkActionBar
+                actions={bulk}
+                selected={[...selected].map((i) => rows?.[i]).filter((r): r is Row => !!r)}
+                source={searched ?? form}
+                onDone={() => void execute(searched ?? form, page, pageSize, sort, false)}
+              />
+            )}
             {loading ? (
               <>
                 <div className="fsp-search__results-header">
@@ -297,7 +347,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                     {screen.xmlExport && (
                       <ExportCsvButton
                         onExport={() =>
-                          exportQueryXml(
+                          api.exportQueryXml(
                             screen.query,
                             searched ?? form,
                             typeof screen.xmlExport === 'string' ? screen.xmlExport : undefined,
@@ -308,8 +358,16 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                         busyText="Preparing XML download"
                       />
                     )}
+                    {screen.pdfExport && (
+                      <ExportCsvButton
+                        onExport={() => api.exportQueryPdf(screen.pdfExport as string, searched ?? form)}
+                        fallbackName={`${screen.query}.pdf`}
+                        label="Download PDF"
+                        busyText="Preparing PDF download"
+                      />
+                    )}
                     <ExportCsvButton
-                      onExport={() => exportQuery(screen.query, searched ?? form)}
+                      onExport={() => api.exportQuery(screen.query, searched ?? form)}
                       fallbackName={`${screen.id}.csv`}
                     />
                   </span>
@@ -322,6 +380,17 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                         <Table {...getTableProps()} size="md">
                           <TableHead>
                             <TableRow>
+                              {hasBulk && (
+                                <TableHeader>
+                                  <SelectCell
+                                    id={`${screen.id}-select-all`}
+                                    label="Select all rows"
+                                    checked={selectableIdx.length > 0 && selectableIdx.every((i) => selected.has(i))}
+                                    disabled={selectableIdx.length === 0}
+                                    onChange={(on) => setSelected(on ? new Set(selectableIdx) : new Set())}
+                                  />
+                                </TableHeader>
+                              )}
                               {dtHeaders.map((h) => {
                                 const col = screen.columns.find((c) => c.key === h.key);
                                 const { key: _k, ...hp } = getHeaderProps({ header: h });
@@ -346,7 +415,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                           <TableBody>
                             {dtRows.map((dtRow, i) => {
                               const source = rows[i] ?? {};
-                              const href = screen.rowLink ? linkHref(screen.rowLink, source) : null;
+                              const href = screen.rowLink ? linkHref(screen.rowLink, source, api.screenHref) : null;
                               const { key: _rk, ...rp } = getRowProps({ row: dtRow });
                               return (
                                 <TableRow
@@ -367,6 +436,17 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                                   tabIndex={href ? 0 : undefined}
                                   role={href ? 'link' : undefined}
                                 >
+                                  {hasBulk && (
+                                    <TableCell onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                                      <SelectCell
+                                        id={`${screen.id}-select-${page}-${i}`}
+                                        label={`Select row ${i + 1}`}
+                                        checked={selected.has(i)}
+                                        disabled={!rowSelectable(bulk, source)}
+                                        onChange={(on) => toggle(i, on)}
+                                      />
+                                    </TableCell>
+                                  )}
                                   {screen.columns.map((c) => (
                                     <TableCell
                                       key={c.key}

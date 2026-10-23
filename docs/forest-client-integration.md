@@ -35,6 +35,16 @@ same rule the HBS queries apply (`QueriesReportsCatalog.releasable`).
 key (401/403) or an unreachable API → 502 with a plain message; an unknown
 client number → 404 (the type-ahead just shows no suggestion).
 
+## What stays in SQL
+
+Nothing reads `FOREST_CLIENT` directly, and HBS doesn't need a grant on it.
+Client data used inside a query (result-list and report columns, the FOI
+severing, the legacy "client / location exists" checks on returns, profiles
+and uploads) is joined in SQL from `V_CLIENT_PUBLIC` and `CLIENT_LOCATION`,
+both granted to `FSA_HBS_READ_WRITE_ROLE` ([database.md](database.md)). Moving
+those to the API would turn one join into a call per row and make the upload
+unpack and return edits depend on the API being up.
+
 ## Configuration
 
 | Property | Env var | Meaning |

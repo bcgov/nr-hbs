@@ -60,6 +60,18 @@ public class ScaleControlAuditCatalog implements QueryCatalog {
         LEFT JOIN hbs_object_type_code otc ON otc.hbs_object_type_code = b.hbs_object_type_code
        WHERE a.hbs_object_type_code IN ('SSR', 'DSR')""";
 
+  /** The audited document number: the part of OBJECT_NEW_ID before the comma. */
+  private static final String AUDIT_DOCUMENT =
+      "SUBSTR(a.object_new_id, 1, INSTR(a.object_new_id, ',') - 1)";
+
+  private static final String CHANGE_LOG_FENCE = "AND ((a.hbs_object_type_code = 'SSR' AND EXISTS (SELECT 1 FROM (\n"
+      + SummaryReturnsCatalog.union(false)
+      + "\n) f WHERE TO_CHAR(f.document_control_number) = " + AUDIT_DOCUMENT
+      + " AND :scopeClientNumber IN (f.bill_to_client, f.copy_to_client, f.mark_holder_client,"
+      + " f.site_owner_client, f.stratum_owner_client)))"
+      + "\n OR (a.hbs_object_type_code = 'DSR' AND EXISTS (SELECT 1 FROM (" + DetailReturnsSql.DOCUMENT_VERSIONS
+      + "\n " + DetailReturnsSql.CLIENT_FENCE + ") dv WHERE dv.ddn = " + AUDIT_DOCUMENT + ")))";
+
   /** Legacy "Pop/Strat/Year" radio expanded to three audited fields (ScaleReturnAuditsTag). */
   private static final String FIELD_NAME_FILTER = """
       AND (b.field_name = :fieldName
@@ -235,7 +247,11 @@ public class ScaleControlAuditCatalog implements QueryCatalog {
         .filter(QueryFilter.required("documentNumber",
             "AND a.object_new_id LIKE :documentNumber || ',%'", Type.UPPER))
         .filter(QueryFilter.required("versionNumber",
-            "AND SUBSTR(a.object_new_id, INSTR(a.object_new_id, ',') + 1) = :versionNumber", Type.STRING));
+            "AND SUBSTR(a.object_new_id, INSTR(a.object_new_id, ',') + 1) = :versionNumber", Type.STRING))
+        // Industry fence (legacy P962 had none: it was only linked from the fenced return views):
+        // the return must be one the caller may view — the summary-return fence (bill to, copy to,
+        // mark holder, site owner, stratum owner) for SSR, the detail-return fence for DSR.
+        .clientScope(CHANGE_LOG_FENCE);
 
     QueryDefinition.Builder anomalies = QueryDefinition.builder("scaleControl.software.anomalies")
         .legacy("P991/P992")

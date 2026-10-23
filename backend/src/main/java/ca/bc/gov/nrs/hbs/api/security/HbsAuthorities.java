@@ -121,4 +121,8 @@ public final class HbsAuthorities {
       "hasAnyRole('HBS_MOF_ADMIN','HBS_MOF_MGR','HBS_CLI_ADMIN','HBS_SPC_ADMIN')";
   /** Reference-data cache (/cache/*). */
   public static final String CACHE_ADMIN = "hasRole('HBS_PROD_CTL')";
+
+  // ── Service accounts ──────────────────────────────────────────────
+  /** Legacy share bridge (client-credentials service account): /integrations/legacy/**. */
+  public static final String LEGACY_BRIDGE = "hasRole('HBS_LEGACY_BRIDGE')";
 }

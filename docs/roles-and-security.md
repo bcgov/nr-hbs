@@ -31,10 +31,8 @@ differs.
   `preferred_username` suffix), `idir_username` / `bceid_username`. The audit
   user id is `IDIR\NAME` / `BCEID\NAME`, truncated to the VARCHAR2(30) audit
   columns.
-- **No anonymous access.** The legacy app let anonymous users run several
-  queries (invoice/statement copies, timber mark, stumpage rates, sampling
-  plans) and self-register. That has no equivalent in the FSP model, so it is
-  an open decision (`docs/questions.md` Q1).
+- **Anonymous access: the public read-only area only** (decided 2026-10-21,
+  `docs/questions.md` Q1). See "Public (anonymous) read-only area" below.
 
 ## Role model — legacy WebADE roles carried over 1:1
 
@@ -73,6 +71,7 @@ legacy role becomes one FAM client role, prefixed `HBS_` unless it already was:
 | SPC_ADMIN | `HBS_SPC_ADMIN_FOREST_CLIENT-<client>` | Other Industry Administrator | BCeID | ✔ |
 | SPC_SFTWR_VNDR | `HBS_SPC_SFTWR_VNDR_FOREST_CLIENT-<client>` | Software Vendor | BCeID | ✔ |
 | SPC_SUBM_AGNT | `HBS_SPC_SUBM_AGNT_FOREST_CLIENT-<client>` | Data Submission Agent | BCeID | ✔ |
+| — (new) | `HBS_LEGACY_BRIDGE` | Legacy Share Bridge (service account, see below) | client credentials | — |
 
 FAM puts a client-tied grant's scope in the role name and nowhere else:
 `HBS_CLI_SCALER_FOREST_CLIENT-00012345` (`RoleScope`, ported from nr-fta;
@@ -123,6 +122,7 @@ Keep the three in sync.
 | `FINAL_BILL_ADMIN` | `HBS_BILL_ADMIN`, `HBS_SUPER_MGR` |
 | `FIELD_SCALED_DECKS` | `HBS_BILL_ADMIN`, `HBS_SCALE_ADMIN`, `HBS_SUPER_MGR` |
 | `BILLING_FORCE` | `HBS_SUPER_MGR` |
+| `FINAL_BILL_GENERATE` | `HBS_BILL_ADMIN`, `HBS_MOF_MGR` (legacy P829/P830 `hbs1:rolePresent`) |
 | `PROFILES_VIEW` | `HBS_MOF_USER`, `HBS_CLI_USER` |
 | `SCALE_SITE_ADMIN` | `HBS_SCALE_ADMIN` |
 | `PROFILE_BILLING_ADMIN` | `HBS_BILL_ADMIN` |
@@ -134,6 +134,7 @@ Keep the three in sync.
 | `SOFTWARE_USE_VIEW` | `HBS_MOF_USER`, `HBS_CLI_USER`, `HBS_SPC_SFTWR_VNDR` |
 | `USER_ADMIN` | `HBS_MOF_ADMIN`, `HBS_MOF_MGR`, `HBS_CLI_ADMIN`, `HBS_SPC_ADMIN` |
 | `CACHE_ADMIN` | `HBS_PROD_CTL` |
+| `LEGACY_BRIDGE` | `HBS_LEGACY_BRIDGE` (service account only) |
 
 ## Enforcement, front to back
 
@@ -163,6 +164,52 @@ and its Struts actions almost never checked roles. Menus merely hid links, so
 many maintenance screens could be opened by URL. Client users could also list
 other clients' documents by editing the pre-filled client number. Both are
 closed by (3) and (4). See `docs/pinch-points.md` §13.
+
+## Public (anonymous) read-only area
+
+The legacy app showed its `Public_User` (no login, or a login without an HBS
+role) the public menu: harvest reports, invoice/statement copies, timber mark
+information, stumpage rates, the stratum advisor, and self-registration. The
+new app keeps that as a separate, read-only surface. Full details are in
+[public-access.md](public-access.md).
+
+- **Paths:** `GET /api/v1/hbs/public/**` only. It has its own Spring Security
+  chain (`PublicAccessSecurityConfig`): `permitAll` for GET, `denyAll` for any
+  other method, and no resource server, so a token is ignored. Every other path
+  keeps the default chain, unchanged.
+- **Viewer:** always `Viewer.ANONYMOUS` (`hbsIsMinistry='N'`,
+  `hbsViewerClient=''`, `hbsUserType='PUB'`). Every FOI CASE severs, and no
+  client fence can apply.
+- **What can run:** only the queries whitelisted in `PublicQueries`. Each is
+  derived from the registry query of the same id, with criteria narrowed and
+  rows capped. Statement copies go through the same `StatementDocumentService`
+  as the logged-in download.
+- **Limits:** per-client-IP token bucket and a per-pod concurrency cap
+  (`PublicRateLimitFilter`, `hbs.public.*`), plus a kill switch
+  (`hbs.public.enabled`).
+- **Self-registration** is replaced by `/public/access`, which explains how to
+  get access. Roles come from FAM.
+
+## Service account: legacy share bridge
+
+The share bridge on the legacy batch host ([coexistence.md](coexistence.md#share-bridge))
+calls `GET /api/v1/hbs/integrations/legacy/process-parameters` with a
+**client-credentials** token of its own CSS service-account client, carrying the
+client role `HBS_LEGACY_BRIDGE` (no person ever holds it).
+
+- **Token acceptance** (`AuthorizedPartyValidator`): a service-account token's
+  `azp` is its own client, not `KEYCLOAK_CLIENT_ID`. Client ids listed in
+  `hbs.keycloak.legacy-bridge-client-id` (`KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID`,
+  comma-separated, blank = none) are accepted **only** when every HBS role on
+  the token is a service role (`HbsRoles.SERVICE`).
+- **Confinement** (`HbsApiResourceApplication` + `LegacyBridgeAccess`):
+  `/api/v1/hbs/integrations/legacy/**` requires `ROLE_HBS_LEGACY_BRIDGE`; every
+  other authenticated path refuses a token carrying it. People can't call the
+  bridge endpoint; the bridge can't call anything else.
+- `HBS_LEGACY_BRIDGE` is neither ministry nor client-scoped (legacy user type `PUB`).
+- Setup (Keycloak / FAM): create the service-account client, grant it the
+  `HBS_LEGACY_BRIDGE` client role so it appears in the token's `client_roles`,
+  and set `KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID` in the backend deployment.
 
 ## Data domains
 

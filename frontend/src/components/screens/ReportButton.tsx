@@ -7,7 +7,7 @@ import { runReport } from '@/services/screens';
 import type { ReportLinkDef } from '@/screens/types';
 import { triggerBrowserDownload } from '@/utils/download';
 
-import { reportParams } from './links';
+import { reportFileName, reportParams } from './links';
 import '@/components/ExportCsvButton/ExportCsvButton.css';
 
 interface ReportButtonProps {
@@ -31,7 +31,8 @@ export const ReportButton: FC<ReportButtonProps> = ({ report, source, size = 'md
     setBusy(true);
     try {
       const { blob, filename } = await runReport(report.reportId, reportParams(report, source), format);
-      triggerBrowserDownload(blob, filename ?? `${report.reportId}.${format.toLowerCase()}`);
+      const ext = format.toLowerCase();
+      triggerBrowserDownload(blob, reportFileName(report, source, ext) ?? filename ?? `${report.reportId}.${ext}`);
     } catch (e) {
       display({ kind: 'error', title: 'Report failed', subtitle: (e as Error).message, timeout: 7000 });
     } finally {

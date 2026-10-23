@@ -81,9 +81,9 @@ public class HbsReportService {
    */
   private static final java.util.regex.Pattern SAFE_PROMPT =
       java.util.regex.Pattern.compile("[A-Za-z0-9 _.,/:%*()&#+-]{0,200}");
-  /** Reports whose procs parse dates as 'YYYY-Mon-DD' instead of ISO. */
+  /** Reports whose procs parse dates as 'YYYY-Mon-DD' instead of ISO (HBS3R829: FB_EXPIRING_BEFORE). */
   private static final java.util.Set<String> MON_DATE_REPORTS =
-      java.util.Set.of("HBS3R972", "HBS3R973", "HBS3R974", "HBS3R979");
+      java.util.Set.of("HBS3R972", "HBS3R973", "HBS3R974", "HBS3R979", "HBS3R829");
   private static final java.time.format.DateTimeFormatter MON_DATE =
       java.time.format.DateTimeFormatter.ofPattern("yyyy-MMM-dd", java.util.Locale.CANADA);
 

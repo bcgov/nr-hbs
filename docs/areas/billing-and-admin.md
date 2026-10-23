@@ -54,61 +54,43 @@ Notes on the port:
   - ENTRY_TIMESTAMP is stored at midnight.
   - NEXT_RATIO_STMT_DATE is stored at 00:00. Legacy stored 23:59:59.
 
+### Billing — ported workflows (work package 7)
+
+Package `backend/.../api/billing` (WorkflowCommand beans; one transaction each; reads in `BillingReads`).
+
+| Legacy | Command id | Class | Notes |
+|---|---|---|---|
+| P811/P812, P813/P814 for one listed profile | `billing.markHolderProfile.forceSummarizationDate` | `ForceSummarizationDateCommand` | Re-reads the profile (RowLock), `P811Action.validateForm` year 2000–2099 + frequency window (`ForceDateRules.summarization`), profile in effect on the force date, then `HBS_STORE_HBS_MARK_PROFILE` with every other column from the DB row. |
+| P811/P813 Save (Client Location / "For All Client With Custom Mark Holder Profile") | `billing.forceSummarization.force` | `ForceSummarizationCommand` | Screens `force-piece-summarization-all`, `force-weigh-slip-summarization-all`. "All" also forces the default profile (mhprof_id 1 piece / 2 weight). No match → "No Records". |
+| P823/P824 | `billing.populationProfile.forceRatioComputationDate` | `ForceRatioComputationDateCommand` | `P823Action.validateForm` incl. its operator-precedence quirk (`ForceDateRules.ratioComputation`), after LAST / before NEXT ratio statement date, custom profile in effect (else error.profile.notfound), NEXT_RATIO_STMT_DATE stored at 23:59:59 (BT4677). The global profile is popprof_id 1. |
+| P829/P830 Generate and Hold / Release | `billing.finalBill.generateHold`, `billing.finalBill.generateRelease` | `GenerateFinalBillHoldCommand`, `…ReleaseCommand` (`GenerateFinalBillCommand`) | Capability `FINAL_BILL_GENERATE` (HBS_BILL_ADMIN, HBS_MOF_MGR, as P829.jsp). Re-reads the HBS3R829 row and requires eligibility flag `*`; calls `HBS3R830` through `TableApi.call` (OUT `fb_returnvalue`: 0 = "Processed.", else "Not Processed."). HBS3R830 commits per PSYMark itself, as in legacy. |
+| P835 Save | `billing.finalBillTenure.create` | `FinalBillTenureCreateCommand` + `FinalBillTenureRules` | All P835Action checks and messages: population exists / 4 digits, year 2000–2099, ratio type not Default, no YTD cyclic billing (invoices/statements), mark in TIMBER_MARK + MARK_BILLED_CLI and non-renewable (`TimberMark.isRenewable`), Pop/Yr exists, not already elected. |
+| P836 Save (key change) | `billing.finalBillTenure.update` | `FinalBillTenureUpdateCommand` | Screen `final-bill-tenure-edit`. Delete + insert keeping the old ENTRY_ columns; insert/delete errors when cyclic billing exists for the new/old Pop/Yr/Mark; unchanged keys with cyclic billing give both messages (BT 2810). |
+| P836 Delete | `billing.finalBillTenure.remove` | `FinalBillTenureRemoveCommand` | Refused with error.finalbillabledropoutmark.deleteerror when cyclic billing exists. |
+| P832 Hold Selected / Release Selected (`P831Action` ACTION_HOLD / ACTION_RELEASE → `ClientHelper.updateSummaryWeightScaleReturnHold/Release`) | `billing.unissuedFinalBills.hold`, `billing.unissuedFinalBills.release` | `UnissuedFinalBillCommands` (`Hold`, `Release`) | Capability `FINAL_BILL_ADMIN`. One savepoint per selected return (legacy autocommitted each), reported PROCESSED / NOTPROCESSED / ERROR. Each row re-loads the active version (stale version / `updateTimestamp` → ERROR, industry fence), must be a weight-scale final bill (FB), and qualifies as legacy did: hold RDY/ERR, release HLD. Hold is `SummaryReturnWorkflows.hold` (BT16641 SPR + new HLD version) — legacy P831 called the older `WorkflowStateHelper.hold`, which after BT16641 left the return without an active version, and only logged a failed `holdAllowed`; both are not reproduced (a return outside OIP/RWC is reported ERROR). Release is `SummaryReturnWorkflows.release` (`Release.execute`, BT7327 final-bill flag). The list query now returns `update_timestamp`. Screen: `unissued-final-bills` check boxes (`bulkActions`). |
+| P842 Cancel Issued Sample Tallies in Selected Strata, P843 Clear Field Scale Flag for Weigh Slips in Selected Strata, P844 Clear Field Scale Flag for Selected Log Tallies (`P840Action.bulkRequestCommonAction`, `doCancelReturn`, `doClearFiledScaleFlag`) | `billing.fieldScaledDecks.bulk` (`docType` S / W / P) | `detailreturns.command.FieldScaledDeckBulkCommand`, `FieldScaledDeckReturns` | Capability `FIELD_SCALED_DECKS`; the mark's district must be one of the caller's associated districts (`IsTimberMarkAssociatedWithUserTag`). Each selected row's returns are found with the legacy search criteria (`setCriteria` → HBS2R651/601/551: active, mark, deck or any deck for `*`, S: ISS + SS/RS/CS, W: HLD/RDY/ERR/NTI + FS flag Y + PS/SS/RS/PD, P: same statuses + FS flag Y + the row's event type, check-scale rule for S/P, the row's Pop/Stratum/Year or none for "Unknown"; the scale-date window was never filled). S: cancel when `isCancelAllowed && isActive`; W/P: hold → FIELD_SCALE_IND = N → release (or, already held, N → release) on the detail-return workflow. One savepoint per return, reported per return. The deck queries now return `selectable` (the procs' `slect` district check + issued / FS-flag count > 0) and P844's `event_code`. |
+
+The previous registry commands for these ids were removed from `BillingCatalog`
+(they wrote whatever the browser sent). The force / tenure queries now return
+`update_timestamp` for the lock, and `final-bill-tenure` returns `opu/osy/otm`.
+
 ### Billing — legacy logic not yet ported
 
-1. **Force summarization validation and the "all" option** (`ear/hbs-view/…/ivs/config/P811Action.java` and
-   `P813Action.java`, `validateForm` and the Yes branch):
-   - Force year must be 2000–2099. The date must be on or after today.
-   - Window from today by frequency: MTH ≤ 28 days, BWK ≤ 14, DLY ≤ 1. A December→January year rollover only.
-   - "For All Client With Custom Mark Holder Profile" updates every matching profile AND the default profile
-     (mhprof_id 1 for piece, 2 for weight) in one action.
-   - The row command does not enforce any of this server-side. It needs a `BillingForceService`.
-2. **Force ratio computation validation** (`P823Action.java`):
-   - The profile must exist for Population/Sampling Year/Effective Date.
-   - The same frequency window rule applies.
-   - The force date must be > period start and < period end ("Force Date cannot be less than Ratio Computation Period
-     Start" / "… greater than … Period End").
-   - Legacy sets the time to 23:59:59.
-   - "For The Global Profile" updates every profile active at the force date.
-3. **Generate and Hold / Generate and Release final bills** (P829/P830):
-   - Call path: `P828Action` → `ProfileManagerBean.generateFinalBill` → `HBS3R830(OUT status, year, pop, stratum,
-     'HLD'|'RDY', userId)`.
-   - The first argument is an OUT parameter, so `CommandService` can't call it.
-   - Limited to HBS_BILL_ADMIN / MOF_MGR. Only rows with the eligible flag `*` are offered. Each row is re-queried
-     afterwards.
-4. **"Populations in Associated Districts"** (P828 radio): HBS3R829 filters by `HBS_USER_DIST_DATA_DOMAIN` for the
-   logged-in user id.
-   - Note: the legacy MOF branch (`strSelectStarMOF` + `Z.ratio_type_code` filter) effectively always limited ministry
-     users to their own district domains.
-   - Query definitions get no viewer user-id bind, so the new screen shows all populations to ministry users. Fixing
-     this needs a `:hbsUserId` viewer bind in `QueryService` (shared file).
-   - The P828 role-based defaults (all three suppress boxes for admin roles; CLI_SITE_ADMIN preset client) also need
-     the user's roles. Today only "No eligible PSYMarks billed" defaults on.
-5. **P831/P832 Hold Selected / Release Selected**: `ClientHelper.updateSummaryWeightScaleReturnHold/Release`
-   (`ear/hbs-view/…/ivs/config/ClientHelper.java` ~line 1435). This is summary-return workflow (hold RDY/ERR, release
-   HLD) and belongs with the summary-return services. The row link opens the summary return (`summary-return`).
-6. **P835 add validations** (`P835Action.java`):
-   - Population exists. Year is 4 digits. Population / Sampling Year combination exists.
-   - Population ratio type is not Default ("An election for final billing cannot be made for a population where Ratio
-     Type is Default.").
-   - The timber mark is valid and non-renewable ("…must be exempt from final bills (must be non-renewable)").
-   - No invoices or statements exist for the Pop/Yr/Mark.
-   - No duplicate (the PK enforces this).
-7. **P836 update and delete**:
-   - Changing any key was delete + insert (`P836Action.java`). Today the user deletes and adds instead.
-   - Delete is blocked when statements exist ("Cannot delete this Mark from final billing…"). The command doesn't check
-     this.
-8. **P842–P844 bulk actions** (`ear/hbs-view/…/ivs/config/P840Action.java`, `bulkActionForSampleTally`,
-   `bulkActionForWeighSlip`, `bulkActionForLogTally`, `doCancelReturn`, `doClearFiledScaleFlag`):
-   - "Cancel Issued Sample Tallies in Selected Strata": `DetailScaleDocumentHelper.cancel()` per active document.
-   - "Clear Field Scale Flag for Weigh Slips in Selected Strata" / "…for Selected Log Tallies": hold, set
-     `field_scale_ind = N`, then release.
-   - The buttons show only when the mark's district is in the user's district data domain (the procs' `slect` column).
-     That needs the viewer user id, so the column is omitted.
-   - The P841 overview/override-rule count links (to detail search and override rule search) are also not reproduced.
-9. **HBS3R829 Jasper print**: the report needs `FB_USERID`, and the proc does `SELECT … INTO` from HBS_USER, so a
-   missing or foreign user fails. `HbsReportService` should fill `*_USERID` from the JWT, as it already does for
-   `*_USERTYPE`, before the print is offered.
+1. ~~P842–P844 bulk actions~~ — ported (`billing.fieldScaledDecks.bulk`, above). The overview count links (to the
+   detail search) are still not reproduced.
+2. ~~P831/P832 Hold Selected / Release Selected~~ — ported (`billing.unissuedFinalBills.hold/.release`, above).
+3. ~~**P828 "Populations in Associated Districts" and role defaults**~~ — ported: `final-bill-status` has the
+   Populations selection (`districtScope`: All / Region-District / Associated Districts / Single / Owned By, the
+   query filters `ASSOCIATED` through `HBS_USER_DIST_DATA_DOMAIN` of `:hbsUserId`), with the `P828Form.initForm`
+   role defaults (HBS_BILL_ADMIN / HBS_SCALE_ADMIN / HBS_INV_CORR_APP / HBS_SMP_ADMIN: Associated Districts and all
+   three suppress flags; CLI_SITE_ADMIN: Owned By). The implicit MOF district restriction of the HBS3R829 MOF
+   branch (open question 1) is not applied.
+4. ~~**HBS3R829 Jasper print**~~ — ported: "Print" on `final-bill-status` maps the criteria to the `FB_*`
+   prompts (`FB_RADIO_SELECTED` = the Populations selection, `FB_STRATUM_FLAG` = N); `HbsReportService` fills
+   `FB_USERID` from the token (the proc needs the caller's HBS_USER row, kept by `HbsUserProvisioning`) and
+   rewrites `FB_EXPIRING_BEFORE` to the proc's `YYYY-MON-DD`.
+5. Row actions: Generate and Hold / Release are offered only on eligible (`*`) rows (`ActionDef.showWhen`). The force
+   actions stay on every row: their checks are date windows whose legacy messages the user must see.
 
 ## Administration (User Services P009–P019, Cache, Miscellaneous)
 
@@ -121,7 +103,7 @@ Notes on the port:
 | P019 Update Associated Districts | `user-data-domain` (Add) / `user-district-domains` (Remove) | `admin.userDataDomains.addDistrict` / `removeDistrict` (`HBS_CREATE_DIST_DATA_DOMAIN` / `HBS_REMOVE_DIST_DATA_DOMAIN`) | `uss/DistrictDataDomainQuery.java` |
 | P017 / P018 Update Associated Sites (Ministry / Industry) | `user-data-domain` (Add) / `user-site-domains` (Remove) | `admin.userDataDomains.addSite` / `removeSite` (`HBS_CREATE_SITE_DATA_DOMAIN` / `HBS_REMOVE_SITE_DATA_DOMAIN`); `codes.admin.scaleSites` | `uss/SiteDataDomainQuery.java` |
 | "P017" Update Associated Client Locations (AssociatedLocations.jsp) | `user-data-domain` (Add) / `user-location-domains` (Remove) | `admin.userDataDomains.addLocation` / `removeLocation` (`HBS_CREATE_LOCATION_DOMAIN` / `HBS_REMOVE_LOCATION_DOMAIN`) | `uss/LocationDomainQuery.java` |
-| P010 Enrolment Request (new / update / activate / deactivate) | not carried over | — | Replaced by FAM: accounts, roles and activation are managed in FAM |
+| P010 Enrolment Request (new / update / activate / deactivate) | not carried over as a screen | — | Accounts, roles and activation are managed in FAM. The `HBS_USER` row legacy enrolment created (still read by the legacy batch for statement e-mails and by the data domains) is kept current from the login token by `users/HbsUserProvisioning` (`HBS_CREATE_USER` / `HBS_STORE_USER`). Users removed in FAM keep their row until an admin removes their data domains. |
 | P012 Request Email Sent | not carried over | — | FAM |
 | Register (Restricted Client Administrator Verification, public) | not carried over | — | FAM onboarding. The legacy registration "key" was derivable from the client number (square roots of digits), so it was insecure. |
 | P016 Review Requests | not carried over | — | FAM (no HBS_USER_REQUEST workflow) |

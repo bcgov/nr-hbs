@@ -221,6 +221,36 @@ public class DetailReturnsViewCatalog implements QueryCatalog {
                    x.hbs_txn_type_code AS txn_type, ttc.description AS txn_type_desc,
                    x.hbs_txn_status_code AS txn_status, sr.entry_timestamp AS date_summarized,
                    x.document_control_number AS sdn, x.summary_document_version AS sdn_version,
+                   -- "Date Issued" (DetailScaleTransactionsTag.createDisplayTransaction): the latest
+                   -- transaction of the summary version — piece / weight: FOREST_INVOICE.invoice_date of
+                   -- its invoice (InvoiceHelper.findInvoice(number, "N")); sample: the compiled sample
+                   -- statement's issue date (BT13916). The SRTS ForestTally.processedHdbsDt fallback is
+                   -- not carried over: neither SRTS_TALLY_NUMBER nor FOREST_TALLY exists in nr-mof-db.
+                   CASE sr.hbs_return_type_code
+                     WHEN 'P' THEN (SELECT MAX(fi.invoice_date) FROM piece_scl_smry_txn st
+                                      JOIN forest_invoice fi ON fi.invoice_number = st.invoice_number
+                                                            AND fi.cancellation_ind = 'N'
+                                     WHERE st.document_control_number = x.document_control_number
+                                       AND st.version = x.summary_document_version
+                                       AND st.event_sequence = (SELECT MAX(s2.event_sequence) FROM piece_scl_smry_txn s2
+                                                                 WHERE s2.document_control_number = st.document_control_number
+                                                                   AND s2.version = st.version))
+                     WHEN 'W' THEN (SELECT MAX(fi.invoice_date) FROM weight_scl_smry_txn st
+                                      JOIN forest_invoice fi ON fi.invoice_number = st.invoice_number
+                                                            AND fi.cancellation_ind = 'N'
+                                     WHERE st.document_control_number = x.document_control_number
+                                       AND st.version = x.summary_document_version
+                                       AND st.event_sequence = (SELECT MAX(s2.event_sequence) FROM weight_scl_smry_txn s2
+                                                                 WHERE s2.document_control_number = st.document_control_number
+                                                                   AND s2.version = st.version))
+                     WHEN 'S' THEN (SELECT MAX(c.issue_date) FROM sample_scl_smry_txn st
+                                      JOIN hbs_compiled_sample_stmnt c ON c.trx_id = st.trx_id
+                                     WHERE st.document_control_number = x.document_control_number
+                                       AND st.version = x.summary_document_version
+                                       AND st.event_sequence = (SELECT MAX(s2.event_sequence) FROM sample_scl_smry_txn s2
+                                                                 WHERE s2.document_control_number = st.document_control_number
+                                                                   AND s2.version = st.version))
+                   END AS date_issued,
                    x.volume, x.value
               FROM (
                 SELECT t.detail_document_number AS ddn, t.detail_document_version AS version, t.dtl_txn_id,
