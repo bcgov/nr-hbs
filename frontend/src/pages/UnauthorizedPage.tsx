@@ -43,7 +43,7 @@ const UnauthorizedPage: FC = () => {
             <h2 data-testid="unauthorized-subtitle" className="landing-subtitle">
               {displayName
                 ? `You're signed in as ${displayName}, but your account isn't authorized to use HBS.`
-                : 'Your account is signed in, but it isn’t authorized to use HBS.'}
+                : 'Your account is signed in, but it isn’t authorized to use the Harvest Billing System.'}
             </h2>
 
             <div className="landing-actions">

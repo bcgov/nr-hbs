@@ -2,7 +2,12 @@ package ca.bc.gov.nrs.hbs.api.service.v1.report;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperReport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,5 +43,25 @@ class HbsReportServicePromptTest {
   void reformatsDatesForMonDateReports() {
     assertThat(HbsReportService.safePrompt(R972, "CBD_FROMDATE", "2024-03-05")).isEqualTo("2024-Mar-05");
     assertThat(HbsReportService.safePrompt(R051, "PSR_FROM", "2024-03-05")).isEqualTo("2024-03-05");
+  }
+
+  @Test
+  void numericPromptsAreConverted() throws Exception {
+    // HBS2R411 declares Avg_Rate_* as Double: a String failed with ClassCastException while filling.
+    JasperReport report;
+    try (InputStream in = getClass().getResourceAsStream("/reports/hbs/HBS2R411/HBS2R411.jrxml")) {
+      report = JasperCompileManager.compileReport(in);
+    }
+    Map<String, Object> params = new HashMap<>();
+    params.put("Avg_Rate_Coast", " 12.5 ");
+    params.put("Avg_Rate_NInterior", "");
+    params.put("PSAGED_SCALED_PRIORTO", "2026-01-01");
+    HbsReportService.coerce(report, params);
+    assertThat(params).containsEntry("Avg_Rate_Coast", 12.5)
+        .containsEntry("Avg_Rate_NInterior", null)
+        .containsEntry("PSAGED_SCALED_PRIORTO", "2026-01-01");
+
+    params.put("Avg_Rate_SInterior", "abc");
+    assertThatThrownBy(() -> HbsReportService.coerce(report, params)).isInstanceOf(IllegalArgumentException.class);
   }
 }

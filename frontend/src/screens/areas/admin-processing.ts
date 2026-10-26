@@ -14,7 +14,7 @@ export const screens: ScreenDef[] = [
     id: 'processing-parameters',
     legacy: 'P038',
     area: 'admin',
-    title: 'HBS Alert and Processing Parameters',
+    title: 'Harvest Billing System Alert and Processing Parameters',
     capability: 'PRODUCTION_CONTROL',
     nav: true,
     query: 'admin.processingParameters',

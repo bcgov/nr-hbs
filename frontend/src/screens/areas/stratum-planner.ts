@@ -1,4 +1,5 @@
 import type { ActionDef, ColumnDef, FieldDef, ScreenDef } from '../types';
+import { SAMPLING_YEAR_OPTIONS } from '@/screens/years';
 
 /**
  * Stratum Planner — legacy tab "Stratum Planner" (module smp, menu P850
@@ -16,11 +17,11 @@ import type { ActionDef, ColumnDef, FieldDef, ScreenDef } from '../types';
 /** P891 / P896 / P897 plan header: population, year, plan, owner, district, period. */
 const planHeaderFields = (): FieldDef[] => [
   { name: 'population', label: 'Population', required: true, maxLength: 4, helperText: '4 digits' },
-  { name: 'samplingYear', label: 'Year', type: 'number', required: true, maxLength: 4 },
+  { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
   { name: 'planAbbreviation', label: 'Plan Abbreviation', required: true, upper: true, maxLength: 2 },
   { name: 'planName', label: 'Plan Name', required: true, maxLength: 40, span: 2 },
-  { name: 'clientNumber', label: 'Client No', type: 'client', required: true, maxLength: 8 },
-  { name: 'clientLocnCode', label: 'Loc', required: true, upper: true, maxLength: 2 },
+  { name: 'clientNumber', label: 'Client Number', type: 'client', required: true, maxLength: 8 },
+  { name: 'clientLocnCode', label: 'Location', required: true, upper: true, maxLength: 2 },
   { name: 'orgUnitNo', label: 'District', type: 'select', codeList: 'codes.rating.districts', required: true },
   { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true, helperText: 'First day of a month' },
   { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true, helperText: 'Last day of a month' },
@@ -39,7 +40,7 @@ const confirmPopulationField: FieldDef = {
 const copyOptionFields: FieldDef[] = [
   { name: 'usePlanEffectiveDate', label: 'Use the plan Effective Date for all strata', type: 'checkbox', span: 2 },
   { name: 'usePlanExpiryDate', label: 'Use the plan Expiry Date for all strata', type: 'checkbox', span: 2 },
-  { name: 'usePlanClient', label: 'Use the plan Client No / Loc for all strata', type: 'checkbox', span: 2 },
+  { name: 'usePlanClient', label: 'Use the plan Client Number / Location for all strata', type: 'checkbox', span: 2 },
   { name: 'deleteUnusedStrata', label: 'Delete unused strata', type: 'checkbox', span: 2 },
 ];
 
@@ -48,7 +49,7 @@ const stratumFields = (): FieldDef[] => [
   { name: 'stratumNumber', label: 'Stratum Number', required: true, maxLength: 2 },
   { name: 'stratumName', label: 'Stratum Name', required: true, maxLength: 20 },
   { name: 'clientNumber', label: 'Stratum Owner Client', type: 'client', required: true, maxLength: 8 },
-  { name: 'clientLocnCode', label: 'Loc', required: true, upper: true, maxLength: 2 },
+  { name: 'clientLocnCode', label: 'Location', required: true, upper: true, maxLength: 2 },
   { name: 'effectiveDate', label: 'Stratum Effective Date', type: 'date', required: true, helperText: 'First day of a month' },
   { name: 'expiryDate', label: 'Stratum Expiry Date', type: 'date', required: true, helperText: 'Last day of a month' },
   { name: 'scaleProductCode', label: 'Product Schedule', type: 'select', codeList: 'codes.sampling.productSchedules', required: true },
@@ -211,7 +212,7 @@ export const screens: ScreenDef[] = [
     query: 'sampling.plans.search',
     criteria: [
       { name: 'population', label: 'Population', maxLength: 4 },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4 },
+      { name: 'samplingYear', type: 'select', options: SAMPLING_YEAR_OPTIONS, label: 'Sampling Year' },
       { name: 'effectiveOnOrBefore', label: 'Effective On or Before', type: 'date' },
       { name: 'expiringOnOrAfter', label: 'Expiring On or After', type: 'date' },
       { name: 'planStatus', label: 'Plan Status', type: 'select', codeList: 'codes.sampling.planStatuses' },
@@ -303,12 +304,12 @@ export const screens: ScreenDef[] = [
           query: 'sampling.stratumPlans.list',
           params: { planId: 'planId' },
           columns: [
-            { key: 'stratumNumber', header: 'No.' },
+            { key: 'stratumNumber', header: 'Number' },
             { key: 'stratumName', header: 'Name' },
-            { key: 'segs', header: 'Segs', format: 'number' },
-            { key: 'estimatedVolume', header: 'Est. Volume', format: 'volume' },
-            { key: 'estimatedLoads', header: 'Est. Loads', format: 'number' },
-            { key: 'estimatedLoadSize', header: 'Est. Size', format: 'number' },
+            { key: 'segs', header: 'Segregations', format: 'number' },
+            { key: 'estimatedVolume', header: 'Estimated Volume', format: 'volume' },
+            { key: 'estimatedLoads', header: 'Estimated Loads', format: 'number' },
+            { key: 'estimatedLoadSize', header: 'Estimated Size', format: 'number' },
             { key: 'estimatedStandardDeviation', header: 'St Dev', format: 'number' },
             { key: 'optimumSampleCalc', header: 'Optimum Samp', format: 'number' },
             { key: 'optimumPrecisionCalc', header: 'Optimum Prec', format: 'number' },
@@ -328,7 +329,7 @@ export const screens: ScreenDef[] = [
           query: 'sampling.planComparison.list',
           params: { planId: 'planId' },
           columns: [
-            { key: 'stratumNumber', header: 'Stratum No.' },
+            { key: 'stratumNumber', header: 'Stratum Number' },
             { key: 'stratumName', header: 'Name' },
             { key: 'sampleLoadsPlan', header: 'Loads Plan', format: 'number' },
             { key: 'sampleLoadsActual', header: 'Loads Act.', format: 'number' },
@@ -408,11 +409,11 @@ export const screens: ScreenDef[] = [
     keys: ['planId'],
     fields: [
       { name: 'populationNumber', label: 'Population', readOnlyOnEdit: true },
-      { name: 'samplingYear', label: 'Year', readOnlyOnEdit: true },
+      { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, readOnlyOnEdit: true },
       { name: 'planAbbreviation', label: 'Plan Abbreviation', readOnlyOnEdit: true },
       { name: 'planName', label: 'Plan Name', required: true, maxLength: 40 },
-      { name: 'clientNumber', label: 'Client No', type: 'client', required: true, maxLength: 8 },
-      { name: 'clientLocnCode', label: 'Loc', required: true, upper: true, maxLength: 2 },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', required: true, maxLength: 8 },
+      { name: 'clientLocnCode', label: 'Location', required: true, upper: true, maxLength: 2 },
       { name: 'orgUnitNo', label: 'District', type: 'select', codeList: 'codes.rating.districts', required: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
@@ -471,7 +472,7 @@ export const screens: ScreenDef[] = [
           { key: 'effectiveDate', label: 'Stratum Effective Date', format: 'date' },
           { key: 'expiryDate', label: 'Stratum Expiry Date', format: 'date' },
           { key: 'clientNumber', label: 'Stratum Owner Client' },
-          { key: 'clientLocnCode', label: 'Loc' },
+          { key: 'clientLocnCode', label: 'Location' },
           { key: 'stratumDesc', label: 'Stratum Description' },
           { key: 'timberSourceDesc', label: 'Timber Source Description' },
           { key: 'speciesGradeProfileDesc', label: 'Species / Grade Profile Description' },
@@ -640,7 +641,7 @@ export const screens: ScreenDef[] = [
     description: 'Supply one or more of the following search criteria.',
     criteria: [
       { name: 'population', label: 'Population', maxLength: 4 },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4 },
+      { name: 'samplingYear', type: 'select', options: SAMPLING_YEAR_OPTIONS, label: 'Sampling Year' },
       { name: 'clientNumber', label: 'Population Owner Client', type: 'client', maxLength: 8 },
       { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
     ],
@@ -682,10 +683,10 @@ export const screens: ScreenDef[] = [
     query: 'sampling.strata.search',
     criteria: [
       { name: 'population', label: 'Population', required: true, maxLength: 4 },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', required: true, maxLength: 4 },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
     ],
     columns: [
-      { key: 'stratumNumber', header: 'Stratum No.' },
+      { key: 'stratumNumber', header: 'Stratum Number' },
       { key: 'stratumName', header: 'Name' },
       { key: 'sampleLoads', header: 'Sample Loads', format: 'number' },
       { key: 'sampleVolume', header: 'Sample Volume', format: 'volume' },
@@ -719,7 +720,7 @@ export const screens: ScreenDef[] = [
     query: 'sampling.populationStats.search',
     criteria: [
       { name: 'population', label: 'Population', required: true, maxLength: 4 },
-      { name: 'samplingYear', label: 'Year', type: 'number', required: true, maxLength: 4 },
+      { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
       statTypeField,
     ],
     columns: statColumns,
@@ -737,7 +738,7 @@ export const screens: ScreenDef[] = [
     query: 'sampling.stratumStats.search',
     criteria: [
       { name: 'population', label: 'Population', required: true, maxLength: 4 },
-      { name: 'samplingYear', label: 'Year', type: 'number', required: true, maxLength: 4 },
+      { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
       { name: 'stratumNumber', label: 'Stratum', required: true, maxLength: 2 },
       statTypeField,
     ],
@@ -767,15 +768,15 @@ export const screens: ScreenDef[] = [
       {
         title: 'Stratum',
         fields: [
-          { key: 'populationNumber', label: 'Pop' },
-          { key: 'stratumNumber', label: 'Strat' },
+          { key: 'populationNumber', label: 'Population' },
+          { key: 'stratumNumber', label: 'Stratum' },
           { key: 'samplingYear', label: 'Year' },
           { key: 'ratioType', label: 'Ratio Type' },
           { key: 'stratumName', label: 'Stratum Name' },
           { key: 'gradeSchedule', label: 'Grade Schedule' },
           { key: 'productSchedule', label: 'Product Schedule' },
           { key: 'clientNumber', label: 'Stratum Owner' },
-          { key: 'clientLocnCode', label: 'Loc' },
+          { key: 'clientLocnCode', label: 'Location' },
           { key: 'clientName', label: 'Stratum Owner Name' },
         ],
       },
@@ -798,8 +799,8 @@ export const screens: ScreenDef[] = [
           query: 'sampling.stratumSamples.list',
           params: STRATUM_RECORD_PARAMS,
           columns: [
-            { key: 'documentControlNumber', header: 'SDN' },
-            { key: 'version', header: 'Ver No' },
+            { key: 'documentControlNumber', header: 'Summary Document Number' },
+            { key: 'version', header: 'Version Number' },
             { key: 'licenseNumber', header: 'Scaler' },
             { key: 'returnNumber', header: 'Return' },
             { key: 'scaleSite', header: 'Site' },
@@ -869,7 +870,7 @@ export const screens: ScreenDef[] = [
           { key: 'samplingYear', label: 'Year' },
           { key: 'populationNumber', label: 'Population' },
           { key: 'stratumNumber', label: 'Stratum' },
-          { key: 'trxId', label: 'Txn' },
+          { key: 'trxId', label: 'Transaction' },
           { key: 'timberMark', label: 'Mark' },
           { key: 'licenseNumber', label: 'Scaler' },
           { key: 'returnNumber', label: 'Return' },

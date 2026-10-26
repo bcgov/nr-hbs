@@ -26,7 +26,7 @@ const SOFTWARE_CRITERIA: FieldDef[] = [
   { name: 'product', label: 'Product', type: 'select', codeList: 'codes.scaleControl.softwareProducts', group: 'Software' },
   { name: 'version', label: 'Version', maxLength: 4, group: 'Software' },
   { name: 'revision', label: 'Revision', maxLength: 4, group: 'Software' },
-  { name: 'scaleSite', label: 'Scale Site No', maxLength: 4, upper: true, group: 'Scale Site' },
+  { name: 'scaleSite', label: 'Scale Site Number', maxLength: 4, upper: true, group: 'Scale Site' },
 ];
 
 /** Report prompts shared by HBS3R992 / HBS3R993 (dates are yyyy-mm-dd). */
@@ -60,7 +60,7 @@ export const screens: ScreenDef[] = [
           { value: 'Timber_Mark', label: 'Timber Mark' },
           { value: 'Scale_Date', label: 'Scale Date' },
           { value: 'Scale_Site', label: 'Scale Site' },
-          { value: 'Pop_Strat_Year', label: 'Pop/Strat/Year' },
+          { value: 'Pop_Strat_Year', label: 'Population/Stratum/Year' },
         ],
       },
       { name: 'fromDate', label: 'From Date', type: 'date', required: true, group: 'Change Date' },
@@ -105,7 +105,7 @@ export const screens: ScreenDef[] = [
     title: 'Scale Return Change Log',
     nav: false,
     capability: 'SCALE_CONTROL_VIEW',
-    description: 'Field-level change history of one scale return version (SDN / DDN).',
+    description: 'Field-level change history of one scale return version (summary or detail document number).',
     query: 'scaleControl.changeLog.document',
     criteria: [
       { name: 'returnFormat', label: 'Return Format', type: 'select', required: true, options: RETURN_FORMATS },
@@ -181,7 +181,7 @@ export const screens: ScreenDef[] = [
       { key: 'softwareRevision', header: 'Software Revision' },
       { key: 'reason', header: 'Reason', sortable: true },
       { key: 'returnType', header: 'Return Type' },
-      { key: 'documentControlNo', header: 'Document Control No' },
+      { key: 'documentControlNo', header: 'Document Control Number' },
       { key: 'documentVersion', header: 'Document Version' },
     ],
     reports: [

@@ -55,7 +55,7 @@ const GRIDS: Record<Grid, { title: string; legacy: string; query: string; comman
       { key: 'pieces', header: 'Pieces', kind: 'number', maxLength: 6 },
       { key: 'volume', header: 'Volume', kind: 'number', maxLength: 10 },
       { key: 'sb4', header: 'SB4', kind: 'flag', pieceOnly: true },
-      { key: 'nmv', header: 'NMV', kind: 'flag', pieceOnly: true },
+      { key: 'nmv', header: 'No Mark Visible', kind: 'flag', pieceOnly: true },
       { key: 'avoidable', header: 'Avoidable', kind: 'flag', pieceOnly: true },
       { key: 'bcombMark', header: 'Beachcomb Mark', upper: true, maxLength: 6, pieceOnly: true },
     ],

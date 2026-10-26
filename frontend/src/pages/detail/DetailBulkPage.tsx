@@ -54,7 +54,7 @@ const UPDATE_FIELDS = [
   { value: 'SCALE_SITE', label: 'Scale Site' },
   { value: 'SCALE_DATE', label: 'Scale Date (yyyymmdd)' },
   { value: 'TIMBER_MARK', label: 'Timber Mark' },
-  { value: 'POP_STRAT_YEAR', label: 'Pop/Strat/Year' },
+  { value: 'POP_STRAT_YEAR', label: 'Population/Stratum/Year' },
 ];
 
 const CRITERIA: FieldDef[] = [

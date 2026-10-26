@@ -1,6 +1,7 @@
 import type { ROLE_TYPE } from '@/context/auth/types';
 
 import type { ActionDef, BulkActionDef, ColumnDef, FieldDef, ScreenDef } from '../types';
+import { SAMPLING_YEAR_OPTIONS } from '@/screens/years';
 
 /**
  * Billing area — legacy Billing tab (P800, /ivs/*).
@@ -24,8 +25,8 @@ const DEFAULT_SAMPLING_YEAR = String(new Date(Date.now() - 60 * 24 * 60 * 60 * 1
 
 const forceSummarizationCriteria: FieldDef[] = [
   { name: 'frequency', label: 'Frequency', type: 'select', options: FREQUENCIES },
-  { name: 'clientNumber', label: 'Client No.', type: 'client', group: 'Client Location' },
-  { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Client Location' },
+  { name: 'clientNumber', label: 'Client Number', type: 'client', group: 'Client Location' },
+  { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Client Location' },
   {
     name: 'forceDate',
     label: 'Force date',
@@ -86,8 +87,8 @@ const forceAllForm = (id: string, legacy: string, returnType: 'P' | 'W', title: 
       ],
       span: 4,
     },
-    { name: 'clientNumber', label: 'Client No.', type: 'client', group: 'Client Location' },
-    { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Client Location' },
+    { name: 'clientNumber', label: 'Client Number', type: 'client', group: 'Client Location' },
+    { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Client Location' },
     { name: 'forceDate', label: 'Force date', type: 'date', required: true },
   ],
 });
@@ -153,12 +154,12 @@ const generateActions = (params: Record<string, string>): ActionDef[] => [
 
 const tenureCriteria: FieldDef[] = [
   { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, group: 'For This Timber Mark' },
-  { name: 'markClientNumber', label: 'Client No.', type: 'client', group: 'For All Timber Marks Owned By' },
-  { name: 'markClientLocnCode', label: 'Loc', maxLength: 2, group: 'For All Timber Marks Owned By' },
+  { name: 'markClientNumber', label: 'Client Number', type: 'client', group: 'For All Timber Marks Owned By' },
+  { name: 'markClientLocnCode', label: 'Location', maxLength: 2, group: 'For All Timber Marks Owned By' },
   { name: 'population', label: 'Population', upper: true, maxLength: 4, group: 'For This Population and Sampling Year' },
-  { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, group: 'For This Population and Sampling Year' },
-  { name: 'popClientNumber', label: 'Client No.', type: 'client', group: 'For All Populations Owned By' },
-  { name: 'popClientLocnCode', label: 'Loc', maxLength: 2, group: 'For All Populations Owned By' },
+  { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, group: 'For This Population and Sampling Year' },
+  { name: 'popClientNumber', label: 'Client Number', type: 'client', group: 'For All Populations Owned By' },
+  { name: 'popClientLocnCode', label: 'Location', maxLength: 2, group: 'For All Populations Owned By' },
 ];
 
 // ------------------------------------------------------------------ P841-P844 field scale tables
@@ -240,7 +241,7 @@ export const screens: ScreenDef[] = [
     query: 'billing.forceRatioComputation.profiles',
     criteria: [
       { name: 'population', label: 'Population', upper: true, maxLength: 4, group: 'For A Single Custom Profile' },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, group: 'For A Single Custom Profile' },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, group: 'For A Single Custom Profile' },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', group: 'For A Single Custom Profile' },
       { name: 'globalProfile', label: 'For The Global Profile', type: 'checkbox' },
       { name: 'forceDate', label: 'Force date', type: 'date', required: true },
@@ -276,11 +277,11 @@ export const screens: ScreenDef[] = [
     legacy: 'P828/P829',
     area: 'billing',
     title: 'Final Bill Status Summary',
-    description: 'Configure Final Bill Status Summary — weight-scale final bills by population.',
+    description: 'Weight-scale final bills by population.',
     capability: 'BILLING_VIEW',
     query: 'billing.finalBillStatus.populations',
     criteria: [
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true, defaultValue: DEFAULT_SAMPLING_YEAR },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true, defaultValue: DEFAULT_SAMPLING_YEAR },
       // P828 population selection (HBS3R829 FB_RADIO_SELECTED); role defaults from P828Form.initForm.
       {
         name: 'districtScope',
@@ -301,8 +302,8 @@ export const screens: ScreenDef[] = [
       },
       { name: 'orgUnit', label: 'Populations in Region/District', codeList: 'codes.orgUnits' },
       { name: 'population', label: 'Single Population', upper: true, maxLength: 4 },
-      { name: 'clientNumber', label: 'Population Owned By — Client No.', type: 'client' },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
+      { name: 'clientNumber', label: 'Population Owned By — Client Number', type: 'client' },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
       { name: 'expiringBefore', label: 'Expiring Before', type: 'date', helperText: 'Leave blank to list all' },
       ...suppressFields.map((f) =>
         f.name === 'suppressNoEligible' ? f : { ...f, roleDefaults: [{ roles: P828_ADMINS, value: 'Y' }] },
@@ -328,8 +329,8 @@ export const screens: ScreenDef[] = [
       },
     ],
     columns: [
-      { key: 'populationNumber', header: 'Pop No', sortable: true },
-      { key: 'popExpiry', header: 'Pop Expiry', format: 'date', sortable: true },
+      { key: 'populationNumber', header: 'Population Number', sortable: true },
+      { key: 'popExpiry', header: 'Population Expiry', format: 'date', sortable: true },
       ...finalBillCountColumns,
     ],
     rowLink: {
@@ -350,13 +351,13 @@ export const screens: ScreenDef[] = [
     capability: 'BILLING_VIEW',
     query: 'billing.finalBillStatus.strata',
     criteria: [
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
       { name: 'population', label: 'Population', upper: true, maxLength: 4, required: true },
       { name: 'expiringBefore', label: 'Expiring Before', type: 'date' },
       ...suppressFields,
     ],
     columns: [
-      { key: 'stratumNumber', header: 'Stratum No', sortable: true },
+      { key: 'stratumNumber', header: 'Stratum Number', sortable: true },
       { key: 'popExpiry', header: 'Stratum Expiry', format: 'date' },
       ...finalBillCountColumns,
     ],
@@ -395,7 +396,7 @@ export const screens: ScreenDef[] = [
       { key: 'scaleDate', header: 'Scale Date', format: 'date', sortable: true },
       { key: 'status', header: 'Status', format: 'status' },
       { key: 'scaleSite', header: 'Site' },
-      { key: 'popStrYear', header: 'Pop/Str/Year' },
+      { key: 'popStrYear', header: 'Population/Stratum/Year' },
       { key: 'timberMark', header: 'TimberMark', sortable: true },
       { key: 'invoiceTo', header: 'Invoice To' },
       { key: 'copyTo', header: 'Copy To' },
@@ -500,7 +501,7 @@ export const screens: ScreenDef[] = [
     command: 'billing.finalBillTenure.create',
     fields: [
       { name: 'populationNumber', label: 'Population', upper: true, maxLength: 4, required: true },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
       { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, required: true },
     ],
     submitLabel: 'Save',
@@ -509,7 +510,7 @@ export const screens: ScreenDef[] = [
       params: { population: 'populationNumber', samplingYear: 'samplingYear' },
     },
     notes:
-      'The mark must be non-renewable, the population must not use Default ratios, and no invoices or statements may exist for the Pop/Yr/Mark.',
+      'The mark must be non-renewable, the population must not use Default ratios, and no invoices or statements may exist for the Population/Year/Mark.',
   },
   {
     kind: 'detail',
@@ -546,7 +547,7 @@ export const screens: ScreenDef[] = [
         capability: 'FINAL_BILL_ADMIN',
         danger: true,
         confirm:
-          'Remove this mark from final billing for this Pop/Yr? Not allowed when invoices or statements exist for the Pop/Yr/Mark.',
+          'Remove this mark from final billing for this Population/Year? Not allowed when invoices or statements exist for the Population/Year/Mark.',
         params: {
           populationNumber: 'populationNumber',
           samplingYear: 'samplingYear',
@@ -580,7 +581,7 @@ export const screens: ScreenDef[] = [
       { name: 'otm', label: 'Current Timber Mark', readOnlyOnEdit: true, group: 'Current election' },
       { name: 'updateTimestamp', label: 'Last Updated', readOnlyOnEdit: true, group: 'Current election' },
       { name: 'populationNumber', label: 'Population', upper: true, maxLength: 4, required: true, group: 'New values' },
-      { name: 'samplingYear', label: 'Sampling Year', type: 'number', maxLength: 4, required: true, group: 'New values' },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true, group: 'New values' },
       { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, required: true, group: 'New values' },
     ],
     submitLabel: 'Save',
@@ -589,7 +590,7 @@ export const screens: ScreenDef[] = [
       params: { population: 'populationNumber', samplingYear: 'samplingYear', timberMark: 'timberMark' },
     },
     notes:
-      'Changing the population, year or mark replaces the election. Not allowed when invoices or statements exist for the old or the new Pop/Yr/Mark.',
+      'Changing the population, year or mark replaces the election. Not allowed when invoices or statements exist for the old or the new Population/Year/Mark.',
   },
   {
     kind: 'search',
@@ -701,8 +702,8 @@ export const screens: ScreenDef[] = [
           query: 'billing.fieldScaledDecks.sampleTallies',
           params: deckParams,
           columns: [
-            { key: 'psy', header: 'Pop/Strat/Year' },
-            { key: 'ytdRatio', header: 'YTD Ratio', format: 'number' },
+            { key: 'psy', header: 'Population/Stratum/Year' },
+            { key: 'ytdRatio', header: 'Year-to-Date Ratio', format: 'number' },
             { key: 'ratioSource', header: 'Source' },
             ...statusCountColumns,
           ],
@@ -715,10 +716,10 @@ export const screens: ScreenDef[] = [
           query: 'billing.fieldScaledDecks.weighSlips',
           params: deckParams,
           columns: [
-            { key: 'psy', header: 'Pop/Strat/Year' },
-            { key: 'ytdRatio', header: 'YTD Ratio', format: 'number' },
+            { key: 'psy', header: 'Population/Stratum/Year' },
+            { key: 'ytdRatio', header: 'Year-to-Date Ratio', format: 'number' },
             { key: 'ratioSource', header: 'Source' },
-            { key: 'fsFlag', header: 'FS Flag', format: 'number' },
+            { key: 'fsFlag', header: 'Field Scale Flag', format: 'number' },
             ...statusCountColumns,
           ],
           bulkActions: [deckBulk('W', 'Clear Field Scale Flag for Weigh Slips in Selected Strata', { psy: 'psy' })],
@@ -731,7 +732,7 @@ export const screens: ScreenDef[] = [
           params: deckParams,
           columns: [
             { key: 'eventType', header: '' },
-            { key: 'nti', header: 'NTI', format: 'number' },
+            { key: 'nti', header: 'Not To Be Billed', format: 'number' },
             { key: 'held', header: 'Held', format: 'number' },
             { key: 'error', header: 'Error', format: 'number' },
             { key: 'other', header: 'Other', format: 'number' },
@@ -746,7 +747,7 @@ export const screens: ScreenDef[] = [
           params: deckParams,
           columns: [
             { key: 'eventType', header: 'Event Type' },
-            { key: 'fsFlag', header: 'FS Flag', format: 'number' },
+            { key: 'fsFlag', header: 'Field Scale Flag', format: 'number' },
             ...statusCountColumns,
           ],
           bulkActions: [deckBulk('P', 'Clear Field Scale Flag for Selected Log Tallies', { eventCode: 'eventCode' })],

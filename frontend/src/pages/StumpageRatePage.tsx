@@ -154,7 +154,7 @@ const StumpageRatePage: FC = () => {
               },
               { label: 'Appraisal Effective Date', value: formatValue(appraisal.appEffectiveDate, 'date') },
               { label: 'Appraisal Expiry Date', value: formatValue(appraisal.appExpiryDate, 'date') },
-              { label: 'Admin Org', value: formatValue(appraisal.adminOrg) },
+              { label: 'Administrative Organization', value: formatValue(appraisal.adminOrg) },
               { label: 'Region', value: formatValue(appraisal.region) },
             ]}
           />

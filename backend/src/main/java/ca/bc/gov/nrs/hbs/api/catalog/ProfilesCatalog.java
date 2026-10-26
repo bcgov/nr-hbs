@@ -102,78 +102,89 @@ public class ProfilesCatalog implements QueryCatalog {
 
   // ---------------------------------------------------------------- P320–P323
 
+  private static final QueryDefinition SCALE_SITE_SEARCH = scaleSiteProfiles("profiles.scaleSites.search", "P320/P321");
+
+  /**
+   * P311 Client Profile's Scale Site Profiles tab: the same rows by client, but not
+   * the P320 search, so none of its pre-checks ({@code ScaleSiteProfileSearchGuard}):
+   * a client that is not a trading partner, or has no profiles, gets an empty list.
+   */
+  private static final QueryDefinition CLIENT_SCALE_SITES = scaleSiteProfiles("profiles.scaleSites.byClient", "P311");
+
   /**
    * HBS2R321's SELECT (TRADING_PARTNER_SUBMITTER summary rows UNION
    * SCALE_SITE_PROFILE detail rows), wrapped so the three legacy search types
    * (Scale Site / Trading Partner / Site Owner) are plain filters.
    * {@code profile_key} disambiguates the two id spaces ('TPS…' / 'SSP…').
    */
-  private static final QueryDefinition SCALE_SITE_SEARCH = QueryDefinition.builder("profiles.scaleSites.search")
-      .legacy("P320/P321")
-      .capability(Capability.PROFILES_VIEW)
-      .sql("""
-          SELECT * FROM (
-            SELECT 'TPS' || tps.tps_id AS profile_key,
-                   'TPS' AS profile_source,
-                   tps.tps_id AS tps_id,
-                   tps.scale_site_id_nmbr AS scale_site_id,
-                   tps.tp_doc_type AS doc_type,
-                   CASE tps.tp_doc_type WHEN 'S' THEN 'Summary' WHEN 'D' THEN 'Detail' END AS submission_type,
-                   tps.hbs_return_type_code AS return_type,
-                   rt.description AS return_type_desc,
-                   tps.effective_date AS effective_date,
-                   tps.expiry_date AS expiry_date,
-                   tps.client_number AS client_number,
-                   tps.client_locn_code AS client_locn_code,
-                   tps.tpsubmtr_type AS submitter_type,
-                   CASE WHEN fc.client_number IS NULL THEN NULL ELSE %s END AS client_name,
-                   ss.owner_cli_number AS owner_client_number,
-                   ss.owner_cli_locn_cd AS owner_client_locn_code
-              FROM trading_partner_submitter tps
-              LEFT JOIN v_client_public fc ON fc.client_number = tps.client_number
-              LEFT JOIN scale_site ss ON ss.scale_site_id_nmbr = tps.scale_site_id_nmbr
-              LEFT JOIN hbs_return_type_code rt ON rt.hbs_return_type_code = tps.hbs_return_type_code
-            UNION ALL
-            SELECT 'SSP' || ssp.ssprof_id,
-                   'SSP',
-                   NULL,
-                   ssp.scale_site_id_nmbr,
-                   ssp.doc_type,
-                   CASE ssp.doc_type WHEN 'S' THEN 'Summary' WHEN 'D' THEN 'Detail' END,
-                   ssp.hbs_return_type_code,
-                   rt.description,
-                   ssp.effective_date,
-                   ssp.expiry_date,
-                   NULL,
-                   NULL,
-                   NULL,
-                   CASE WHEN fc.client_number IS NULL THEN NULL ELSE %s END,
-                   ss.owner_cli_number,
-                   ss.owner_cli_locn_cd
-              FROM scale_site_profile ssp
-              JOIN scale_site ss ON ss.scale_site_id_nmbr = ssp.scale_site_id_nmbr
-              LEFT JOIN v_client_public fc ON fc.client_number = ss.owner_cli_number
-              LEFT JOIN hbs_return_type_code rt ON rt.hbs_return_type_code = ssp.hbs_return_type_code
-          ) p
-          WHERE 1=1""".formatted(clientName("fc"), clientName("fc")))
-      .filter(QueryFilter.upper("scaleSiteId", "AND p.scale_site_id = :scaleSiteId"))
-      // Trading partner (HBS2R321 RB_CLIENT_NUMBER: TPS.CLIENT_NUMBER / SS.OWNER_CLI_NUMBER)
-      .filter(QueryFilter.eq("clientNumber",
-          "AND (p.client_number = :clientNumber OR (p.profile_source = 'SSP' AND p.owner_client_number = :clientNumber))"))
-      .filter(QueryFilter.eq("clientLocnCode",
-          "AND (p.client_locn_code = :clientLocnCode OR (p.profile_source = 'SSP' AND p.owner_client_locn_code = :clientLocnCode))"))
-      // Site owner (P320 "Site Owner": every profile of the sites the client owns)
-      .filter(QueryFilter.eq("ownerClientNumber", "AND p.owner_client_number = :ownerClientNumber"))
-      .filter(QueryFilter.eq("ownerClientLocnCode", "AND p.owner_client_locn_code = :ownerClientLocnCode"))
-      .sort("scaleSiteId", "p.scale_site_id")
-      .sort("submissionType", "p.submission_type")
-      .sort("returnTypeDesc", "p.return_type_desc")
-      .sort("effectiveDate", "p.effective_date")
-      .sort("expiryDate", "p.expiry_date")
-      .sort("clientNumber", "p.client_number")
-      .orderBy("p.doc_type, p.scale_site_id, p.client_number, p.effective_date")
-      .clientScope("AND (p.client_number = :scopeClientNumber OR p.owner_client_number = :scopeClientNumber)")
-      .build();
+  private static QueryDefinition scaleSiteProfiles(String id, String legacy) {
+    return QueryDefinition.builder(id)
+        .legacy(legacy)
+        .capability(Capability.PROFILES_VIEW)
+        .sql("""
+            SELECT * FROM (
+              SELECT 'TPS' || tps.tps_id AS profile_key,
+                     'TPS' AS profile_source,
+                     tps.tps_id AS tps_id,
+                     tps.scale_site_id_nmbr AS scale_site_id,
+                     tps.tp_doc_type AS doc_type,
+                     CASE tps.tp_doc_type WHEN 'S' THEN 'Summary' WHEN 'D' THEN 'Detail' END AS submission_type,
+                     tps.hbs_return_type_code AS return_type,
+                     rt.description AS return_type_desc,
+                     tps.effective_date AS effective_date,
+                     tps.expiry_date AS expiry_date,
+                     tps.client_number AS client_number,
+                     tps.client_locn_code AS client_locn_code,
+                     tps.tpsubmtr_type AS submitter_type,
+                     CASE WHEN fc.client_number IS NULL THEN NULL ELSE %s END AS client_name,
+                     ss.owner_cli_number AS owner_client_number,
+                     ss.owner_cli_locn_cd AS owner_client_locn_code
+                FROM trading_partner_submitter tps
+                LEFT JOIN v_client_public fc ON fc.client_number = tps.client_number
+                LEFT JOIN scale_site ss ON ss.scale_site_id_nmbr = tps.scale_site_id_nmbr
+                LEFT JOIN hbs_return_type_code rt ON rt.hbs_return_type_code = tps.hbs_return_type_code
+              UNION ALL
+              SELECT 'SSP' || ssp.ssprof_id,
+                     'SSP',
+                     NULL,
+                     ssp.scale_site_id_nmbr,
+                     ssp.doc_type,
+                     CASE ssp.doc_type WHEN 'S' THEN 'Summary' WHEN 'D' THEN 'Detail' END,
+                     ssp.hbs_return_type_code,
+                     rt.description,
+                     ssp.effective_date,
+                     ssp.expiry_date,
+                     NULL,
+                     NULL,
+                     NULL,
+                     CASE WHEN fc.client_number IS NULL THEN NULL ELSE %s END,
+                     ss.owner_cli_number,
+                     ss.owner_cli_locn_cd
+                FROM scale_site_profile ssp
+                JOIN scale_site ss ON ss.scale_site_id_nmbr = ssp.scale_site_id_nmbr
+                LEFT JOIN v_client_public fc ON fc.client_number = ss.owner_cli_number
+                LEFT JOIN hbs_return_type_code rt ON rt.hbs_return_type_code = ssp.hbs_return_type_code
+            ) p
+            WHERE 1=1""".formatted(clientName("fc"), clientName("fc")))
+        .filter(QueryFilter.upper("scaleSiteId", "AND p.scale_site_id = :scaleSiteId"))
+        // Trading partner (HBS2R321 RB_CLIENT_NUMBER: TPS.CLIENT_NUMBER / SS.OWNER_CLI_NUMBER)
+        .filter(QueryFilter.eq("clientNumber",
+            "AND (p.client_number = :clientNumber OR (p.profile_source = 'SSP' AND p.owner_client_number = :clientNumber))"))
+        .filter(QueryFilter.eq("clientLocnCode",
+            "AND (p.client_locn_code = :clientLocnCode OR (p.profile_source = 'SSP' AND p.owner_client_locn_code = :clientLocnCode))"))
+        // Site owner (P320 "Site Owner": every profile of the sites the client owns)
+        .filter(QueryFilter.eq("ownerClientNumber", "AND p.owner_client_number = :ownerClientNumber"))
+        .filter(QueryFilter.eq("ownerClientLocnCode", "AND p.owner_client_locn_code = :ownerClientLocnCode"))
+        .sort("scaleSiteId", "p.scale_site_id")
+        .sort("submissionType", "p.submission_type")
+        .sort("returnTypeDesc", "p.return_type_desc")
+        .sort("effectiveDate", "p.effective_date")
+        .sort("expiryDate", "p.expiry_date")
+        .sort("clientNumber", "p.client_number")
+        .orderBy("p.doc_type, p.scale_site_id, p.client_number, p.effective_date")
+        .clientScope("AND (p.client_number = :scopeClientNumber OR p.owner_client_number = :scopeClientNumber)")
+        .build();
+  }
 
   /** P322 — one TRADING_PARTNER_SUBMITTER row, keyed by the list's profile_key. */
   private static final QueryDefinition SCALE_SITE_RECORD = QueryDefinition.builder("profiles.scaleSites.record")
@@ -406,7 +417,7 @@ public class ProfilesCatalog implements QueryCatalog {
   public List<QueryDefinition> queries() {
     return List.of(
         CLIENT_SEARCH, CLIENT_DETAIL,
-        SCALE_SITE_SEARCH, SCALE_SITE_RECORD,
+        SCALE_SITE_SEARCH, CLIENT_SCALE_SITES, SCALE_SITE_RECORD,
         POPULATION_SEARCH, POPULATION_RECORD,
         SCALER_SEARCH, SCALER_EXPIRING, SCALER_DETAIL, SCALER_KEY_HISTORY);
   }

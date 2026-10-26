@@ -118,10 +118,15 @@ export const FieldInput: FC<FieldInputProps> = ({
               value: c.code,
               label: c.label ?? (c.description ? `${c.code} - ${c.description}` : c.code),
             })));
+      // A stored value outside the list (an old sampling year, say) still shows.
+      const shown =
+        value && field.type !== 'yesno' && !options.some((o) => o.value === value)
+          ? [{ value, label: value }, ...options]
+          : options;
       return (
         <Select {...common} value={value} onChange={(e) => onChange(e.target.value)}>
           <SelectItem value="" text={field.codeList && codes === null ? 'Loading…' : emptyOption} />
-          {options.map((o) => (
+          {shown.map((o) => (
             <SelectItem key={o.value} value={o.value} text={o.label} />
           ))}
         </Select>
