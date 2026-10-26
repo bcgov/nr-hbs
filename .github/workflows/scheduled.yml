@@ -103,4 +103,4 @@ jobs:
           allow_issue_writing: true
           issue_title: "ZAP Security Report"
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: https://nr-hbs-test.apps.silver.devops.gov.bc.ca
+          target: https://nr-hbs-test.apps.gold.devops.gov.bc.ca
