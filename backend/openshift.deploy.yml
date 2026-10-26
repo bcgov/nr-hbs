@@ -133,10 +133,12 @@ parameters:
     required: false
     value: "false"
   # Size of the shared ReadWriteMany volume that replaces the legacy
-  # XMLinput / XMLarchive SMB shares (submitted scale data).
+  # XMLinput / XMLarchive SMB shares (submitted scale data). Small by default:
+  # the namespace storage quota (1Gi) is shared by every PR zone's PVCs. Set
+  # the XML_STORAGE_SIZE repository/environment variable to size TEST/PROD.
   - name: XML_STORAGE_SIZE
     required: false
-    value: "5Gi"
+    value: "200Mi"
   - name: DATABASE_HOST
     required: true
   - name: DATABASE_SERVICE_NAME

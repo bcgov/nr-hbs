@@ -198,6 +198,7 @@ jobs:
             -p IMAGE_TAG="${{ inputs.tag }}"
             -p MIN_REPLICAS="${{ inputs.backend_replicas }}"
             -p MAX_REPLICAS="${{ inputs.backend_replicas }}"
+            -p XML_STORAGE_SIZE="${{ vars.XML_STORAGE_SIZE || '200Mi' }}"
             -p KEYCLOAK_ISSUER_URI="${{ vars.KEYCLOAK_ISSUER_URI }}"
             -p KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
             -p KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID="${{ vars.KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID }}"
