@@ -1,5 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.service.v1.report;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,11 @@ import java.util.Set;
  *   <li>{@code INVSMRY_LICMARKTYPE} 1/2 with no marks leaves {@code IN ' )'} dangling;</li>
  *   <li>each {@code INVSMRY_LICMARKnn} is one mark or licence ({@code VARRAY OF VARCHAR(10)}).</li>
  * </ul>
+ *
+ * <p>The interval is whole months, as legacy's month drop-downs sent it
+ * ({@code TimberMarkHelper.getBillingDateFrom/To}): the procs compare
+ * {@code BILLING_PERIOD} / {@code SCALING_PERIOD} {@code <= INVSMRY_TO}, so a To
+ * date inside the month dropped that month's rows.
  *
  * <p>The screen sends timber marks as one comma list in {@code INVSMRY_LICMARK01}
  * and forest file ids in the pseudo prompt {@code INVSMRY_LICENCES}. The
@@ -41,6 +48,8 @@ final class HarvestHistoryPrompts {
     defaultIfBlank(params, "INVSMRY_GRPTYPE", "1");
     defaultIfBlank(params, "INVSMRY_DISPDTLS", "TTT");
     defaultIfBlank(params, "INVSMRY_DISPSPG", "FFF");
+    wholeMonth(params, "INVSMRY_FROM", false);
+    wholeMonth(params, "INVSMRY_TO", true);
 
     List<String> marks = split(text(params, "INVSMRY_LICMARK01"));
     List<String> licences = split(supplied.getOrDefault(LICENCES, ""));
@@ -69,6 +78,20 @@ final class HarvestHistoryPrompts {
       params.put(String.format("INVSMRY_LICMARK%02d", i), value);
     }
     params.put("INVSMRY_LICMARKTYPE", type);
+  }
+
+  /** From → first day of its month, To → last day (yyyy-mm-dd, as the procs parse it). */
+  private static void wholeMonth(Map<String, Object> params, String name, boolean end) {
+    String value = text(params, name);
+    if (value.length() < 10) {
+      return;
+    }
+    try {
+      LocalDate day = LocalDate.parse(value.substring(0, 10));
+      params.put(name, (end ? day.withDayOfMonth(day.lengthOfMonth()) : day.withDayOfMonth(1)).toString());
+    } catch (DateTimeParseException ex) {
+      // Left as entered: the screen's guard has already rejected bad dates.
+    }
   }
 
   private static void defaultIfBlank(Map<String, Object> params, String name, String value) {

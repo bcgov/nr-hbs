@@ -36,6 +36,18 @@ class HarvestHistoryPromptsTest {
   }
 
   @Test
+  void intervalIsWholeMonths() {
+    // A To date inside the month dropped that month's rows (BILLING_PERIOD <= INVSMRY_TO).
+    Map<String, Object> p = prompts("INVSMRY_FROM", "2026-10-15", "INVSMRY_TO", "2026-10-23");
+    HarvestHistoryPrompts.apply("HBS3R431", p, Map.of());
+    assertThat(p).containsEntry("INVSMRY_FROM", "2026-10-01").containsEntry("INVSMRY_TO", "2026-10-31");
+
+    Map<String, Object> scaling = prompts("INVSMRY_FROM", "2024-01-31", "INVSMRY_TO", "2024-02-01");
+    HarvestHistoryPrompts.apply("HBS3R441", scaling, Map.of());
+    assertThat(scaling).containsEntry("INVSMRY_FROM", "2024-01-01").containsEntry("INVSMRY_TO", "2024-02-29");
+  }
+
+  @Test
   void keepsChosenGrouping() {
     Map<String, Object> p = prompts("INVSMRY_GRPTYPE", "4", "INVSMRY_DISPDTLS", "TFF");
     HarvestHistoryPrompts.apply("HBS3R441", p, Map.of());

@@ -36,6 +36,7 @@ import FieldGrid from './FieldGrid';
 import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
+import ReportDialogButton from './ReportDialogButton';
 import ScreenLayout from './ScreenLayout';
 import { useScreenApi } from './screenApi';
 
@@ -114,7 +115,6 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
   const [sort, setSort] = useState<Sort>(lastSearch?.sort ?? { dir: 'asc' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formError, setFormError] = useState<string | null>(null);
   const [searched, setSearched] = useState<Criteria | null>(null);
   const bulk = useBulkActions(screen.bulkActions);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -125,6 +125,8 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
       if (f.required && !criteria[f.name]?.trim()) next[f.name] = `${f.label} is required`;
     });
     setErrors(next);
+    // Required fields first: the "one of" check waits until they're filled.
+    if (Object.keys(next).length > 0) return false;
     if (screen.requireOneOf && !screen.requireOneOf.some((n) => criteria[n]?.trim())) {
       // Two groups can share a label ("Client No" under Trading Partner and
       // under Site Owner), so a repeated label carries its group.
@@ -136,16 +138,11 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
           return repeated && f.group ? `${f.label} (${f.group})` : f.label;
         })
         .join(', ');
-      setFormError(`Enter at least one of: ${labels}.`);
-      // Highlight the candidates too, so the user sees where to type.
-      screen.requireOneOf.forEach((n) => {
-        next[n] = next[n] ?? 'Enter this or one of the other highlighted fields';
-      });
-      setErrors(next);
+      // One snackbar; none of the candidates is wrong on its own.
+      display({ kind: 'warning', title: 'More criteria needed', subtitle: `Enter at least one of: ${labels}.`, timeout: 0 });
       return false;
     }
-    setFormError(null);
-    return Object.keys(next).length === 0;
+    return true;
   };
 
   // Once a search the user ran (or a page change) finishes, bring the results
@@ -178,6 +175,8 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
         setSearched({ ...criteria });
         setLastSearch({ criteria, page: res.page.number, size: res.page.size, sort: nextSort });
       } catch (e) {
+        // Stay on the criteria so the user sees what to fix.
+        scrollPending.current = false;
         // Business-rule checks name the criteria they concern: mark those fields.
         if (e instanceof ApiFieldError) {
           const names = new Set(screen.criteria.map((f) => f.name));
@@ -200,7 +199,8 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
     if (hasUrlCriteria) {
       const criteria = { ...defaults, ...fromUrl };
       setForm(criteria);
-      if (validate(criteria)) void execute(criteria, 0, pageSize, sort, false);
+      // Arriving from another screen's link: show its results, not the criteria.
+      if (validate(criteria)) void execute(criteria, 0, pageSize, sort);
     } else if (lastSearch) {
       void execute(lastSearch.criteria, lastSearch.page, lastSearch.size, lastSearch.sort, false);
     } else if (screen.autoSearch && validate(form)) {
@@ -233,7 +233,6 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
     setTotal(0);
     setPage(0);
     setErrors({});
-    setFormError(null);
   };
 
   const onSort = (key: string) => {
@@ -288,11 +287,6 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
             idPrefix={screen.id}
             errors={errors}
           />
-          {formError && (
-            <p className="hbs-screen__form-error" role="alert">
-              {formError}
-            </p>
-          )}
           <div className="fsp-search__actions">
             <Button kind="tertiary" size="md" type="button" onClick={onClear} disabled={loading}>
               Clear all
@@ -344,6 +338,13 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                     {(screen.reports ?? []).filter((r) => reportApplies(r, reportSource)).map((r) => (
                       <ReportButton key={r.reportId + r.label} report={r} source={reportSource} size="sm" kind="ghost" />
                     ))}
+                    {screen.reportDialog && (
+                      <ReportDialogButton
+                        dialog={screen.reportDialog}
+                        source={reportSource}
+                        storageKey={`hbs.screen.${screen.id}.reportDialog`}
+                      />
+                    )}
                     {screen.xmlExport && (
                       <ExportCsvButton
                         onExport={() =>

@@ -142,6 +142,17 @@ export interface ReportLinkDef {
   showWhen?: ReportCondition | ReportCondition[];
 }
 
+/** Report-only prompts asked in a modal, then one of several reports run with them. */
+export interface ReportDialogDef {
+  /** The button that opens the modal. */
+  label: string;
+  heading: string;
+  /** Kept for the session, so closing and re-opening the modal keeps them. */
+  fields: FieldDef[];
+  /** One modal button each; params read the criteria and these fields. */
+  reports: ReportLinkDef[];
+}
+
 /** A write action (registry command) available on a screen. */
 export interface ActionDef {
   id: string;
@@ -238,6 +249,8 @@ export interface SearchScreenDef extends BaseScreen {
   /** At least one of these criteria must be filled (legacy "enter at least one…"). */
   requireOneOf?: string[];
   reports?: ReportLinkDef[];
+  /** One button opening a modal of report-only prompts, with a button per report (P403 average rates). */
+  reportDialog?: ReportDialogDef;
   /**
    * "Download XML" of the results: `true` = the query's legacy-schema XML (P431/P441 "Send XML");
    * a string = another API path under /api/v1/hbs taking the same criteria (P451 "Generate XML").

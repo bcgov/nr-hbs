@@ -77,7 +77,7 @@ export const AREAS: AreaDef[] = [
     label: 'Scale Control',
     legacy: 'P900',
     capability: 'SCALE_CONTROL_VIEW',
-    description: 'Late submissions, anomalies, change log, transport events and LDS registry.',
+    description: 'Late submissions, anomalies, change log, transport events and Load Description Slip registry.',
   },
   {
     id: 'profiles',

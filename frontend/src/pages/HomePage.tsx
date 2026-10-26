@@ -207,7 +207,7 @@ const BLOCKS: HomeBlock[] = [
         label: 'XML Batches',
         links: [
           ...detailTypes('detail-batches', {}, ['HBS_SCALE_ADMIN', 'HBS_CLI_SITE_ADMIN', 'HBS_SPC_SUBM_AGNT']),
-          { label: 'SFP Tallies', screen: 'detail-batches', params: { returnType: 'F' }, roles: ['HBS_SPC_SUBM_AGNT'] },
+          { label: 'Special Forest Product Tallies', screen: 'detail-batches', params: { returnType: 'F' }, roles: ['HBS_SPC_SUBM_AGNT'] },
         ],
       },
     ],
@@ -224,7 +224,7 @@ const BLOCKS: HomeBlock[] = [
       {
         label: 'Settings',
         links: [
-          { label: 'HBS Alert and Processing Parameters', screen: 'processing-parameters' },
+          { label: 'Harvest Billing System Alert and Processing Parameters', screen: 'processing-parameters' },
           { label: 'Anomaly Assessment Windows', screen: 'anomaly-windows' },
         ],
       },

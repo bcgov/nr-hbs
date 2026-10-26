@@ -126,7 +126,7 @@ const ScalerKeyRequestPage: FC = () => {
       required: true,
       maxLength: 9,
       upper: true,
-      helperText: '7 to 9 upper-case letters or digits; HBS adds a check digit',
+      helperText: '7 to 9 upper-case letters or digits; Harvest Billing System adds a check digit',
     },
     ...(managed
       ? ([
@@ -235,7 +235,7 @@ const ScalerKeyRequestPage: FC = () => {
         >
           <DefinitionGrid
             items={[
-              { label: 'Scaler Licence No', value: confirmation.licenceNumber },
+              { label: 'Scaler Licence Number', value: confirmation.licenceNumber },
               { label: 'Authentication Key', value: <code>{confirmation.authenticationKey}</code> },
               { label: 'Active From Scale Date', value: confirmation.activeFrom },
               { label: 'Active To Scale Date', value: confirmation.activeTo },

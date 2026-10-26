@@ -125,6 +125,7 @@ public class HbsReportService {
     HbsReportFormat format = HbsReportFormat.fromNullable(request.format());
     JasperReport jasperReport = compiledCache.computeIfAbsent(def.id(), id -> compile(def));
     Map<String, Object> params = buildParameters(def, request.parameters());
+    coerce(jasperReport, params);
 
     try (Connection connection = dataSource.getConnection()) {
       JasperPrint print = JasperFillManager.fillReport(jasperReport, params, connection);
@@ -168,6 +169,7 @@ public class HbsReportService {
     }
     HarvestHistoryPrompts.apply(def.id(), params, Map.of(HarvestHistoryPrompts.LICENCES,
         safePrompt(def, HarvestHistoryPrompts.LICENCES, in.getOrDefault(HarvestHistoryPrompts.LICENCES, ""))));
+    StatementTransmissionPrompts.apply(def.id(), params, in.get(StatementTransmissionPrompts.RECENT));
     Map<String, String> prompts = new HashMap<>();
     params.forEach((k, v) -> prompts.put(k, v instanceof String str ? str : null));
     ReportPromptRules.check(def.id(), prompts);
@@ -176,6 +178,33 @@ public class HbsReportService {
     params.put("SUBREPORT_DIR", dir.toAbsolutePath() + "/");
     params.put("SUBREPORT_EXT", ".jasper");
     return params;
+  }
+
+  /**
+   * Prompts arrive as text; a few reports declare numeric ones (HBS2R411/412
+   * {@code Avg_Rate_*} are {@code Double}), which Jasper would otherwise fail to
+   * cast while filling. Blank becomes null.
+   */
+  static void coerce(JasperReport report, Map<String, Object> params) {
+    for (net.sf.jasperreports.engine.JRParameter p : report.getParameters()) {
+      if (p.isSystemDefined() || !(params.get(p.getName()) instanceof String text)) {
+        continue;
+      }
+      Class<?> type = p.getValueClass();
+      if (!Number.class.isAssignableFrom(type)) {
+        continue;
+      }
+      String value = text.trim();
+      try {
+        params.put(p.getName(), value.isEmpty() ? null
+            : type == Double.class ? Double.valueOf(value)
+            : type == Integer.class ? Integer.valueOf(value)
+            : type == Long.class ? Long.valueOf(value)
+            : new java.math.BigDecimal(value));
+      } catch (NumberFormatException ex) {
+        throw new IllegalArgumentException("Report prompt '" + p.getName() + "' must be a number", ex);
+      }
+    }
   }
 
   static String safePrompt(HbsReportDefinition def, String name, String raw) {

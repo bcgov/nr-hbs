@@ -23,7 +23,7 @@ const THIRTY_DAYS_AGO = isoDaysFromToday(-30);
 
 const transmissionColumns: ColumnDef[] = [
   { key: 'receivedTimestamp', header: 'Date / Time Received', format: 'datetime', sortable: true },
-  { key: 'transmissionId', header: 'Xmit Id', sortable: true },
+  { key: 'transmissionId', header: 'Transmission ID', sortable: true },
   { key: 'fileName', header: 'File Name', sortable: true },
   { key: 'batchCount', header: 'Batch Count', format: 'number', sortable: true },
   { key: 'recordCount', header: 'Record Count', format: 'number', sortable: true },
@@ -36,8 +36,8 @@ const transmissionColumns: ColumnDef[] = [
 const batchColumns: ColumnDef[] = [
   { key: 'batchId', header: 'Batch Id', sortable: true },
   { key: 'batchReceived', header: 'Batch Received', format: 'datetime', sortable: true },
-  { key: 'transmissionId', header: 'Xmit ID', sortable: true },
-  { key: 'docType', header: 'Doc Type', sortable: true },
+  { key: 'transmissionId', header: 'Transmission ID', sortable: true },
+  { key: 'docType', header: 'Document Type', sortable: true },
   { key: 'scaleSiteNo', header: 'Scale Site', sortable: true },
   { key: 'returnCount', header: 'Return Count', format: 'number', sortable: true },
   { key: 'rejectedCount', header: 'Rejected', format: 'number', sortable: true },
@@ -55,7 +55,7 @@ const RETURN_TYPES = [
   { value: 'S', label: 'Sample' },
   { value: 'A', label: 'Arrival Ledger' },
   { value: 'D', label: 'Departure Ledger' },
-  { value: 'F', label: 'SFP Tally' },
+  { value: 'F', label: 'Special Forest Product Tally' },
   { value: 'ALL', label: 'All' },
 ];
 
@@ -106,7 +106,7 @@ const slipFields: FieldDef[] = [
     placeholder: 'IDIR\\USERID',
     helperText: 'Domain and user id, e.g. IDIR\\JSMITH',
   },
-  { name: 'hdqSentDate', label: 'Date Sent to HDQ', type: 'date', required: true },
+  { name: 'hdqSentDate', label: 'Date Sent to Headquarters', type: 'date', required: true },
   { name: 'documentCount', label: 'Document Count', type: 'number', required: true, maxLength: 5 },
   { name: 'paperBatchComment', label: 'Instruction/notes', type: 'textarea', maxLength: 255, span: 4 },
 ];
@@ -190,7 +190,7 @@ export const screens: ScreenDef[] = [
       {
         title: 'Transmission',
         fields: [
-          { key: 'transmissionId', label: 'Xmit Id' },
+          { key: 'transmissionId', label: 'Transmission ID' },
           { key: 'receivedTimestamp', label: 'Date / Time Received', format: 'datetime' },
           { key: 'fileName', label: 'File Name' },
           { key: 'fileDatetime', label: 'File Date', format: 'datetime' },
@@ -349,10 +349,10 @@ export const screens: ScreenDef[] = [
         fields: [
           { key: 'batchId', label: 'Batch Id' },
           { key: 'batchReceived', label: 'Batch Received', format: 'datetime' },
-          { key: 'transmissionId', label: 'Xmit ID' },
+          { key: 'transmissionId', label: 'Transmission ID' },
           { key: 'fileName', label: 'File Name' },
-          { key: 'docType', label: 'Doc Type' },
-          { key: 'docTypeDescription', label: 'Doc Type Description' },
+          { key: 'docType', label: 'Document Type' },
+          { key: 'docTypeDescription', label: 'Document Type Description' },
           { key: 'scaleSiteNo', label: 'Scale Site' },
           { key: 'orgUnitName', label: 'District' },
           { key: 'submitterBatchId', label: 'Submitter Batch Id' },
@@ -473,7 +473,7 @@ export const screens: ScreenDef[] = [
           { key: 'scaledTo', label: 'Scaled To', format: 'date' },
           { key: 'regionName', label: 'Region' },
           { key: 'senderUserid', label: "Sender's HBS User Id" },
-          { key: 'hdqSentDate', label: 'Date Sent to HDQ', format: 'date' },
+          { key: 'hdqSentDate', label: 'Date Sent to Headquarters', format: 'date' },
           { key: 'documentCount', label: 'Document Count', format: 'number' },
           { key: 'documentsReceived', label: 'Documents Received', format: 'number' },
           { key: 'paperBatchComment', label: 'Instruction/notes' },

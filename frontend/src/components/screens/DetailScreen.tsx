@@ -232,8 +232,9 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
  * record's identifiers, then Carbon contained tabs over a full-bleed grey
  * pane — "Details" first (each field section a white icon-titled tile), then
  * one tab per child table. A record with a single section skips the tab bar.
- * Record-level actions (Edit, legacy commands, reports) sit level with the
- * title; commands are gated by capability.
+ * Record-level actions (Edit, legacy commands, reports) sit under the
+ * tombstone (level with the title when there is none); commands are gated by
+ * capability.
  */
 export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
   const navigate = useNavigate();
@@ -383,11 +384,12 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
     : [];
 
   return (
-    <ScreenLayout screen={screen} actions={actions}>
+    <ScreenLayout screen={screen} actions={tombstone.length > 0 ? undefined : actions}>
       <AsyncBoundary loading={!record && !error} error={error} onRetry={reload} loadingText="Loading record…">
         {record && (
           <>
             {tombstone.length > 0 && <Tombstone ariaLabel={`${screen.title} summary`} items={tombstone} />}
+            {tombstone.length > 0 && actions && <div className="hbs-detail__actions">{actions}</div>}
             {panes.length > 1 ? (
               // Carbon's <Tabs> renders no DOM of its own, so the grey full-bleed
               // pane is styled through this wrapper (styles/_detail.scss).

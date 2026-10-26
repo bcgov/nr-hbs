@@ -45,7 +45,7 @@ const PublicKeyPage: FC = () => {
         description="HBS_Public_Key.xml (schema HBS_Public_Key.xsd): each key's identifier, signing date range, modulus and exponent."
       >
         <Button size="md" renderIcon={Download} disabled={busy} onClick={() => void download()}>
-          {busy ? 'Downloading…' : 'Download HBS Public Key'}
+          {busy ? 'Downloading…' : 'Download Harvest Billing System Public Key'}
         </Button>
       </SectionTile>
     </PageLayout>

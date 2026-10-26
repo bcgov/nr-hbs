@@ -1,4 +1,5 @@
 import type { ActionDef, ColumnDef, FieldDef, Option, ReportLinkDef, ScreenDef } from '@/screens/types';
+import { SAMPLING_YEAR_OPTIONS } from '@/screens/years';
 
 /**
  * Scale Returns - Summary (legacy /dac/summary/*). Backend:
@@ -41,13 +42,13 @@ const SAMPLE_RETURN_TYPES: Option[] = [
 
 /** P051 / P101 / P151 result columns. */
 const LIST_COLUMNS: ColumnDef[] = [
-  { key: 'documentControlNumber', header: 'SDN', sortable: true },
-  { key: 'version', header: 'Vers No', sortable: true },
+  { key: 'documentControlNumber', header: 'Summary Document Number', sortable: true },
+  { key: 'version', header: 'Version Number', sortable: true },
   { key: 'status', header: 'Status', format: 'status', sortable: true },
   { key: 'categoryDesc', header: 'Return Category', sortable: true },
   { key: 'scaleSite', header: 'Scale Site', sortable: true },
   { key: 'scaleDate', header: 'Scale Date', format: 'date', sortable: true },
-  { key: 'popStratumYear', header: 'Pop Stratum Year' },
+  { key: 'popStratumYear', header: 'Population Stratum Year' },
   { key: 'timberMark', header: 'Timber Mark', sortable: true },
   { key: 'scalerLicence', header: 'Scaler Licence', sortable: true },
   { key: 'returnNumber', header: 'Return Number' },
@@ -87,7 +88,7 @@ const listReport = (reportId: string, label: string, extra: Record<string, strin
 
 const SEARCH_CRITERIA: FieldDef[] = [
   { name: 'returnType', label: 'Scale Type', type: 'radio', options: SCALE_TYPES, required: true, defaultValue: 'P', group: 'General Criteria' },
-  { name: 'documentControlNumber', label: 'Document Control No', type: 'number', maxLength: 10, group: 'General Criteria' },
+  { name: 'documentControlNumber', label: 'Document Control Number', type: 'number', maxLength: 10, group: 'General Criteria' },
   { name: 'status', label: 'Version Status', codeList: 'codes.versionStates', group: 'General Criteria' },
   { name: 'generated', label: 'Generated Summary', type: 'select', options: YES_NO_ALL, group: 'General Criteria' },
   { name: 'category', label: 'Return Category', codeList: 'codes.summaryReturns.categories', group: 'General Criteria' },
@@ -113,12 +114,12 @@ const SEARCH_CRITERIA: FieldDef[] = [
   { name: 'scalerLicence', label: 'Primary Scaler Licence', upper: true, maxLength: 4, group: 'Location or Scaling Criteria' },
   { name: 'returnNumber', label: 'Return Number', maxLength: 4, group: 'Location or Scaling Criteria' },
   { name: 'fieldScaleDeckId', label: 'Field Deck Id', upper: true, maxLength: 1, group: 'Location or Scaling Criteria' },
-  { name: 'invoiceNumber', label: 'Statement No', upper: true, maxLength: 7, group: 'Location or Scaling Criteria' },
+  { name: 'invoiceNumber', label: 'Statement Number', upper: true, maxLength: 7, group: 'Location or Scaling Criteria' },
   // P202 confirmed-returns link (legacy hidden overrideRatingRuleId).
-  { name: 'overrideRatingRuleId', label: 'Override Rule No', type: 'number', group: 'Location or Scaling Criteria' },
+  { name: 'overrideRatingRuleId', label: 'Override Rule Number', type: 'number', group: 'Location or Scaling Criteria' },
   { name: 'population', label: 'Population', upper: true, maxLength: 4, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
   { name: 'stratum', label: 'Stratum', upper: true, maxLength: 2, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
-  { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
+  { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, group: 'Weight and Sample Scale Only - Population/Stratum/Year' },
   { name: 'markHolderClient', label: 'Mark Holder', type: 'client', group: 'Client Association - Client No' },
   { name: 'siteOwnerClient', label: 'Site Owner', type: 'client', group: 'Client Association - Client No' },
   { name: 'stratumOwnerClient', label: 'Stratum Owner', type: 'client', group: 'Client Association - Client No' },
@@ -200,7 +201,7 @@ const weightFields = (): FieldDef[] => [
   { name: 'category', label: 'Return Type', type: 'select', options: WEIGHT_RETURN_TYPES, required: true },
   { name: 'populationNumber', label: 'Population', upper: true, maxLength: 4, required: true },
   { name: 'stratumNumber', label: 'Stratum', upper: true, maxLength: 2, required: true },
-  { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, required: true },
+  { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
   { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, required: true },
   { name: 'scaleSite', label: 'Scale Site', upper: true, maxLength: 4, required: true },
   { name: 'billToClientNumber', label: 'Bill To', type: 'client' },
@@ -215,10 +216,10 @@ const sampleFields = (): FieldDef[] => [
   { name: 'category', label: 'Return Type', type: 'select', options: SAMPLE_RETURN_TYPES, required: true },
   { name: 'populationNumber', label: 'Population', upper: true, maxLength: 4, required: true },
   { name: 'stratumNumber', label: 'Stratum', upper: true, maxLength: 2, required: true },
-  { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, required: true },
+  { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
   { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, required: true },
   { name: 'scalerLicence', label: 'Scaler Licence', upper: true, maxLength: 4, required: true },
-  { name: 'loadArrivalNumber', label: 'Load Arrival No', maxLength: 10 },
+  { name: 'loadArrivalNumber', label: 'Load Arrival Number', maxLength: 10 },
   { name: 'netWeight', label: 'Sample Weight', type: 'number', maxLength: 6, required: true },
   { name: 'returnNumber', label: 'Return Number', maxLength: 4, required: true },
   { name: 'logCount', label: 'Log Count', type: 'number', maxLength: 6, required: true },
@@ -238,7 +239,7 @@ export const screens: ScreenDef[] = [
     area: 'scale-returns',
     title: 'Search for Summary Scale Returns',
     navLabel: 'Summary Returns',
-    description: 'Click on the Document Control No to view a single Summary Scale Return.',
+    description: 'Click on the Document Control Number to view a single Summary Scale Return.',
     capability: 'SCALE_RETURNS_VIEW',
     query: 'summaryReturns.search',
     criteria: SEARCH_CRITERIA,
@@ -313,13 +314,13 @@ export const screens: ScreenDef[] = [
     query: 'summaryReturns.find',
     criteria: [
       { name: 'documentControlNumber', label: 'Summary Document Number', type: 'number', maxLength: 10, group: 'Specific Document Identifier' },
-      { name: 'invoiceNumber', label: 'Statement No', upper: true, maxLength: 7, group: 'Specific Document Identifier' },
+      { name: 'invoiceNumber', label: 'Statement Number', upper: true, maxLength: 7, group: 'Specific Document Identifier' },
       { name: 'activeOnly', label: 'Active Version Only', type: 'yesno', defaultValue: 'Y', group: 'Specific Document Identifier' },
     ],
     requireOneOf: ['documentControlNumber', 'invoiceNumber'],
     columns: [
-      { key: 'documentControlNumber', header: 'SDN', sortable: true },
-      { key: 'version', header: 'Vers No', sortable: true },
+      { key: 'documentControlNumber', header: 'Summary Document Number', sortable: true },
+      { key: 'version', header: 'Version Number', sortable: true },
       { key: 'returnTypeDesc', header: 'Scale Type' },
       { key: 'status', header: 'Status', format: 'status' },
       { key: 'categoryDesc', header: 'Return Category' },
@@ -364,16 +365,17 @@ export const screens: ScreenDef[] = [
       { path: SUMMARY_GRID_PATH, params: { ...KEYS, grid: '=dailyLoads' }, label: 'Edit Daily Loads', capability: 'SUMMARY_RETURN_EDIT', requiresAction: 'update' },
     ],
     actions: DETAIL_ACTIONS,
+    // Each proc only returns its own return type; the others print an empty template.
     reports: [
-      { reportId: 'HBS2R052', label: 'Print (Piece)', fileName: 'Piece Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { PSRETURN_DOCUMENTNUMBER: 'documentControlNumber', PSRETURN_VERSIONNUMBER: 'version' } },
-      { reportId: 'HBS2R102', label: 'Print (Weight)', fileName: 'Weight Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { WSRETURN_DOCUMENTNUMBER: 'documentControlNumber', WSRETURN_VERSIONNUMBER: 'version' } },
-      { reportId: 'HBS2R152', label: 'Print (Sample)', fileName: 'Sample Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { SSRETURN_DOCUMENTNUMBER: 'documentControlNumber', SSRETURN_VERSIONNUMBER: 'version' } },
+      { reportId: 'HBS2R052', label: 'Print (Piece)', fileName: 'Piece Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { PSRETURN_DOCUMENTNUMBER: 'documentControlNumber', PSRETURN_VERSIONNUMBER: 'version' }, showWhen: { field: 'returnType', values: ['P'] } },
+      { reportId: 'HBS2R102', label: 'Print (Weight)', fileName: 'Weight Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { WSRETURN_DOCUMENTNUMBER: 'documentControlNumber', WSRETURN_VERSIONNUMBER: 'version' }, showWhen: { field: 'returnType', values: ['W'] } },
+      { reportId: 'HBS2R152', label: 'Print (Sample)', fileName: 'Sample Scale Return {documentControlNumber} v{version} {timberMark} {scaleSite}', params: { SSRETURN_DOCUMENTNUMBER: 'documentControlNumber', SSRETURN_VERSIONNUMBER: 'version' }, showWhen: { field: 'returnType', values: ['S'] } },
     ],
     sections: [
       {
         title: 'Scale Return',
         fields: [
-          { key: 'documentControlNumber', label: 'SDN' },
+          { key: 'documentControlNumber', label: 'Summary Document Number' },
           { key: 'returnStateDesc', label: 'State' },
           { key: 'version', label: 'Version' },
           { key: 'statusDesc', label: 'Status' },
@@ -412,11 +414,11 @@ export const screens: ScreenDef[] = [
       {
         title: 'Weight / Sample Scale',
         fields: [
-          { key: 'popStratumYear', label: 'Pop/Strat/Year' },
+          { key: 'popStratumYear', label: 'Population/Stratum/Year' },
           { key: 'totalLoads', label: 'Total Loads', format: 'number' },
           { key: 'totalWeight', label: 'Total Weight', format: 'number' },
           { key: 'sampleVolume', label: 'Sample Volume', format: 'volume' },
-          { key: 'loadArrivalNumber', label: 'Load Arrival No' },
+          { key: 'loadArrivalNumber', label: 'Load Arrival Number' },
           { key: 'netWeight', label: 'Sample Weight', format: 'number' },
           { key: 'weighSlipNumber', label: 'Weigh Slip' },
         ],
@@ -439,10 +441,10 @@ export const screens: ScreenDef[] = [
           query: 'summaryReturns.transactions',
           params: { documentControlNumber: 'documentControlNumber', version: 'version' },
           columns: [
-            { key: 'txnSeq', header: 'Txn Seq' },
+            { key: 'txnSeq', header: 'Transaction Sequence' },
             { key: 'drCr', header: 'DR/CR' },
-            { key: 'txnTypeDesc', header: 'Txn Type' },
-            { key: 'txnStatus', header: 'Txn Status' },
+            { key: 'txnTypeDesc', header: 'Transaction Type' },
+            { key: 'txnStatus', header: 'Transaction Status' },
             { key: 'overrideRatingRuleId', header: 'Override' },
             { key: 'rateDate', header: 'Rate Date', format: 'date' },
             { key: 'dateSent', header: 'Date Sent', format: 'date' },
@@ -461,14 +463,14 @@ export const screens: ScreenDef[] = [
           query: 'summaryReturns.segregations',
           params: { documentControlNumber: 'documentControlNumber', version: 'version' },
           columns: [
-            { key: 'txnSeq', header: 'Txn Seq' },
-            { key: 'txnType', header: 'Txn Type' },
+            { key: 'txnSeq', header: 'Transaction Sequence' },
+            { key: 'txnType', header: 'Transaction Type' },
             { key: 'inputMark', header: 'Input Mark' },
             { key: 'billedMark', header: 'Billed Mark' },
             { key: 'species', header: 'Species' },
             { key: 'product', header: 'Product' },
             { key: 'grade', header: 'Grade' },
-            { key: 'nmvInd', header: 'NMV', format: 'yesno' },
+            { key: 'nmvInd', header: 'No Mark Visible', format: 'yesno' },
             { key: 'sb4Ind', header: 'SB4', format: 'yesno' },
             { key: 'avoidableInd', header: 'Avoidable', format: 'yesno' },
             { key: 'pieces', header: 'Pieces', format: 'number' },
@@ -512,10 +514,10 @@ export const screens: ScreenDef[] = [
             { key: 'detailDocType', header: 'Document Type' },
             { key: 'detailDocumentNumber', header: 'Detail Document Number' },
             { key: 'detailDocumentVersion', header: 'Version' },
-            { key: 'eventSequence', header: 'Txn Seq' },
+            { key: 'eventSequence', header: 'Transaction Sequence' },
             { key: 'drCr', header: 'DR/CR' },
-            { key: 'txnType', header: 'Txn Type' },
-            { key: 'txnStatus', header: 'Txn Status' },
+            { key: 'txnType', header: 'Transaction Type' },
+            { key: 'txnStatus', header: 'Transaction Status' },
           ],
         },
       },
@@ -525,7 +527,7 @@ export const screens: ScreenDef[] = [
           query: 'summaryReturns.versions',
           params: { documentControlNumber: 'documentControlNumber' },
           columns: [
-            { key: 'version', header: 'Vers No' },
+            { key: 'version', header: 'Version Number' },
             { key: 'statusDesc', header: 'Status' },
             { key: 'activeVersionInd', header: 'Active', format: 'yesno' },
             { key: 'scaleDate', header: 'Scale Date', format: 'date' },
@@ -540,7 +542,7 @@ export const screens: ScreenDef[] = [
           query: 'summaryReturns.detail',
           params: { documentControlNumber: 'documentControlNumber', version: 'version' },
           columns: [
-            { key: 'documentControlNumber', header: 'SDN' },
+            { key: 'documentControlNumber', header: 'Summary Document Number' },
             { key: 'version', header: 'Version' },
             { key: 'statusDesc', header: 'Status' },
           ],
@@ -615,8 +617,8 @@ export const screens: ScreenDef[] = [
     loadQuery: 'summaryReturns.detail',
     keys: ['documentControlNumber', 'version'],
     fields: [
-      { name: 'documentControlNumber', label: 'SDN', readOnlyOnEdit: true, group: 'Scale Return' },
-      { name: 'version', label: 'Version No', readOnlyOnEdit: true, group: 'Scale Return' },
+      { name: 'documentControlNumber', label: 'Summary Document Number', readOnlyOnEdit: true, group: 'Scale Return' },
+      { name: 'version', label: 'Version Number', readOnlyOnEdit: true, group: 'Scale Return' },
       { name: 'returnType', label: 'Scale Type', readOnlyOnEdit: true, group: 'Scale Return' },
       { name: 'returnStateCode', label: 'State', readOnlyOnEdit: true, group: 'Scale Return' },
       { name: 'status', label: 'Status', readOnlyOnEdit: true, group: 'Scale Return' },

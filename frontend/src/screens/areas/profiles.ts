@@ -1,4 +1,5 @@
 import type { ColumnDef, FieldDef, ScreenDef } from '@/screens/types';
+import { SAMPLING_YEAR_OPTIONS } from '@/screens/years';
 
 /**
  * Profiles area — legacy /cpm/* (P310–P385). Backend:
@@ -70,7 +71,7 @@ const POPULATION_COLUMNS: ColumnDef[] = [
 ];
 
 const MARK_HOLDER_COLUMNS: ColumnDef[] = [
-  { key: 'clientLoc', header: 'Client / Loc', sortable: false },
+  { key: 'clientLoc', header: 'Client / Location', sortable: false },
   { key: 'returnTypeDesc', header: 'Return Type', sortable: true },
   { key: 'effectiveDate', header: 'Effective Date', format: 'date', sortable: true },
   { key: 'expiryDate', header: 'Expiry Date', format: 'date', sortable: true },
@@ -79,15 +80,15 @@ const MARK_HOLDER_COLUMNS: ColumnDef[] = [
 ];
 
 const DELIVERY_COLUMNS: ColumnDef[] = [
-  { key: 'clientLoc', header: 'Client / Loc' },
+  { key: 'clientLoc', header: 'Client / Location' },
   { key: 'effectiveDate', header: 'Effective Date', format: 'date', sortable: true },
   { key: 'expiryDate', header: 'Expiry Date', format: 'date', sortable: true },
   { key: 'deliveryMethodDesc', header: 'Delivery Method' },
 ];
 
 const CLIENT_CRITERIA: FieldDef[] = [
-  { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8 },
-  { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
+  { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8 },
+  { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
 ];
 
 export const screens: ScreenDef[] = [
@@ -102,12 +103,12 @@ export const screens: ScreenDef[] = [
     capability: 'PROFILES_VIEW',
     query: 'profiles.client.search',
     criteria: [
-      { name: 'clientNumber', label: 'Client No', type: 'client', maxLength: 8, required: true },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, required: true },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
     ],
     columns: [
-      { key: 'clientNumber', header: 'Client No', sortable: true },
-      { key: 'clientLocnCode', header: 'Loc', sortable: true },
+      { key: 'clientNumber', header: 'Client Number', sortable: true },
+      { key: 'clientLocnCode', header: 'Location', sortable: true },
       { key: 'clientName', header: 'Client Name' },
       { key: 'locationName', header: 'Location' },
       { key: 'city', header: 'City' },
@@ -129,8 +130,8 @@ export const screens: ScreenDef[] = [
       {
         title: 'Client Profile',
         fields: [
-          { key: 'clientNumber', label: 'Client No' },
-          { key: 'clientLocnCode', label: 'Loc' },
+          { key: 'clientNumber', label: 'Client Number' },
+          { key: 'clientLocnCode', label: 'Location' },
           { key: 'clientName', label: 'Client Name' },
           { key: 'clientType', label: 'Client Type' },
           { key: 'locationName', label: 'Location' },
@@ -156,7 +157,7 @@ export const screens: ScreenDef[] = [
       {
         title: 'Scale Site Profiles',
         table: {
-          query: 'profiles.scaleSites.search',
+          query: 'profiles.scaleSites.byClient',
           params: { clientNumber: 'clientNumber', clientLocnCode: 'clientLocnCode' },
           columns: SCALE_SITE_COLUMNS,
           rowLink: { screen: 'scale-site-profile-update', params: { profileKey: 'profileKey' } },
@@ -204,10 +205,10 @@ export const screens: ScreenDef[] = [
     query: 'profiles.scaleSites.search',
     criteria: [
       { name: 'scaleSiteId', label: 'Scale Site ID', upper: true, maxLength: 4, group: 'Scale Site' },
-      { name: 'clientNumber', label: 'Client No', type: 'client', maxLength: 8, group: 'Trading Partner' },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Trading Partner' },
-      { name: 'ownerClientNumber', label: 'Client No', type: 'client', maxLength: 8, group: 'Site Owner' },
-      { name: 'ownerClientLocnCode', label: 'Loc', maxLength: 2, group: 'Site Owner' },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, group: 'Trading Partner' },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Trading Partner' },
+      { name: 'ownerClientNumber', label: 'Client Number', type: 'client', maxLength: 8, group: 'Site Owner' },
+      { name: 'ownerClientLocnCode', label: 'Location', maxLength: 2, group: 'Site Owner' },
     ],
     requireOneOf: ['scaleSiteId', 'clientNumber', 'ownerClientNumber'],
     columns: SCALE_SITE_COLUMNS,
@@ -298,8 +299,8 @@ export const screens: ScreenDef[] = [
     query: 'profiles.population.search',
     criteria: [
       { name: 'populationNumber', label: 'Population', maxLength: 4, group: 'Population' },
-      { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8, group: 'Population Owner' },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Population Owner' },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, group: 'Population Owner' },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Population Owner' },
     ],
     requireOneOf: ['populationNumber', 'clientNumber'],
     columns: POPULATION_COLUMNS,
@@ -345,8 +346,8 @@ export const screens: ScreenDef[] = [
           { key: 'frequencyDesc', label: 'Frequency' },
           { key: 'lastRatioStmtDate', label: 'Ratio Computation Period Start', format: 'date' },
           { key: 'nextRatioStmtDate', label: 'Ratio Computation Period End', format: 'date' },
-          { key: 'clientNumber', label: 'Client No.' },
-          { key: 'clientLocnCode', label: 'Loc' },
+          { key: 'clientNumber', label: 'Client Number' },
+          { key: 'clientLocnCode', label: 'Location' },
         ],
       },
     ],
@@ -382,7 +383,7 @@ export const screens: ScreenDef[] = [
     keys: ['popprofId'],
     fields: [
       { name: 'populationNumber', label: 'Population', readOnlyOnEdit: true },
-      { name: 'samplingYear', label: 'Sampling Year', readOnlyOnEdit: true },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, readOnlyOnEdit: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', readOnlyOnEdit: true },
       {
         name: 'expiryDate',
@@ -413,7 +414,7 @@ export const screens: ScreenDef[] = [
     command: 'profiles.population.create',
     fields: [
       { name: 'populationNumber', label: 'Population', maxLength: 4, required: true },
-      { name: 'samplingYear', label: 'Sampling Year', maxLength: 4, required: true },
+      { name: 'samplingYear', label: 'Sampling Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, required: true },
       {
         name: 'effectiveDate',
         label: 'Effective Date',
@@ -442,8 +443,8 @@ export const screens: ScreenDef[] = [
     query: 'profiles.markHolders.search',
     criteria: [
       { name: 'timberMark', label: 'Timber Mark', upper: true, maxLength: 6, group: 'Timber Mark' },
-      { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8, group: 'Mark Holder (Licensee)' },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2, group: 'Mark Holder (Licensee)' },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, group: 'Mark Holder (Licensee)' },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2, group: 'Mark Holder (Licensee)' },
     ],
     requireOneOf: ['timberMark', 'clientNumber'],
     columns: MARK_HOLDER_COLUMNS,
@@ -482,7 +483,7 @@ export const screens: ScreenDef[] = [
       {
         title: 'Mark Holder Profile',
         fields: [
-          { key: 'clientLoc', label: 'Client / Loc' },
+          { key: 'clientLoc', label: 'Client / Location' },
           { key: 'clientName', label: 'Client Name' },
           { key: 'returnTypeDesc', label: 'Return Type' },
           { key: 'effectiveDate', label: 'Effective Date', format: 'date' },
@@ -527,8 +528,8 @@ export const screens: ScreenDef[] = [
     loadQuery: 'profiles.markHolders.record',
     keys: ['mhprofId'],
     fields: [
-      { name: 'clientNumber', label: 'Client No.', readOnlyOnEdit: true },
-      { name: 'clientLocnCode', label: 'Loc', readOnlyOnEdit: true },
+      { name: 'clientNumber', label: 'Client Number', readOnlyOnEdit: true },
+      { name: 'clientLocnCode', label: 'Location', readOnlyOnEdit: true },
       { name: 'returnType', label: 'Return Type', type: 'select', options: MARK_HOLDER_RETURN_TYPES, readOnlyOnEdit: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', readOnlyOnEdit: true },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
@@ -552,8 +553,8 @@ export const screens: ScreenDef[] = [
     capability: 'PROFILE_BILLING_ADMIN',
     command: 'profiles.markHolders.create',
     fields: [
-      { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8, required: true },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2, required: true },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, required: true },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2, required: true },
       { name: 'returnType', label: 'Return Type', type: 'select', options: MARK_HOLDER_RETURN_TYPES, defaultValue: 'W', required: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true, helperText: 'First day of a future month' },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true, helperText: 'Last day of the month' },
@@ -578,7 +579,7 @@ export const screens: ScreenDef[] = [
       { key: 'licenceNumber', header: 'Scaler Licence' },
       { key: 'clientName', header: 'Name' },
       { key: 'licenceStatus', header: 'Status' },
-      { key: 'akExpiryDate', header: 'AK Expiry Scale Date', format: 'date' },
+      { key: 'akExpiryDate', header: 'Authentication Key Expiry Scale Date', format: 'date' },
     ],
     rowLink: { screen: 'scaler-profile', params: { licenceNumber: 'licenceNumber' } },
     notes:
@@ -590,21 +591,21 @@ export const screens: ScreenDef[] = [
     legacy: 'P360/P364',
     area: 'profiles',
     title: 'Select Scaler to Update',
-    navLabel: 'Scalers with Expiring AKs',
+    navLabel: 'Scalers with Expiring Authentication Keys',
     capability: 'SCALE_SITE_ADMIN',
     query: 'profiles.scalers.expiring',
     criteria: [
-      { name: 'expiryDate', label: 'Active Scalers with AKs Expiring Before', type: 'date', required: true },
-      { name: 'orgUnitNo', label: 'In Org Unit', codeList: 'codes.orgUnits' },
-      { name: 'inMyOrgUnit', label: 'In my Org Unit', type: 'checkbox', align: 'center' },
+      { name: 'expiryDate', label: 'Active Scalers with Authentication Keys Expiring Before', type: 'date', required: true },
+      { name: 'orgUnitNo', label: 'In Organization Unit', codeList: 'codes.orgUnits' },
+      { name: 'inMyOrgUnit', label: 'In my Organization Unit', type: 'checkbox', align: 'center' },
     ],
     columns: [
       { key: 'licenceNumber', header: 'Scaler License', sortable: true },
       { key: 'clientName', header: 'Name' },
       { key: 'userId', header: 'User ID' },
       { key: 'lastActive', header: 'Last Scale Date', format: 'date', sortable: true },
-      { key: 'effectiveDate', header: 'AK Active Scale Date', format: 'date' },
-      { key: 'expiryDate', header: 'AK Expiry Scale Date', format: 'date', sortable: true },
+      { key: 'effectiveDate', header: 'Authentication Key Active Scale Date', format: 'date' },
+      { key: 'expiryDate', header: 'Authentication Key Expiry Scale Date', format: 'date', sortable: true },
       { key: 'entryUserid', header: 'Entered By' },
       { key: 'updateUserid', header: 'Updated By' },
     ],
@@ -630,7 +631,7 @@ export const screens: ScreenDef[] = [
         label: 'Edit Authentication Key',
         capability: 'SCALER_PROFILE_EDIT',
       },
-      { path: '/scale-returns/public-key', params: {}, label: 'Download HBS Public Key', capability: 'ANY_USER' },
+      { path: '/scale-returns/public-key', params: {}, label: 'Download Harvest Billing System Public Key', capability: 'ANY_USER' },
     ],
     sections: [
       {
@@ -674,8 +675,8 @@ export const screens: ScreenDef[] = [
     capability: 'PROFILES_VIEW',
     query: 'profiles.delivery.search',
     criteria: [
-      { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8, required: true },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, required: true },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
     ],
     columns: DELIVERY_COLUMNS,
     rowLink: { screen: 'delivery-profile', params: { dlvprofId: 'dlvprofId' } },
@@ -712,7 +713,7 @@ export const screens: ScreenDef[] = [
       {
         title: 'Statement Delivery Profile',
         fields: [
-          { key: 'clientLoc', label: 'Client / Loc' },
+          { key: 'clientLoc', label: 'Client / Location' },
           { key: 'clientName', label: 'Client Name' },
           { key: 'effectiveDate', label: 'Effective Date', format: 'date' },
           { key: 'expiryDate', label: 'Expiry Date', format: 'date' },
@@ -754,8 +755,8 @@ export const screens: ScreenDef[] = [
     loadQuery: 'profiles.delivery.record',
     keys: ['dlvprofId'],
     fields: [
-      { name: 'clientNumber', label: 'Client No.', readOnlyOnEdit: true },
-      { name: 'clientLocnCode', label: 'Loc', readOnlyOnEdit: true },
+      { name: 'clientNumber', label: 'Client Number', readOnlyOnEdit: true },
+      { name: 'clientLocnCode', label: 'Location', readOnlyOnEdit: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
       { name: 'deliveryMethod', label: 'Document Delivery Method', type: 'select', options: DELIVERY_METHODS, required: true },
@@ -777,8 +778,8 @@ export const screens: ScreenDef[] = [
     capability: 'PROFILE_BILLING_ADMIN',
     command: 'profiles.delivery.create',
     fields: [
-      { name: 'clientNumber', label: 'Client No.', type: 'client', maxLength: 8, required: true },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2, required: true },
+      { name: 'clientNumber', label: 'Client Number', type: 'client', maxLength: 8, required: true },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2, required: true },
       { name: 'effectiveDate', label: 'Effective Date', type: 'date', required: true, helperText: 'Must be a future date' },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
       { name: 'deliveryMethod', label: 'Document Delivery Method', type: 'select', options: DELIVERY_METHODS, defaultValue: 'P', required: true },
@@ -811,13 +812,13 @@ export const screens: ScreenDef[] = [
       { key: 'timberMark', header: 'Timber Mark', sortable: true },
       { key: 'effectiveDate', header: 'Effective Date', format: 'date', sortable: true },
       { key: 'expiryDate', header: 'Expiry Date', format: 'date' },
-      { key: 'ttlMerchntblArea', header: 'Total Merch. Area (Ha)', format: 'number' },
+      { key: 'ttlMerchntblArea', header: 'Total Merchantable Area (Ha)', format: 'number' },
       { key: 'netCruiseVol', header: 'Net Cruise Volume', format: 'volume' },
       { key: 'intDecVol', header: 'Deciduous Volume', format: 'volume' },
       { key: 'totalVol', header: 'Total Cruise Volume', format: 'volume' },
       { key: 'm3PerHa', header: 'Appraised m3/Ha', format: 'number' },
       { key: 'profileM3Display', header: 'Profile m3/Ha' },
-      { key: 'errorCount', header: 'Docs in Error', format: 'number', sortable: true },
+      { key: 'errorCount', header: 'Documents in Error', format: 'number', sortable: true },
     ],
     rowLink: {
       screen: 'cruise-based-profile',
@@ -836,7 +837,7 @@ export const screens: ScreenDef[] = [
     keys: ['timberMark', 'effectiveDate'],
     sections: [
       {
-        title: 'Timber Mark Info',
+        title: 'Timber Mark Information',
         fields: [
           { key: 'timberMark', label: 'Timber Mark' },
           { key: 'cuttingPermitId', label: 'Cutting Permit' },
@@ -845,20 +846,20 @@ export const screens: ScreenDef[] = [
           { key: 'markStatus', label: 'Status' },
           { key: 'markStatusDesc', label: 'Status Description' },
           { key: 'catastrophicInd', label: 'Catastrophic', format: 'yesno' },
-          { key: 'adminOrg', label: 'Admin Org' },
-          { key: 'ttlMerchntblArea', label: 'Total FTA Merchantable Area (Ha)', format: 'number' },
+          { key: 'adminOrg', label: 'Administrative Organization' },
+          { key: 'ttlMerchntblArea', label: 'Total Merchantable Area in Forest Tenure Administration (Ha)', format: 'number' },
           { key: 'cruiseBasedInd', label: 'Cruise Based', format: 'yesno' },
         ],
       },
       {
-        title: 'Appraisal Info',
+        title: 'Appraisal Information',
         fields: [
           { key: 'appraisalStatus', label: 'Status' },
           { key: 'effectiveDate', label: 'Effective', format: 'date' },
-          { key: 'rateCalcMethod', label: 'Rate Calc' },
+          { key: 'rateCalcMethod', label: 'Rate Calculation' },
           { key: 'appraisalMethod', label: 'Method' },
           { key: 'expiryDate', label: 'Expiry', format: 'date' },
-          { key: 'adjustQuarterlyInd', label: 'Adj. Quarterly', format: 'yesno' },
+          { key: 'adjustQuarterlyInd', label: 'Adjusted Quarterly', format: 'yesno' },
           { key: 'ttlMerchntblArea', label: 'Total Merchantable Area', format: 'number' },
           { key: 'othersTiedTo', label: 'Tied To' },
           { key: 'conifStandRateElig', label: 'Coniferous Stand Rate Eligibility' },

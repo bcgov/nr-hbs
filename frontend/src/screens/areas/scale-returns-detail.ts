@@ -1,4 +1,5 @@
 import type { ActionDef, ColumnDef, FieldDef, LinkDef, Option, ReportLinkDef, ScreenDef } from '../types';
+import { SAMPLING_YEAR_OPTIONS } from '@/screens/years';
 
 /**
  * Scale Returns — Detail (legacy dac/detail): detail scale return searches
@@ -30,7 +31,7 @@ const BATCH_RETURN_TYPES: Option[] = [
   { value: 'S', label: 'Sample Tallies' },
   { value: 'A', label: 'Arrival Ledgers' },
   { value: 'D', label: 'Departure Ledgers' },
-  { value: 'F', label: 'SFP Tallies' },
+  { value: 'F', label: 'Special Forest Product Tallies' },
 ];
 
 /** DacConstants.VERSION_STATUS — the 12 statuses offered by P046, in legacy order. */
@@ -58,13 +59,13 @@ const ACTIVE_ONLY: FieldDef = {
 };
 
 const RESULT_COLUMNS: ColumnDef[] = [
-  { key: 'ddn', header: 'DDN', sortable: true },
-  { key: 'version', header: 'Vers No.', sortable: true },
+  { key: 'ddn', header: 'Detail Document Number', sortable: true },
+  { key: 'version', header: 'Version Number', sortable: true },
   { key: 'statusDesc', header: 'Status', sortable: true },
   { key: 'eventTypeDesc', header: 'Event Type', sortable: true },
   { key: 'scaleSiteDisplay', header: 'Scale Site', sortable: true },
   { key: 'eventDate', header: 'Scale Date', format: 'date', sortable: true },
-  { key: 'popStratYear', header: 'Pop/Strat/Year', sortable: true },
+  { key: 'popStratYear', header: 'Population/Stratum/Year', sortable: true },
   { key: 'timberMark', header: 'Timber Mark', sortable: true },
   { key: 'weighSlipNumber', header: 'Weigh Slip Number', sortable: true },
   { key: 'primaryLicenceDisplay', header: 'Scaler Licence', sortable: true },
@@ -84,7 +85,7 @@ const TO_RETURN: LinkDef = { screen: 'detail-return', params: { ddn: 'ddn', vers
 const LIST_REPORTS: ReportLinkDef[] = [
   {
     reportId: 'HBS2R551',
-    label: 'Print Log Tally List (HBS2R551)',
+    label: 'Print Log Tally List',
     params: {
       IS_COUNT: '=N',
       PSR_DOCTYPE: '=P',
@@ -103,7 +104,7 @@ const LIST_REPORTS: ReportLinkDef[] = [
   },
   {
     reportId: 'HBS2R601',
-    label: 'Print Weigh Slip List (HBS2R601)',
+    label: 'Print Weigh Slip List',
     params: {
       IS_COUNT: '=N',
       PSR_SCALESITE: 'scaleSite',
@@ -124,7 +125,7 @@ const LIST_REPORTS: ReportLinkDef[] = [
   },
   {
     reportId: 'HBS2R651',
-    label: 'Print Sample Tally List (HBS2R651)',
+    label: 'Print Sample Tally List',
     params: {
       IS_COUNT: '=N',
       PSR_SCALESITE: 'scaleSite',
@@ -145,7 +146,7 @@ const LIST_REPORTS: ReportLinkDef[] = [
   },
   {
     reportId: 'HBS2R701',
-    label: 'Print Ledger List (HBS2R701)',
+    label: 'Print Ledger List',
     params: {
       IS_COUNT: '=N',
       PSR_LEDGERTYPE: 'returnType',
@@ -295,9 +296,9 @@ const GENERAL_CRITERIA: FieldDef[] = [
   { name: 'receivedDateTo', label: 'Received Date To', type: 'date', group: 'Range of Dates' },
   ...SITE_CRITERIA,
   SITE_SCOPE,
-  { name: 'population', label: 'Pop', maxLength: 4, upper: true, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
-  { name: 'stratum', label: 'Strat', maxLength: 2, upper: true, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
-  { name: 'samplingYear', label: 'Year', type: 'number', maxLength: 4, group: 'Pop/Strat/Year (P, P/Y or P/S/Y)' },
+  { name: 'population', label: 'Population', maxLength: 4, upper: true, group: 'Population/Stratum/Year (P, P/Y or P/S/Y)' },
+  { name: 'stratum', label: 'Stratum', maxLength: 2, upper: true, group: 'Population/Stratum/Year (P, P/Y or P/S/Y)' },
+  { name: 'samplingYear', label: 'Year', type: 'select', options: SAMPLING_YEAR_OPTIONS, group: 'Population/Stratum/Year (P, P/Y or P/S/Y)' },
   {
     name: 'markBasis',
     label: 'Timber Mark Type',
@@ -326,7 +327,7 @@ const GENERAL_CRITERIA: FieldDef[] = [
   { name: 'weighSlipFrom', label: 'Weigh Slip From', maxLength: 10, upper: true, group: 'Range of Numbers' },
   { name: 'weighSlipTo', label: 'Weigh Slip To', maxLength: 10, upper: true, group: 'Range of Numbers' },
   { name: 'transportId', label: 'Transport ID', maxLength: 16, upper: true, helperText: 'Use * as wildcard.', group: 'Range of Numbers' },
-  { name: 'ldsNumber', label: 'LDS Number', maxLength: 10, upper: true, helperText: 'Use * as wildcard.', group: 'Range of Numbers' },
+  { name: 'ldsNumber', label: 'Load Description Slip Number', maxLength: 10, upper: true, helperText: 'Use * as wildcard.', group: 'Range of Numbers' },
   { name: 'markHolderClient', label: 'Mark Holder', type: 'client', group: 'Client Association' },
   { name: 'siteOwnerClient', label: 'Site Owner', type: 'client', group: 'Client Association' },
   { name: 'stratumOwnerClient', label: 'Stratum Owner', type: 'client', group: 'Client Association' },
@@ -618,10 +619,10 @@ export const screens: ScreenDef[] = [
       {
         title: 'Version Information',
         fields: [
-          { key: 'ddn', label: 'DDN' },
+          { key: 'ddn', label: 'Detail Document Number' },
           { key: 'docTypeDesc', label: 'Type' },
           { key: 'returnStateDesc', label: 'State' },
-          { key: 'version', label: 'Version No' },
+          { key: 'version', label: 'Version Number' },
           { key: 'statusDesc', label: 'Status' },
           { key: 'activeInd', label: 'Active Version', format: 'yesno' },
           { key: 'eventTypeDesc', label: 'Event Type' },
@@ -641,12 +642,12 @@ export const screens: ScreenDef[] = [
           { key: 'cutBlockId', label: 'Cut Block' },
           { key: 'returnNumber', label: 'Return Number' },
           { key: 'loadArrivalNumber', label: 'Load Arrival' },
-          { key: 'ldsIn', label: 'LDS No' },
+          { key: 'ldsIn', label: 'Load Description Slip Number' },
           { key: 'transportId', label: 'Transport ID' },
           { key: 'logCount', label: 'Log Count', format: 'number' },
           { key: 'netVolume', label: 'Net Volume Total', format: 'volume' },
           { key: 'volumeCalcMethod', label: 'Scale Method' },
-          { key: 'sfpScaleType', label: 'Scale method (SFP)' },
+          { key: 'sfpScaleType', label: 'Scale method (Special Forest Product)' },
           { key: 'samplePieceCount', label: 'Sample Piece Count', format: 'number' },
           { key: 'fieldScaleInd', label: 'Field Scale', format: 'yesno' },
           { key: 'fieldScaleDeckId', label: 'Deck ID' },
@@ -662,15 +663,15 @@ export const screens: ScreenDef[] = [
         title: 'Weigh Slip / Sample',
         fields: [
           { key: 'weighSlipNumber', label: 'Weigh Slip' },
-          { key: 'popStratYear', label: 'Pop/Strat/Year or Company Stratum' },
+          { key: 'popStratYear', label: 'Population/Stratum/Year or Company Stratum' },
           { key: 'grossWeight', label: 'Gross Weight', format: 'number' },
           { key: 'tareWeight', label: 'Tare Weight', format: 'number' },
           { key: 'netWeight', label: 'Net Weight', format: 'number' },
-          { key: 'sampleDeductionWeight', label: 'Wt less Subsample', format: 'number' },
+          { key: 'sampleDeductionWeight', label: 'Weight less Subsample', format: 'number' },
           { key: 'sampleType', label: 'Sample' },
           { key: 'sampledWeighSlip', label: 'Sampled Weigh Slip' },
           { key: 'sampleWeight', label: 'Sample Weight', format: 'number' },
-          { key: 'ldsOut', label: 'LDS Out' },
+          { key: 'ldsOut', label: 'Load Description Slip Out' },
           { key: 'destination', label: 'Destination' },
         ],
       },
@@ -680,7 +681,7 @@ export const screens: ScreenDef[] = [
           { key: 'checkReplacesOriginalInd', label: 'Replacement', format: 'yesno' },
           { key: 'origLicence', label: 'Original Scaler' },
           { key: 'origReturnNumber', label: 'Original Scale Return' },
-          { key: 'originalDdn', label: 'Original DDN' },
+          { key: 'originalDdn', label: 'Original Detail Document Number' },
           { key: 'origScaleSite', label: 'Originating Scale Site' },
         ],
       },
@@ -694,7 +695,7 @@ export const screens: ScreenDef[] = [
         ],
       },
       {
-        title: 'HBS Edit Error',
+        title: 'Harvest Billing System Edit Error',
         table: {
           query: 'detailReturns.errors',
           params: { ddn: 'ddn', version: 'version' },
@@ -715,7 +716,7 @@ export const screens: ScreenDef[] = [
             { key: 'logNumber', header: 'Log Number' },
             { key: 'inputMark', header: 'Input Mark' },
             { key: 'billedMark', header: 'Billed Mark' },
-            { key: 'nmvInd', header: 'NMV', format: 'yesno' },
+            { key: 'nmvInd', header: 'No Mark Visible', format: 'yesno' },
             { key: 'species', header: 'Species' },
             { key: 'product', header: 'Product' },
             { key: 'grade', header: 'Grade' },
@@ -750,11 +751,11 @@ export const screens: ScreenDef[] = [
           query: 'detailReturns.transactions',
           params: { ddn: 'ddn', version: 'version' },
           columns: [
-            { key: 'eventSequence', header: 'Seq No.' },
+            { key: 'eventSequence', header: 'Sequence Number' },
             { key: 'debitCreditType', header: 'Sign' },
             { key: 'txnTypeDesc', header: 'Type' },
             { key: 'dateSummarized', header: 'Date Summarized', format: 'date' },
-            { key: 'sdn', header: 'SDN' },
+            { key: 'sdn', header: 'Summary Document Number' },
             { key: 'dateIssued', header: 'Date Issued', format: 'date' },
             { key: 'volume', header: 'Volume', format: 'volume' },
             { key: 'value', header: 'Value', format: 'money' },
@@ -767,7 +768,7 @@ export const screens: ScreenDef[] = [
           query: 'detailReturns.versions',
           params: { ddn: 'ddn' },
           columns: [
-            { key: 'version', header: 'Vers No.' },
+            { key: 'version', header: 'Version Number' },
             { key: 'statusDesc', header: 'Status' },
             { key: 'activeInd', header: 'Active', format: 'yesno' },
             { key: 'eventTypeDesc', header: 'Event Type' },
@@ -778,34 +779,40 @@ export const screens: ScreenDef[] = [
         },
       },
     ],
+    // Each proc reads only its own document type's table; the others print an empty template.
     reports: [
       {
         reportId: 'HBS2R552',
-        label: 'Print Log Tally (HBS2R552)',
+        label: 'Print Log Tally',
+        showWhen: { field: 'docType', values: ['P'] },
         fileName: 'Log Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { PSRETURN_DETAILDOCUMENTNUMBER: 'ddn', PSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R602',
-        label: 'Print Weigh Slip (HBS2R602)',
+        label: 'Print Weigh Slip',
+        showWhen: { field: 'docType', values: ['W'] },
         fileName: 'Weigh Slip {ddn} v{version} {timberMark} {scaleDate}',
         params: { WSRETURN_DETAILDOCUMENTNUMBER: 'ddn', WSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R652',
-        label: 'Print Sample Tally (HBS2R652)',
+        label: 'Print Sample Tally',
+        showWhen: { field: 'docType', values: ['S'] },
         fileName: 'Sample Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { SSRETURN_DETAILDOCUMENTNUMBER: 'ddn', SSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS3R755',
-        label: 'Print SFP Tally (HBS3R755)',
+        label: 'Print Special Forest Product Tally',
+        showWhen: { field: 'docType', values: ['F'] },
         fileName: 'SFP Tally {ddn} v{version} {timberMark} {scaleDate}',
         params: { PSRETURN_DETAILDOCUMENTNUMBER: 'ddn', PSRETURN_VERSIONNUMBER: 'version' },
       },
       {
         reportId: 'HBS2R702',
-        label: 'Print Ledger Entry (HBS2R702)',
+        label: 'Print Ledger Entry',
+        showWhen: { field: 'docType', values: ['A', 'D'] },
         fileName: 'Ledger Entry {ddn} v{version} {timberMark} {scaleDate}',
         params: { LEDGERDTL_DOCUMENTNUMBER: 'ddn', LEDGERDTL_VERSIONNUMBER: 'version', LEDGERDTL_LEDGERTYPE: 'docType' },
       },
@@ -825,11 +832,11 @@ export const screens: ScreenDef[] = [
       {
         title: 'Log',
         fields: [
-          { key: 'ddn', label: 'DDN' },
+          { key: 'ddn', label: 'Detail Document Number' },
           { key: 'version', label: 'Version' },
           { key: 'logNumber', label: 'Log Number' },
           { key: 'inputMark', label: 'Beachcomb Mark' },
-          { key: 'nmvInd', label: 'NMV', format: 'yesno' },
+          { key: 'nmvInd', label: 'No Mark Visible', format: 'yesno' },
           { key: 'species', label: 'Species' },
           { key: 'grade', label: 'Grade' },
           { key: 'length', label: 'Length', format: 'number' },

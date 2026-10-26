@@ -28,7 +28,9 @@ Each share and its replacement:
 ## The PVC
 
 `backend/openshift.deploy.yml` creates `${NAME}-backend-xml-${ZONE}`
-(ReadWriteMany, `netapp-file-standard`, `XML_STORAGE_SIZE` default 5Gi) and
+(ReadWriteMany, `netapp-file-standard`, `XML_STORAGE_SIZE` default 200Mi; set the
+`XML_STORAGE_SIZE` GitHub variable to size TEST/PROD within the namespace's
+storage quota) and
 mounts it at `/data/hbs/xml` on every backend pod, so the upload endpoint and
 whichever pod wins the ShedLock for the intake job see the same files.
 

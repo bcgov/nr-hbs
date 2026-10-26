@@ -73,6 +73,7 @@ WSRETURN_JOBNO => $P{WSRETURN_JOBNO}
 		<variableExpression><![CDATA[//Global StringVar empty_day := space(18) + "0" + space(22) + "0";
 //"                  " + "0" + "                      " + "0"
 org.apache.commons.lang3.StringUtils.leftPad("", 18, " ") + "0" + org.apache.commons.lang3.StringUtils.leftPad("", 22, " ") + "0"]]></variableExpression>
+		<initialValueExpression><![CDATA[org.apache.commons.lang3.StringUtils.leftPad("", 18, " ") + "0" + org.apache.commons.lang3.StringUtils.leftPad("", 22, " ") + "0"]]></initialValueExpression>
 	</variable>
 	<variable name="v_string_DAY" class="java.lang.String">
 		<variableExpression><![CDATA[$F{DAY} == null

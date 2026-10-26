@@ -29,7 +29,7 @@ export const screens: ScreenDef[] = [
     area: 'admin',
     title: 'User Data Domains',
     description:
-      'Search for HBS users and maintain their Associated Districts, Associated Sites and Associated Locations.',
+      'Search for Harvest Billing System users and maintain their Associated Districts, Associated Sites and Associated Locations.',
     capability: 'USER_ADMIN',
     query: 'admin.users.search',
     criteria: [
@@ -56,9 +56,9 @@ export const screens: ScreenDef[] = [
           { value: 'INA', label: 'Inactive' },
         ],
       },
-      { name: 'clientNumber', label: 'Client No', type: 'client' },
-      { name: 'clientLocnCode', label: 'Loc', maxLength: 2 },
-      { name: 'orgUnit', label: 'Org Unit', codeList: 'codes.orgUnits' },
+      { name: 'clientNumber', label: 'Client Number', type: 'client' },
+      { name: 'clientLocnCode', label: 'Location', maxLength: 2 },
+      { name: 'orgUnit', label: 'Organization Unit', codeList: 'codes.orgUnits' },
     ],
     columns: [
       { key: 'userId', header: 'User Id', sortable: true },
@@ -103,7 +103,7 @@ export const screens: ScreenDef[] = [
           params: userParam,
           columns: [
             { key: 'orgUnitName', header: 'District Name' },
-            { key: 'orgUnitCode', header: 'Org. Unit' },
+            { key: 'orgUnitCode', header: 'Organization Unit' },
           ],
           rowLink: { screen: 'user-district-domains', params: userParam, label: 'Manage' },
         },
@@ -160,13 +160,13 @@ export const screens: ScreenDef[] = [
         capability: 'USER_ADMIN',
         params: userParam,
         fields: [
-          { name: 'clientNumber', label: 'Client No', type: 'client', helperText: 'Ignored for industry administrators (your own client is used).' },
+          { name: 'clientNumber', label: 'Client Number', type: 'client', helperText: 'Ignored for industry administrators (your own client is used).' },
           { name: 'clientLocnCode', label: 'Location Code', maxLength: 2, required: true },
         ],
       },
     ],
     notes:
-      'Districts apply to HBS Scaling / Billing Administrators, Invoice Correction Approvers and Sample Plan Administrators; sites to Industry Site Administrators; locations to Industry Document Receivers. Select a row to remove domains.',
+      'Districts apply to Harvest Billing System Scaling / Billing Administrators, Invoice Correction Approvers and Sample Plan Administrators; sites to Industry Site Administrators; locations to Industry Document Receivers. Select a row to remove domains.',
   },
   {
     kind: 'search',
@@ -180,7 +180,7 @@ export const screens: ScreenDef[] = [
     criteria: [{ name: 'userId', label: 'User Id', upper: true, required: true }],
     columns: [
       { key: 'orgUnitName', header: 'District Name', sortable: true },
-      { key: 'orgUnitCode', header: 'Org. Unit' },
+      { key: 'orgUnitCode', header: 'Organization Unit' },
     ],
     rowActions: [
       removeAction('remove-district', 'admin.userDataDomains.removeDistrict', { userId: 'userId', orgUnitNo: 'orgUnitNo' }),
