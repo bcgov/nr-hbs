@@ -129,8 +129,10 @@ objects:
                 - name: tmp
                   mountPath: /tmp
               resources:
+                # Requests count against the namespace quota (500m CPU per
+                # namespace; see the backend template's resources comment).
                 requests:
-                  cpu: "50m"
+                  cpu: "25m"
                   memory: "64Mi"
                   ephemeral-storage: "100Mi"
                 limits:
