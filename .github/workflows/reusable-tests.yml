@@ -32,7 +32,7 @@ on:
         required: true
 
 env:
-  DOMAIN: apps.silver.devops.gov.bc.ca
+  DOMAIN: apps.gold.devops.gov.bc.ca
   PREFIX: nr-hbs-${{ inputs.slot || inputs.target }}
 
 permissions: {}

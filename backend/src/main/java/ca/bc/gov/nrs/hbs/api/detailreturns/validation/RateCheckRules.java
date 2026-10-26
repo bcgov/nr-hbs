@@ -134,7 +134,7 @@ public final class RateCheckRules {
 
   /**
    * The Pacific calendar day of a date ({@code DateUtil.startDay}); null stays
-   * null. Same zone as {@code DetailValidator.local}.
+   * null.
    */
   public static LocalDate day(Date d) {
     return d == null ? null : Instant.ofEpochMilli(d.getTime()).atZone(Audit.ZONE).toLocalDate();

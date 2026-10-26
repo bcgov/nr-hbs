@@ -17,7 +17,7 @@ jobs:
   # can be deleted and every PR can have its own hostname.
   #
   # The client is configured once with 50 fixed redirect URIs of the form
-  #   https://nr-hbs-<N>.apps.silver.devops.gov.bc.ca/...   for N in 0..49
+  #   https://nr-hbs-<N>.apps.gold.devops.gov.bc.ca/...   for N in 0..49
   # and each PR is bucketed into a slot via `slot = PR # mod 50`. The PR's
   # OpenShift objects still carry the full PR # (so cleanup is unambiguous),
   # but the frontend Route's `spec.host` uses the slot.

@@ -264,7 +264,7 @@ jobs:
             -p VITE_API_BASE_URL="${{ vars.VITE_API_BASE_URL || '/api' }}"
           triggers: ${{ inputs.triggers }}
 
-      # Default cluster-domain Route (nr-hbs-<slot>.apps.silver...). Applied in
+      # Default cluster-domain Route (nr-hbs-<slot>.apps.gold...). Applied in
       # every environment, PROD included. The PROD vanity hostname + TLS is NOT
       # managed here: per AGENTS.md it is applied on demand by the standalone
       # .github/workflows/route-tls.yml (workflow_dispatch), never by merge.

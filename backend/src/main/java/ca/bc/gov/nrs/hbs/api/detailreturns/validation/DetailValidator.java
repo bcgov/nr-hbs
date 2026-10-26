@@ -643,8 +643,14 @@ public abstract class DetailValidator {
     return true;
   }
 
+  /**
+   * The calendar day of a DATE column. JDBC builds an Oracle DATE (no zone) in
+   * the JVM's default zone, so it is read back in that zone — the wall clock
+   * the DB holds. The container runs in Pacific (TZ), so this is the Pacific
+   * day there, and the same day on a UTC CI runner.
+   */
   protected static LocalDate local(Date d) {
-    return d.toInstant().atZone(ZoneId.of(Audit.ZONE.getId())).toLocalDate();
+    return d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
   }
 
   /** {@code DacValidator.isScaleDateBeforeCurrentDate}: the day is not after today. */

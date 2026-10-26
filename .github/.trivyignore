@@ -29,7 +29,7 @@ AVD-KSV-0125
 # These alerts complain that the pod securityContext does not hardcode a specific
 # non-root user/group ID greater than 10000 (e.g., runAsUser: 10001).
 #
-# On BC Gov's OpenShift Container Platform (Silver/Gold/Emerald clusters), the
+# On BC Gov's OpenShift Container Platform (Gold, where HBS runs), the
 # Security Context Constraints (SCC) controller dynamically allocates a safe,
 # random range of extremely high UIDs/GIDs (e.g., 1000600000 to 1000609999)
 # at runtime.
