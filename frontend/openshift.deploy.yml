@@ -120,7 +120,47 @@ objects:
                   value: ${VITE_API_BASE_URL}
                 - name: VITE_APP_NAME
                   value: ${VITE_APP_NAME}
-              
+              volumeMounts:
+                # Caddy serves /srv; the init container seeds it from the
+                # image so the entrypoint can write config.js with a
+                # read-only root filesystem.
+                - name: srv
+                  mountPath: /srv
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: "50m"
+                  memory: "64Mi"
+                  ephemeral-storage: "100Mi"
+                limits:
+                  cpu: "200m"
+                  memory: "128Mi"
+                  ephemeral-storage: "200Mi"
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 3001
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 3001
+                initialDelaySeconds: 3
+                periodSeconds: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+          volumes:
+            - name: srv
+              emptyDir: {}
+            - name: tmp
+              emptyDir: {}
+
   # ── Service ───────────────────────────────────────────────
   - apiVersion: v1
     kind: Service
