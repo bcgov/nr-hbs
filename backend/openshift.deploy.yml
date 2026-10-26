@@ -32,15 +32,16 @@ parameters:
     value: "1"
   - name: MAX_REPLICAS
     value: "2"
+  # CPU / memory requests. Sized to the Gold namespace quota (requests only:
+  # 500m CPU, 2Gi memory per namespace) — see the resources block on the
+  # backend container for the arithmetic.
   - name: MIN_CPU
-    value: "200m"
-  # Memory request. Kept equal to MAX_MEM for Guaranteed QoS — see the
-  # resources block on the backend container for the quota arithmetic.
+    value: "100m"
   - name: MIN_MEM
-    value: "1Gi"
+    value: "512Mi"
   # Memory limit. The JVM derives its max heap from this value
-  # (-XX:MaxRAMPercentage=60), so raising it raises the heap. Bounded by the
-  # PROD namespace's 4Gi quota across 3 backend + 3 frontend replicas.
+  # (-XX:MaxRAMPercentage=60), so raising it raises the heap. Limits are not
+  # counted by the namespace quota.
   - name: MAX_MEM
     value: "1Gi"
   # Container timezone. Drives the JVM default zone, which both log patterns
@@ -206,7 +207,7 @@ objects:
                   mountPath: /tmp
               resources:
                 requests:
-                  cpu: "200m"
+                  cpu: "50m"
                   memory: "300Mi"
                   ephemeral-storage: "50Mi"
                 limits:
@@ -331,21 +332,20 @@ objects:
               # ~500Mi of the pod sat unused. 1Gi ⇒ ~614MB heap, 3x the old
               # ceiling.
               #
-              # 1Gi is a quota ceiling, not a tuning choice. The PROD namespace
-              # caps at 4Gi total and merge.yml pins BOTH backend and frontend
-              # to 3 replicas there, so the budget is:
-              #   frontend 3 x 128Mi = 384Mi
-              #   backend  3 x   1Gi = 3072Mi
-              #   total              = 3456Mi, leaving 640Mi of namespace slack
-              # Anything above ~1237Mi per backend pod exceeds the quota and the
-              # 3rd replica will fail to schedule. Raise the namespace quota
-              # before raising this.
-              #
-              # requests == limits puts the pod in the Guaranteed QoS class, so
-              # it is the last thing evicted under node memory pressure. Since
-              # MIN_REPLICAS == MAX_REPLICAS in every zone (see reusable-deploy.yml)
-              # the footprint is fixed anyway — there is no burst headroom to
-              # reclaim by requesting less.
+              # The namespace quota (Gold, every zone: requests.cpu 500m,
+              # requests.memory 2Gi) counts requests only, so requests are
+              # sized to fit and the limits keep the heap:
+              #   PROD  3 x (100m, 512Mi) + 3 x frontend (25m, 64Mi)
+              #         = 375m, 1728Mi, plus one frontend surge pod on rollout
+              #   TEST  2 + 2 replicas = 250m, 1152Mi
+              #   dev   one PR = 125m, 576Mi, so three PRs fit at once
+              # requests < limits makes the pod Burstable: it can use the full
+              # 1Gi but is evicted before Guaranteed pods under node memory
+              # pressure. To go back to requests == limits (1Gi), the namespace
+              # quota has to be raised first (Platform Services, by a person on
+              # the team). The init container's request counts too (a pod's
+              # request is the larger of its init and app containers), so it
+              # stays at or below these.
               #
               # ephemeral-storage must exceed the max heap size: the JVM writes
               # a heap dump to /temp (emptyDir) on OOM, and an emptyDir counts
