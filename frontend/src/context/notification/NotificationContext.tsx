@@ -13,6 +13,8 @@ export type NotificationContent = {
 
 export type NotificationContextData = {
   display: (content: NotificationContent) => void;
+  /** Closes an error / warning toast raised on a page other than `pathname`. */
+  dismissStaleProblems: (pathname: string) => void;
 };
 
 export const NotificationContext = createContext<NotificationContextData | undefined>(undefined);

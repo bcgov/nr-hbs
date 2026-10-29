@@ -13,6 +13,7 @@ import { useEffect, useState, type FC } from 'react';
 
 import ClientComboBox from '@/components/ClientComboBox';
 import type { CodeOption } from '@/services/common';
+import RequiredLabel from '@/components/RequiredLabel';
 import type { FieldDef } from '@/screens/types';
 
 import { useScreenApi } from './screenApi';
@@ -57,7 +58,7 @@ export const FieldInput: FC<FieldInputProps> = ({
   onLocationPick,
 }) => {
   const id = `${idPrefix}-${field.name}`;
-  const label = field.required ? `${field.label} *` : field.label;
+  const label = <RequiredLabel text={field.label} required={!!field.required} suffix={field.labelSuffix} />;
   const [codes, setCodes] = useState<CodeOption[] | null>(null);
   const { codeList } = useScreenApi();
 

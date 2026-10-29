@@ -67,6 +67,10 @@ const locationPartner = (fields: FieldDef[], i: number): FieldDef | undefined =>
     : undefined;
 };
 
+/** A field whose `enabledWhen` condition is not met is disabled (and cleared). */
+const isEnabled = (f: FieldDef, values: Record<string, string>): boolean =>
+  !f.enabledWhen || f.enabledWhen.values.includes(values[f.enabledWhen.field] ?? '');
+
 /**
  * Lays fields out on nr-fta's criteria grid (`fsp-search__field-grid`: one
  * column on a phone, two at md, four at lg). Where the field `group` changes —
@@ -90,6 +94,10 @@ export const FieldGrid: FC<FieldGridProps> = ({
   const roles = useMemo(() => (roleKey ? roleKey.split(',') : []), [roleKey]);
   useEffect(() => {
     fields.forEach((f) => {
+      if (!isEnabled(f, values)) {
+        if (values[f.name]) onChange(f.name, '');
+        return;
+      }
       const available = withAvailableOptions(f, values, roles).options;
       const current = values[f.name] ?? '';
       if (!available || available === f.options || !current) return;
@@ -122,7 +130,7 @@ export const FieldGrid: FC<FieldGridProps> = ({
               value={values[f.name] ?? ''}
               onChange={(v) => onChange(f.name, v)}
               idPrefix={idPrefix}
-              readOnly={readOnly?.(f)}
+              readOnly={readOnly?.(f) || !isEnabled(f, values)}
               invalidText={errors?.[f.name]}
               emptyOption={mode === 'form' || f.required ? 'Choose…' : 'Any'}
               onLocationPick={

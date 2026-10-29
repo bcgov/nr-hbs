@@ -146,10 +146,10 @@
    Expanded nav: collapsible sections.
 
    Carbon's SideNavMenu gives us a <button class="side-nav__submenu"> holding
-   a title span and a chevron, followed by a <ul> of menu items. The design
-   asks for bold headings with no icon, and destinations that each carry an
-   icon — which SideNavMenuItem has no prop for, so the icon is a child and
-   the layout is done here.
+   its icon, a title span and a chevron, followed by a <ul> of menu items.
+   Headings (and root links such as Home) are bold with an icon; the
+   destinations inside a section are plain labels, indented to line up with
+   the heading's title.
    ─────────────────────────────────────────────────────────────────────────── */
 
 /* The open/closed submenu list.
@@ -178,10 +178,18 @@
   visibility: hidden;
 }
 
-/* Section heading: bold and dark, like the design's "Provincial" / "Admin". */
-.side-nav-drawer .cds--side-nav__submenu-title {
-  font-weight: 600;
+/* Section heading and root link: regular weight, dark. Home sits at the same
+   level as the headings, so it reads the same. Only the page the user is on
+   is bold (below, and the destination rule further down). */
+.side-nav-drawer .cds--side-nav__submenu-title,
+.side-nav-drawer .side-nav-root-link .cds--side-nav__link-text {
+  font-weight: 400;
   color: var(--cds-text-primary);
+}
+
+.side-nav-drawer .side-nav-root-link.cds--side-nav__link--current .cds--side-nav__link-text,
+.side-nav-drawer .side-nav-root-link[aria-current='page'] .cds--side-nav__link-text {
+  font-weight: 600;
 }
 
 .side-nav-drawer .cds--side-nav__submenu {
@@ -201,44 +209,21 @@
   outline-offset: -2px;
 }
 
-/* A destination inside a section: icon, then label, on one 48px row. */
+/* A destination inside a section: a label on one 48px row, starting where the
+   heading's title starts (1rem inset + the 20px icon + Carbon's 1.5rem
+   icon-to-title gap). */
 .side-nav-drawer .cds--side-nav__menu-item .cds--side-nav__link {
   min-block-size: 3rem;
   block-size: auto;
-  padding-inline-start: 1rem;
+  padding-inline-start: calc(2.5rem + 20px) !important;
 }
 
 .side-nav-drawer .cds--side-nav__menu-item .cds--side-nav__link-text {
   inline-size: 100%;
 }
 
-.side-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  inline-size: 100%;
-}
-
-/* Icons match the nav's existing interactive blue and 20px sizing. The fixed
-   box keeps every label on the same left edge whether or not an entry has an
-   icon. */
-.side-nav-item__icon {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  inline-size: 20px;
-  block-size: 20px;
-  color: var(--cds-link-primary);
-}
-
-.side-nav-item__icon svg {
-  inline-size: 20px;
-  block-size: 20px;
-  fill: currentColor;
-}
-
 .side-nav-item__label {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

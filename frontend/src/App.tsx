@@ -4,6 +4,7 @@ import { useRef, type ReactNode } from 'react';
 import Layout from './components/Layout';
 import ScreenPage from './components/screens/ScreenPage';
 import SessionTimeout from './components/SessionTimeout';
+import DismissToastsOnNavigate from './context/notification/DismissToastsOnNavigate';
 import { useAuth } from './context/auth/useAuth';
 import { useOrg } from './context/org/useOrg';
 import { defaultRouteForUser } from './routes/access';
@@ -78,6 +79,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <DismissToastsOnNavigate />
       {isLoggedIn && <SessionTimeout />}
       {isLoggedIn && !hasHbsRole ? (
         <Routes>

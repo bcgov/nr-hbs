@@ -45,7 +45,7 @@ import type { DetailScreenDef, DetailSection } from '@/screens/types';
 
 import ActionButton from './ActionButton';
 import { BulkActionBar, SelectCell, rowSelectable, useBulkActions } from './BulkActions';
-import DownloadCell from './DownloadCell';
+import DownloadCell, { DownloadColumnCell } from './DownloadCell';
 import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
@@ -204,7 +204,7 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
                             className={c.format === 'date' || c.format === 'datetime' ? 'fsp-search__cell--nowrap' : undefined}
                           >
                             {c.format === 'download' ? (
-                              <DownloadCell url={r[c.key]} />
+                              <DownloadColumnCell column={c} row={r} />
                             ) : c.format === 'status' && r[c.key] ? (
                               <StatusTag status={String(r[c.key])} />
                             ) : (
@@ -298,14 +298,14 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
   // The record's identifiers — its key fields, plus its status — pinned above
   // the tabs, as FTA's tombstone pins a tenure's file id, type and status.
   const tombstone = useMemo(() => {
-    if (!record) return [];
+    if (!record || screen.tombstone === false) return [];
     const all = fieldSections.flatMap((s) => s.fields ?? []);
     const picked = [
       ...screen.keys.map((k) => all.find((f) => f.key === k)).filter((f): f is Field => !!f),
       ...all.filter((f) => f.format === 'status').slice(0, 1),
     ];
     return picked.map((f) => ({ label: f.label, value: fieldValue(f, record) }));
-  }, [fieldSections, record, screen.keys]);
+  }, [fieldSections, record, screen.keys, screen.tombstone]);
 
   const editHref =
     record && screen.editLink && can(user, screen.editLink.capability) && offered(screen.actionsAvailable?.editAction)

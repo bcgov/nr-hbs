@@ -1,5 +1,5 @@
 import { ToastNotification } from '@carbon/react';
-import { useState, useEffect, type ReactNode, useCallback } from 'react';
+import { useState, useEffect, useRef, type ReactNode, useCallback } from 'react';
 
 import { safeErrorMessage } from '@/lib/errorMessage';
 import { NotificationContext, type NotificationContent } from './NotificationContext';
@@ -9,10 +9,16 @@ import { NotificationContext, type NotificationContent } from './NotificationCon
  * in from the top-right of the viewport (styled in src/styles/index.scss),
  * stays for `timeout` ms, then slides out. Callers fire it via
  * useNotification().display({ kind, title, subtitle, timeout }).
+ *
+ * Error and warning toasts stay until closed, but not across pages: each
+ * remembers the page it was raised on, and DismissToastsOnNavigate closes it
+ * once the user moves to another page.
  */
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notificationContent, setNotificationContent] = useState<NotificationContent | null>(null);
   const [notificationClass, setNotificationClass] = useState<string>('slide-in');
+  // The page an error / warning toast was raised on (null for other kinds).
+  const problemPath = useRef<string | null>(null);
 
   const display = useCallback((content: NotificationContent) => {
     // Error / warning toasts stay until the user closes them. The
@@ -31,11 +37,19 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       isProblem && content.subtitle !== undefined
         ? { ...content, subtitle: safeErrorMessage(content.subtitle) }
         : content;
+    problemPath.current = isProblem ? window.location.pathname : null;
     setNotificationClass('slide-in');
     setNotificationContent(isProblem ? { ...safe, timeout: 0 } : safe);
   }, []);
 
+  const dismissStaleProblems = useCallback((pathname: string) => {
+    if (problemPath.current === null || problemPath.current === pathname) return;
+    problemPath.current = null;
+    setNotificationContent(null);
+  }, []);
+
   const onClose = useCallback(() => {
+    problemPath.current = null;
     setNotificationClass('slide-out');
     notificationContent?.onClose?.();
     setNotificationContent(null);
@@ -53,7 +67,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, [notificationClass, notificationContent]);
 
   return (
-    <NotificationContext.Provider value={{ display }}>
+    <NotificationContext.Provider value={{ display, dismissStaleProblems }}>
       {children}
       {notificationContent && (
         <ToastNotification

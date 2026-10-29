@@ -1,0 +1,4 @@
+/* The required-field asterisk, in Carbon's error red (follows the theme). */
+.hbs-required-marker {
+  color: var(--cds-text-error);
+}

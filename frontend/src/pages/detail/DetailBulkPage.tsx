@@ -18,6 +18,7 @@ import { useState, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import ConfirmationModal from '@/components/ConfirmationModal';
+import RequiredLabel from '@/components/RequiredLabel';
 import SectionTile from '@/components/SectionTile';
 import FieldGrid from '@/components/screens/FieldGrid';
 import { useScopedUser } from '@/context/org/useOrg';
@@ -152,7 +153,7 @@ const DetailBulkPage: FC = () => {
       <SectionTile title="Request" icon={ListChecked}>
         <div className="hbs-form">
           <div className="fsp-search__field-grid">
-            <Select id="bulk-action" labelText="Request *" value={action} onChange={(e) => setAction(e.target.value)}>
+            <Select id="bulk-action" labelText={<RequiredLabel text="Request" />} value={action} onChange={(e) => setAction(e.target.value)}>
               {ACTIONS.map((a) => (
                 <SelectItem key={a.value} value={a.value} text={a.label} />
               ))}

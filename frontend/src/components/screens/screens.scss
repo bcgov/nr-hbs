@@ -136,3 +136,10 @@
 .hbs-detail__pane .bordered-table .cds--data-table-content {
   overflow-x: auto;
 }
+
+// An "Actions" column holding several downloads (PDF, XML) side by side.
+.hbs-download-actions {
+  display: inline-flex;
+  gap: 0.25rem;
+  white-space: nowrap;
+}

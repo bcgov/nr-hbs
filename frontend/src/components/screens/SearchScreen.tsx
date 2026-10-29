@@ -31,7 +31,7 @@ import type { ColumnDef, SearchScreenDef } from '@/screens/types';
 
 import ActionButton from './ActionButton';
 import { BulkActionBar, SelectCell, rowSelectable, useBulkActions } from './BulkActions';
-import DownloadCell from './DownloadCell';
+import { DownloadColumnCell } from './DownloadCell';
 import FieldGrid from './FieldGrid';
 import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
@@ -53,7 +53,7 @@ type Persisted = LastSearch<Criteria> & { sort: Sort };
 /** A results cell, formatted as its column says. */
 const Cell: FC<{ column: ColumnDef; row: Row }> = ({ column, row }) => {
   const value = row[column.key];
-  if (column.format === 'download') return <DownloadCell url={value} />;
+  if (column.format === 'download') return <DownloadColumnCell column={column} row={row} />;
   if (column.format === 'status' && value) return <StatusTag status={String(value)} />;
   return <>{formatValue(value, column.format)}</>;
 };
