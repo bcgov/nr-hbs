@@ -162,7 +162,7 @@ jobs:
           KC_SA_CLIENT_SECRET: ${{ secrets.keycloak_sa_client_secret }}
         run: ./.github/scripts/ensure-keycloak-service-account.sh
 
-      - uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
+      - uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
         id: deploy
         # The user-lookup client secret is a step OUTPUT (from keycloak_sa), so
         # it can't sit in the job-level env; set it here and reference
@@ -236,7 +236,7 @@ jobs:
     outputs:
       triggered: ${{ steps.deploy.outputs.triggered }}
     steps:
-      - uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
+      - uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
         id: deploy
         with:
           file: frontend/openshift.deploy.yml
@@ -269,7 +269,7 @@ jobs:
       # managed here: per AGENTS.md it is applied on demand by the standalone
       # .github/workflows/route-tls.yml (workflow_dispatch), never by merge.
       - name: Default Route
-        uses: bcgov/action-deployer-openshift@bb9d143f4f03187239580c17c4b77da04cdb6e66 # v4.2.2
+        uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
         with:
           file: frontend/openshift.route.yml
           oc_namespace: ${{ secrets.oc_namespace }}
