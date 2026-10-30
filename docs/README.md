@@ -24,6 +24,7 @@ Start with the [root README](../README.md). Then:
 | [virus-scanning.md](virus-scanning.md) | configure ClamAV |
 | [user-lookup-integration.md](user-lookup-integration.md) | configure nr-user-lookup-api |
 | [forest-client-integration.md](forest-client-integration.md) | configure nr-forest-client-api (client picker) |
+| [scale-data-api.md](scale-data-api.md) / [scale-data-api-client-guide.md](scale-data-api-client-guide.md) | work on the REST API that replaces FTP submission and statement pickup (spec + the guide given to clients) |
 | [waste-integration-api.md](waste-integration-api.md) | work on the WASTE / Waste Plus billing integration (proposed REST contract) |
 | [areas/](areas/) | find which new screen/query replaced a legacy P-number (one doc per area) |
 | [db/](db/) | DDL this app needs added to nr-mof-db |

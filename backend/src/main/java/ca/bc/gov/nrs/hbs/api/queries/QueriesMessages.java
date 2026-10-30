@@ -124,8 +124,9 @@ public final class QueriesMessages {
   public static final String GROUPING_NOT_FOR_PIECE = "This report grouping is not available for Piece Scale.";
   /** error.scales.invalid */
   public static final String SCALE_SITE_INVALID = "The scale site entered is invalid.";
-  /** error.client.association.required */
-  public static final String ASSOCIATION_REQUIRED = "Association Required.";
+  /** error.client.association.required (legacy text "Association Required.", reworded to say what to do) */
+  public static final String ASSOCIATION_REQUIRED =
+      "Choose a Client Association (Mark Holder, Site Owner or Stratum Owner) to search by client.";
   /** error.client.required */
   public static final String CLIENT_REQUIRED = "Client number Required.";
   /** error.clientinfo.required */

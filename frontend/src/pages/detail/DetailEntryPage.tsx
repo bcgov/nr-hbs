@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState, type FC } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import ConfirmationModal from '@/components/ConfirmationModal';
+import RequiredLabel from '@/components/RequiredLabel';
 import SectionTile from '@/components/SectionTile';
 import FieldGrid from '@/components/screens/FieldGrid';
 import { useNotification } from '@/context/notification/useNotification';
@@ -157,7 +158,7 @@ const DetailEntryPage: FC = () => {
             <div className="fsp-search__field-grid">
               <Select
                 id="entry-doc-type"
-                labelText="Return Type *"
+                labelText={<RequiredLabel text="Return Type" />}
                 value={docType}
                 onChange={(e) => {
                   setDocType(e.target.value as DocTypeCode);
@@ -170,7 +171,7 @@ const DetailEntryPage: FC = () => {
                 ))}
               </Select>
               {docType && (
-                <Select id="entry-event" labelText="Scale Event *" value={event} onChange={(e) => setEvent(e.target.value)}>
+                <Select id="entry-event" labelText={<RequiredLabel text="Scale Event" />} value={event} onChange={(e) => setEvent(e.target.value)}>
                   <SelectItem value="" text="Choose…" />
                   {EVENT_TYPES[docType].map((t) => (
                     <SelectItem key={t.code} value={t.code} text={t.label} />

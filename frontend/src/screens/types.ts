@@ -89,6 +89,10 @@ export interface FieldDef {
   align?: 'center';
   /** Group heading — consecutive fields with the same group render under it. */
   group?: string;
+  /** Words after the label and its required marker, e.g. "To * (up to 12 months)". */
+  labelSuffix?: string;
+  /** Editable only while another field holds one of these values; otherwise disabled and cleared. */
+  enabledWhen?: { field: string; values: string[] };
 }
 
 /**
@@ -104,6 +108,12 @@ export interface ColumnDef {
   key: string;
   header: string;
   format?: ColumnFormat;
+  /**
+   * A 'download' column holding several files (e.g. "Actions": PDF and XML):
+   * one button per entry, reading the row's `key`. `key` above is then only
+   * the column's id.
+   */
+  downloads?: { key: string; label: string }[];
   /** Backend sort key (must be whitelisted in the QueryDefinition). */
   sortable?: boolean;
 }
@@ -292,6 +302,8 @@ export interface DetailScreenDef extends BaseScreen {
   query: string;
   /** URL params required to load the record. */
   keys: string[];
+  /** Pin the record's key fields and status above the tabs (default true). */
+  tombstone?: boolean;
   sections: DetailSection[];
   actions?: ActionDef[];
   editLink?: LinkDef & { capability: Capability };

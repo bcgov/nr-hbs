@@ -7,6 +7,7 @@ import { useLayout } from '@/context/layout/useLayout';
 import { useScopedUser } from '@/context/org/useOrg';
 import {
   getMenuSections,
+  getRootLinks,
   sectionIdForPath,
   type MenuLeaf,
   type MenuSection,
@@ -20,12 +21,14 @@ const SUPPORT_EMAIL = 'FORHVAP.HBSHELP@gov.bc.ca';
  * The application's side navigation — nr-fta's.
  *
  * <ul>
- *   <li><b>Expanded</b> — the legacy HBS tab bar's areas as headings, each a
- *       collapsible {@code SideNavMenu} holding its screens. The section
- *       containing the current route opens on load; the rest stay closed.
- *   <li><b>Collapsed</b> — a 48px icon rail showing one icon per section. The
- *       icons do not navigate: clicking one expands the nav and opens that
- *       section. Hovering names the section.
+ *   <li><b>Expanded</b> — root links (Home) first, then the legacy HBS tab
+ *       bar's areas as headings, each a collapsible {@code SideNavMenu}
+ *       holding its screens. Root links and headings carry an icon; the
+ *       screens inside a section are plain labels. The section containing the
+ *       current route opens on load; the rest stay closed.
+ *   <li><b>Collapsed</b> — a 48px icon rail: one icon per root link, which
+ *       navigates, then one per section, which does not — clicking it expands
+ *       the nav and opens that section. Hovering names either.
  * </ul>
  *
  * The open section is driven from the current route via
@@ -36,6 +39,7 @@ export const LayoutSideNav: FC = () => {
   const { isSideNavExpanded, openSideNav } = useLayout();
   const location = useLocation();
   const user = useScopedUser();
+  const rootLinks = getRootLinks(user);
   const sections = getMenuSections(user);
 
   // The section the user opened from the rail, if any. It takes precedence
@@ -49,6 +53,22 @@ export const LayoutSideNav: FC = () => {
   useEffect(() => {
     if (!isSideNavExpanded) setRailSectionId(undefined);
   }, [isSideNavExpanded]);
+
+  // A root link looks and behaves the same in both states: an icon that
+  // navigates, with its label beside it (expanded) or as a hover tooltip (rail).
+  const renderRootLink = (link: MenuLeaf) => (
+    <SideNavLink
+      data-testid={`side-nav-link-${link.id}`}
+      key={link.id}
+      as={Link}
+      to={link.path}
+      isActive={link.path === location.pathname}
+      renderIcon={link.icon}
+      className="side-nav-root-link"
+    >
+      {link.label}
+    </SideNavLink>
+  );
 
   const renderRailSection = (section: MenuSection) => (
     <SideNavLink
@@ -67,37 +87,28 @@ export const LayoutSideNav: FC = () => {
     </SideNavLink>
   );
 
-  // SideNavMenuItem has no renderIcon, so the icon is a child and the row is
-  // laid out in LayoutSideNav.css.
-  const renderItem = (route: MenuLeaf) => {
-    const Icon = route.icon;
-    return (
-      <SideNavMenuItem
-        data-testid={`side-nav-link-${route.id}`}
-        key={route.id}
-        as={Link}
-        to={route.path}
-        isActive={route.path === location.pathname}
-      >
-        <span className="side-nav-item">
-          {Icon ? (
-            <span className="side-nav-item__icon" aria-hidden="true">
-              <Icon />
-            </span>
-          ) : null}
-          <span className="side-nav-item__label" title={route.label}>
-            {route.label}
-          </span>
-        </span>
-      </SideNavMenuItem>
-    );
-  };
+  // Destinations inside a section are labels only; the section heading
+  // carries the icon. The label is wrapped so LayoutSideNav.css can ellipsize it.
+  const renderItem = (route: MenuLeaf) => (
+    <SideNavMenuItem
+      data-testid={`side-nav-link-${route.id}`}
+      key={route.id}
+      as={Link}
+      to={route.path}
+      isActive={route.path === location.pathname}
+    >
+      <span className="side-nav-item__label" title={route.label}>
+        {route.label}
+      </span>
+    </SideNavMenuItem>
+  );
 
   const renderSection = (section: MenuSection) => (
     <SideNavMenu
       key={section.id}
       data-testid={`side-nav-menu-${section.id}`}
       title={section.label}
+      renderIcon={section.icon}
       defaultExpanded={section.id === activeSectionId}
       className={`side-nav-section side-nav-section--${section.id}`}
     >
@@ -114,6 +125,7 @@ export const LayoutSideNav: FC = () => {
       aria-label="Main navigation"
     >
       <SideNavItems>
+        {rootLinks.map(renderRootLink)}
         {isSideNavExpanded ? sections.map(renderSection) : sections.map(renderRailSection)}
         {/* Support — pinned to the bottom of the nav. A plain mailto: that
             opens the user's own mail client with the HBS help mailbox. */}

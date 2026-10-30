@@ -27,9 +27,10 @@ import type { ScreenArea, ScreenDef } from '@/screens/types';
 
 import { can, type Capability } from './access';
 
-// The nav model is nr-fta's: bold section headings, each holding destinations
-// that carry their own icon; the collapsed rail shows one icon per section.
-// HBS's sections are the legacy top tab bar (one per area).
+// The nav model: root links (Home) and bold section headings, each with an
+// icon, the sections holding their destinations as plain labels. The
+// collapsed rail shows one icon per root link and section. HBS's sections are
+// the legacy top tab bar (one per area).
 
 /** A Carbon icon component (sized by the caller; 16px by default). */
 export type NavIcon = ComponentType<{ size?: number }>;
@@ -39,6 +40,7 @@ export type MenuLeaf = {
   id: string;
   label: string;
   path: string;
+  /** Shown on root links and on the area landing-page tiles, not inside nav sections. */
   icon?: NavIcon;
   capability?: Capability;
 };
@@ -48,8 +50,9 @@ export type MenuSection = {
   id: string;
   label: string;
   /**
-   * Shown in the collapsed rail, which lists the sections rather than every
-   * destination — clicking one opens the nav on that section.
+   * Shown beside the heading, and alone in the collapsed rail, which lists the
+   * sections rather than every destination — clicking one opens the nav on
+   * that section.
    */
   icon: NavIcon;
   items: MenuLeaf[];
@@ -132,25 +135,28 @@ const EXTRA_LEAVES: Partial<Record<ScreenArea, MenuLeaf[]>> = {
   ],
 };
 
-/** The section for HBS's own pages: the work-queue dashboard. */
-const GENERAL: MenuSection = {
-  id: 'general',
-  label: 'General',
-  icon: Home,
-  items: [
-    { id: 'Home', label: 'Home', path: '/home', icon: Home, capability: 'ANY_USER' },
-  ],
-};
+/** Links at the top level of the nav, above the sections: the work-queue dashboard. */
+const ROOT_LINKS: MenuLeaf[] = [
+  { id: 'Home', label: 'Home', path: '/home', icon: Home, capability: 'ANY_USER' },
+];
+
+const visibleTo = (user: FamLoginUser | null | undefined) => (l: MenuLeaf) =>
+  !l.capability || can(user, l.capability);
+
+/** The root links visible to the user. */
+export function getRootLinks(user: FamLoginUser | null | undefined): MenuLeaf[] {
+  return ROOT_LINKS.filter(visibleTo(user));
+}
 
 /**
- * The nav sections visible to the user: General, then one per legacy tab
- * (populated from the screen registry). An entry is shown only when the user
- * may open its screen — the same `can()` check the screen applies, so the menu
- * never offers a page that answers Forbidden. A section left empty is dropped.
+ * The nav sections visible to the user: one per legacy tab (populated from the
+ * screen registry). An entry is shown only when the user may open its screen —
+ * the same `can()` check the screen applies, so the menu never offers a page
+ * that answers Forbidden. A section left empty is dropped.
  */
 export function getMenuSections(user: FamLoginUser | null | undefined): MenuSection[] {
-  const visible = (l: MenuLeaf) => !l.capability || can(user, l.capability);
-  const sections: MenuSection[] = [{ ...GENERAL, items: GENERAL.items.filter(visible) }];
+  const visible = visibleTo(user);
+  const sections: MenuSection[] = [];
   for (const area of AREAS) {
     if (!can(user, area.capability)) continue;
     sections.push({

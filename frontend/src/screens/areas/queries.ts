@@ -93,6 +93,8 @@ const SCALING_GROUPS: Option[] = [
 ];
 
 const CLIENT_GROUP = 'Client Association';
+/** The P401 associations that take a client (all but "All"). */
+const CLIENT_ASSOCIATIONS = ['MARK HOLDER', 'SITE OWNER', 'STRATUM OWNER'];
 
 const CLIENT_ASSOCIATION_FIELDS: FieldDef[] = [
   { name: 'clientNumber', label: 'Both - Client Number', type: 'client', group: CLIENT_GROUP },
@@ -117,8 +119,15 @@ const ISSUED_DOC_COLUMNS: ColumnDef[] = [
   { key: 'totalVolume', header: 'Total Volume', format: 'volume' },
   { key: 'totalValue', header: 'Total Value', format: 'money' },
   { key: 'netWeight', header: 'Total Weight', format: 'number' },
-  { key: 'documentUrl', header: 'PDF', format: 'download' },
-  { key: 'documentXmlUrl', header: 'XML', format: 'download' },
+  {
+    key: 'actions',
+    header: 'Actions',
+    format: 'download',
+    downloads: [
+      { key: 'documentUrl', label: 'PDF' },
+      { key: 'documentXmlUrl', label: 'XML' },
+    ],
+  },
 ];
 
 /** SDN column → the summary return (legacy summaryScaleReturnSearch.do?…&actionType=View+Return+Summary). */
@@ -292,14 +301,12 @@ export const screens: ScreenDef[] = [
     area: 'queries',
     title: 'Mark Monthly Billing History',
     navLabel: 'Billing History (By Date of Invoice)',
-    description:
-      'In addition to the Month Billed Interval, please specify one or more of the following: Region/District Harvested, Mark Holder, File Type, Management Unit Type, Forest File ID, or Timber Mark.',
     capability: 'QUERIES_VIEW',
     query: 'harvestHistory.billing',
     xmlExport: true,
     criteria: [
-      { name: 'billingFrom', label: 'Month Billed Interval (up to 12 months) - From', type: 'date', required: true, group: 'Month Billed Interval' },
-      { name: 'billingTo', label: 'To', type: 'date', required: true, group: 'Month Billed Interval' },
+      { name: 'billingFrom', label: 'From', type: 'date', required: true, group: 'Month Billed Interval' },
+      { name: 'billingTo', label: 'To', labelSuffix: '(up to 12 months)', type: 'date', required: true, group: 'Month Billed Interval' },
       ...HISTORY_SELECTION_FIELDS,
       ...HISTORY_FILTER_FIELDS,
       ...historyReportConfig(BILLING_GROUPS),
@@ -327,14 +334,12 @@ export const screens: ScreenDef[] = [
     area: 'queries',
     title: 'Mark Monthly Scaling History',
     navLabel: 'Scaling History (By Date of Scale)',
-    description:
-      'In addition to the Month Scaled Interval, please specify one or more of the following: Region/District Harvested, Mark Holder, File Type, Management Unit Type, Forest File ID, Timber Mark, Region/District Scaled, or Scale Site.',
     capability: 'QUERIES_VIEW',
     query: 'harvestHistory.scaling',
     xmlExport: true,
     criteria: [
-      { name: 'scalingFrom', label: 'Month Scaled Interval (up to 12 months) - From', type: 'date', required: true, group: 'Month Scaled Interval' },
-      { name: 'scalingTo', label: 'To', type: 'date', required: true, group: 'Month Scaled Interval' },
+      { name: 'scalingFrom', label: 'From', type: 'date', required: true, group: 'Month Scaled Interval' },
+      { name: 'scalingTo', label: 'To', labelSuffix: '(up to 12 months)', type: 'date', required: true, group: 'Month Scaled Interval' },
       ...HISTORY_SELECTION_FIELDS,
       { name: 'regionScaled', label: 'Region/District Scaled', codeList: 'codes.orgUnits', group: 'Selection' },
       { name: 'scaleSite', label: 'Scale Site', upper: true, maxLength: 4, group: 'Selection' },
@@ -439,7 +444,7 @@ export const screens: ScreenDef[] = [
     reports: ISSUED_DOC_REPORTS,
   },
 
-  // P452 / P453 — Transmissions of Issued Statements (Home: ?recent=Y)
+  // P452 / P453 — Transmissions of Issued Statements (Home: From = 30 days ago)
   {
     kind: 'search',
     id: 'statement-transmissions',
@@ -447,7 +452,7 @@ export const screens: ScreenDef[] = [
     area: 'queries',
     title: 'Search for Transmissions of Issued Statements',
     navLabel: 'Transmission Records for Invoices and Statements',
-    description: 'Transmissions Between the From Date and To Date, or the last 30 days.',
+    description: 'Transmissions created between the From Date and To Date.',
     capability: 'QUERIES_VIEW',
     query: 'statementTransmissions.search',
     criteria: [
@@ -464,7 +469,6 @@ export const screens: ScreenDef[] = [
         helperText: 'Associated: the locations you receive documents for',
       },
       { name: 'clientLocation', label: 'Client Location', maxLength: 2, helperText: 'Blank for All Locations' },
-      { name: 'recent', label: 'Recently Issued (last 30 days)', type: 'checkbox', align: 'center' },
       { name: 'fromDate', label: 'From Date', type: 'date', group: 'Transmissions Between ...' },
       { name: 'toDate', label: 'To Date', type: 'date', group: 'Transmissions Between ...' },
       {
@@ -478,7 +482,7 @@ export const screens: ScreenDef[] = [
         helperText: 'Blank for Both',
       },
     ],
-    requireOneOf: ['fromDate', 'recent'],
+    requireOneOf: ['fromDate'],
     columns: [
       { key: 'clientLocnCode', header: 'Location', sortable: true },
       { key: 'clientLocnName', header: 'Name' },
@@ -663,8 +667,23 @@ export const screens: ScreenDef[] = [
         span: 4,
         group: CLIENT_GROUP,
       },
-      { name: 'clientNumber', label: 'Client Number', type: 'client', group: CLIENT_GROUP },
-      { name: 'clientLocation', label: 'Location', maxLength: 2, group: CLIENT_GROUP },
+      // Legacy rule (P401Action, BT 1172): a client is searched only through an
+      // association, so the client fields wait for one.
+      {
+        name: 'clientNumber',
+        label: 'Client Number',
+        type: 'client',
+        group: CLIENT_GROUP,
+        enabledWhen: { field: 'clientAssociation', values: CLIENT_ASSOCIATIONS },
+        helperText: 'Choose a Client Association other than All first',
+      },
+      {
+        name: 'clientLocation',
+        label: 'Location',
+        maxLength: 2,
+        group: CLIENT_GROUP,
+        enabledWhen: { field: 'clientAssociation', values: CLIENT_ASSOCIATIONS },
+      },
     ],
     columns: [
       { key: 'districtScaledCode', header: 'District', sortable: true },
@@ -836,6 +855,7 @@ export const screens: ScreenDef[] = [
     area: 'queries',
     title: 'Timber Mark Query',
     nav: false,
+    tombstone: false,
     capability: 'QUERIES_VIEW',
     query: 'timberMarks.detail',
     keys: ['timberMark'],

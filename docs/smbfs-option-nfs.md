@@ -29,7 +29,7 @@ flowchart LR
     SMB1["SMB 2/3 shares<br/>(unchanged)"]
     AM["AutoMate + batch"]
   end
-  SFTP["Vendor SFTP"] --> SMB1
+  XFER["Vendor file transfer<br/>(FTP or SFTP, unconfirmed)"] --> SMB1
   M1 -- "NFS v3 or v4.1<br/>only the Solaris host may connect" --> NFS1 --> DATA
   SMB1 --> DATA
   AM -- "local / UNC" --> DATA
@@ -38,7 +38,7 @@ flowchart LR
 
 What stays the same:
 - the data and where it lives;
-- the SMB 2/3 shares, the per-client `<CLIENT_NUMBER>$` shares and SFTP;
+- the SMB 2/3 shares, the per-client `<CLIENT_NUMBER>$` shares and the vendor file-transfer service;
 - the batch configuration and AutoMate;
 - Windows backups;
 - `HBSConfiguration.properties` on Solaris.

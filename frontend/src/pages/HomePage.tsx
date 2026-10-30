@@ -29,6 +29,8 @@ interface HomeLink {
   label: string;
   screen: string;
   params?: Record<string, string>;
+  /** A date param set to this many days before today when the link is drawn (a rolling "recent" window). */
+  daysAgo?: { param: string; days: number };
   /** Extra role guard for this single link (legacy nested rolePresent). */
   roles?: ROLE_TYPE[];
 }
@@ -247,7 +249,13 @@ const BLOCKS: HomeBlock[] = [
     rows: [
       {
         label: 'Transmissions',
-        links: [{ label: 'Recent Transmissions of Issued Statements', screen: 'statement-transmissions', params: { recent: 'Y' } }],
+        links: [
+          {
+            label: 'Recent Transmissions of Issued Statements',
+            screen: 'statement-transmissions',
+            daysAgo: { param: 'fromDate', days: WORKBENCH_DATE_RANGE_DAYS },
+          },
+        ],
       },
     ],
   },
@@ -266,10 +274,19 @@ const BLOCKS: HomeBlock[] = [
 const hasAny = (userRoles: readonly string[], roles?: readonly string[]) =>
   !roles || roles.some((r) => userRoles.includes(r));
 
+/** Local yyyy-mm-dd `days` before today (toISOString would shift the day for Pacific users). */
+const localDaysAgo = (days: number): string => {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 const HomeLinkView: FC<{ link: HomeLink }> = ({ link }) => {
   const target = SCREENS_BY_ID.get(link.screen);
   if (!target) return <span className="home-queue__link--missing">{link.label}</span>;
-  const qs = new URLSearchParams(link.params ?? {}).toString();
+  const params = new URLSearchParams(link.params ?? {});
+  if (link.daysAgo) params.set(link.daysAgo.param, localDaysAgo(link.daysAgo.days));
+  const qs = params.toString();
   return (
     <Link to={`${screenPath(target)}${qs ? `?${qs}` : ''}`} state={originState(HOME_ORIGIN)}>
       {link.label}

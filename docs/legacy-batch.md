@@ -60,7 +60,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  V["Scale-site software / vendor"] -->|"SFTP"| IN[/"ftp.root.dir/&lt;client&gt;/HBS/inbound"/]
+  V["Scale-site software / vendor"] -->|"FTP or client share<br/>(protocol unconfirmed)"| IN[/"ftp.root.dir/&lt;client&gt;/HBS/inbound"/]
   W["Web upload P505"] -->|"validated on receipt"| XI
 
   IN --> B1011["<b>B1011</b> receive + XSD validate<br/>HBS_B0004.BAT"]
@@ -95,6 +95,14 @@ flowchart TD
   IN & OUT -.-> B9001["<b>B9001</b> purge FTP files (&gt;31 d)"]
   PR -.-> B9003["<b>B9003</b> purge print dirs (&gt;7 d)"]
 ```
+
+How files reach `inbound` is not in the legacy code: the batch only reads and
+writes folders. The folder and config names say FTP (`FTPfiles`, `ftp.root.dir`,
+"files received through ftp" in `hbs_batch.0x.properties`), and
+`documentation/file_shares.txt` also lists per-client Windows shares
+(`\\HBS.SHARE\FTPfiles\<CLIENT_NUMBER>\` as `<CLIENT_NUMBER>$`). Whether the
+transfer service is FTP or SFTP, and who maps the shares directly, is to be
+confirmed with Infra ([smbfs-removal.md](smbfs-removal.md) question 4).
 
 ### Status codes along the way
 

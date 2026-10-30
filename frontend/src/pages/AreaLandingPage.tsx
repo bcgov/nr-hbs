@@ -19,7 +19,7 @@ import './HomePage.scss';
  * A legacy tab landing page (P400 Queries Menu, P002 Scale Return Menu, P850,
  * P199, P800, P900 …), laid out as nr-fta's landing pages: the area's
  * screens the user may open, as quick-link tiles in one section — the same
- * destinations, icons and order as the area's section of the side nav.
+ * destinations and order as the area's section of the side nav.
  */
 const AreaLandingPage: FC = () => {
   const { area } = useParams();

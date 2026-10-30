@@ -3,6 +3,7 @@ import { Download } from '@carbon/icons-react';
 import { useState, type FC } from 'react';
 
 import { useNotification } from '@/context/notification/useNotification';
+import type { ColumnDef } from '@/screens/types';
 import { triggerBrowserDownload } from '@/utils/download';
 
 import { useScreenApi } from './screenApi';
@@ -35,6 +36,20 @@ export const DownloadCell: FC<{ url: unknown; label?: string }> = ({ url, label 
     <Button kind="ghost" size="sm" renderIcon={Download} disabled={busy} onClick={onClick}>
       {label ?? ext}
     </Button>
+  );
+};
+
+/** A 'download' column's cell: one button, or one per file of a multi-file ("Actions") column. */
+export const DownloadColumnCell: FC<{ column: ColumnDef; row: Record<string, unknown> }> = ({ column, row }) => {
+  if (!column.downloads) return <DownloadCell url={row[column.key]} />;
+  const files = column.downloads.filter((d) => typeof row[d.key] === 'string' && row[d.key]);
+  if (files.length === 0) return <>—</>;
+  return (
+    <span className="hbs-download-actions">
+      {files.map((d) => (
+        <DownloadCell key={d.key} url={row[d.key]} label={d.label} />
+      ))}
+    </span>
   );
 };
 

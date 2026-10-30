@@ -208,7 +208,7 @@ class QueriesCriteriaGuardTest {
         "Scale From Date must be on or after 2019-Jan-01", "This report grouping is not available for Piece Scale.");
     assertThat(messages("scaleSiteSummary.search", "returnType", "P", "groupBy", "DISTRICTSCALESITE",
         "scaleDateFrom", "2026-01-01", "scaleDateTo", "2026-02-01", "clientAssociation", "ALL",
-        "clientNumber", "00001234")).containsExactly("Association Required.");
+        "clientNumber", "00001234")).containsExactly(QueriesMessages.ASSOCIATION_REQUIRED);
     assertThat(messages("scaleSiteSummary.search", "scaleDateFrom", "2026-01-01", "scaleDateTo", "2026-02-01"))
         .containsExactly("A report grouping must be specified.", "A return type is required.");
     assertThat(messages("scaleSiteSummary.search", "returnType", "W", "groupBy", "SCALESITETIMBERMARK",

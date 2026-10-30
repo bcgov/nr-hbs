@@ -62,7 +62,7 @@
 .fsp-search__form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
 }
 
 // ── Field grid ──
@@ -87,16 +87,21 @@
 
 // Section heading inside the criteria grid (e.g. "Date ranges"). Spans the full
 // width so it sits on its own row and pushes the fields below it to a fresh
-// one. Negative margins on both sides tighten the 1rem row gaps so the heading
-// sits snug against the fields it introduces.
+// one. It sits snug against the fields it introduces (as nr-fsp-new's: -0.5rem
+// below) and well clear of the section before it (1.75rem with the row gap), so
+// each fieldset reads as its own section. The first heading needs no extra top.
 .fsp-search__field-grid .fsp-search__group-heading {
   grid-column: 1 / -1;
-  margin: -0.25rem 0;
+  margin: 0.75rem 0 -0.5rem;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.125rem;
   letter-spacing: 0.16px;
   color: var(--cds-text-secondary);
+}
+
+.fsp-search__field-grid .fsp-search__group-heading:first-child {
+  margin-block-start: 0;
 }
 
 // A cell that spans the whole grid — the sort-by radio row, and anywhere else a

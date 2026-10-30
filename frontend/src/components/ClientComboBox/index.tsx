@@ -1,5 +1,5 @@
 import { ComboBox } from '@carbon/react';
-import { useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC, type ReactNode } from 'react';
 
 import { getClientLocations, searchClientsAuto, type ClientSearchResult } from '@/services/clientSearch';
 
@@ -34,7 +34,7 @@ interface ClientComboBoxProps {
    * location fills it, as the legacy lookup filled both fields.
    */
   onLocationPick?: (locationCode: string) => void;
-  titleText: string;
+  titleText: ReactNode;
   helperText?: string;
   placeholder?: string;
   invalid?: boolean;
