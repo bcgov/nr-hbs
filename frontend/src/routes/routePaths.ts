@@ -45,6 +45,9 @@ export type MenuLeaf = {
   capability?: Capability;
 };
 
+/** A whole nav: root links above the sections. */
+export type Menu = { rootLinks: MenuLeaf[]; sections: MenuSection[] };
+
 /** A heading with its destinations. */
 export type MenuSection = {
   id: string;
@@ -178,11 +181,7 @@ export function getMenuSections(user: FamLoginUser | null | undefined): MenuSect
  * The id of the section the current page belongs to: the one listing `path`,
  * else — for a record or form opened from a list — the area its URL sits under.
  */
-export function sectionIdForPath(
-  user: FamLoginUser | null | undefined,
-  path: string,
-): string | undefined {
-  const sections = getMenuSections(user);
+export function sectionIdIn(sections: MenuSection[], path: string): string | undefined {
   const exact = sections.find((s) => s.items.some((i) => i.path === path));
   if (exact) return exact.id;
   const area = path.split('/')[1];

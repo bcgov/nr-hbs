@@ -8,7 +8,8 @@ import { useScopedUser } from '@/context/org/useOrg';
 import {
   getMenuSections,
   getRootLinks,
-  sectionIdForPath,
+  sectionIdIn,
+  type Menu,
   type MenuLeaf,
   type MenuSection,
 } from '@/routes/routePaths';
@@ -34,18 +35,21 @@ const SUPPORT_EMAIL = 'FORHVAP.HBSHELP@gov.bc.ca';
  * The open section is driven from the current route via
  * {@code defaultExpanded} (Carbon's SideNavMenu only reacts to the nav
  * collapsing when its context reports {@code isRail}, which this nav is not).
+ *
+ * {@code menu} replaces the signed-in user's menu — the public area passes
+ * its own (pages/public/publicMenu.ts) and gets the same nav.
  */
-export const LayoutSideNav: FC = () => {
+export const LayoutSideNav: FC<{ menu?: Menu }> = ({ menu }) => {
   const { isSideNavExpanded, openSideNav } = useLayout();
   const location = useLocation();
   const user = useScopedUser();
-  const rootLinks = getRootLinks(user);
-  const sections = getMenuSections(user);
+  const rootLinks = menu?.rootLinks ?? getRootLinks(user);
+  const sections = menu?.sections ?? getMenuSections(user);
 
   // The section the user opened from the rail, if any. It takes precedence
   // over the route's own section so the nav expands showing what was clicked.
   const [railSectionId, setRailSectionId] = useState<string | undefined>(undefined);
-  const routeSectionId = sectionIdForPath(user, location.pathname);
+  const routeSectionId = sectionIdIn(sections, location.pathname);
   const activeSectionId = railSectionId ?? routeSectionId;
 
   // Once the nav is closed again, forget the rail choice so reopening follows

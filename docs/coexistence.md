@@ -58,7 +58,8 @@ flowchart LR
 2. `statement.delivery.webapp.url` (batch `hbs_batch.02.properties`, token
    `b_statement_url`) → the new app's base URL.
 3. Invoice information link in the same e-mail: `cfg_b_general_info`
-   (property `invoice_general_info`) → `<new app base URL>/invoice-information`.
+   (property `invoice_general_info`) → `<new app base URL>/public/invoice-information`
+   (the old `/invoice-information` also works: it redirects there).
 4. Reference cache off: `cfg_p_cache_enabled=false` (EAR `configure.properties`),
    or schedule a nightly WebLogic restart.
 5. Schedule the share bridge (below) in AutoMate.

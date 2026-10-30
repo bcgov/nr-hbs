@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import SectionTile from '@/components/SectionTile';
-import { useTheme } from '@/context/theme/useTheme';
 import PageLayout from '@/pages/PageLayout';
 
 /**
@@ -11,8 +10,9 @@ import PageLayout from '@/pages/PageLayout';
  * legacy page `hbs-web/src/main/webapp/hbs/opq/cis/invoiceGeneralInformation.html`;
  * public, like the legacy page: it is reachable without signing in.
  *
- * URL to configure in the legacy batch (`cfg_b_general_info`):
- * `<new app base URL>/invoice-information`.
+ * Served in the public area at `/public/invoice-information` (the old
+ * `/invoice-information` redirects there). URL to configure in the legacy
+ * batch (`cfg_b_general_info`): `<new app base URL>/public/invoice-information`.
  */
 
 type Code = [code: string, description: string];
@@ -125,20 +125,6 @@ const Content: FC = () => (
   </PageLayout>
 );
 
-/**
- * @param standalone render without the signed-in shell (anonymous visitors,
- *   users without an HBS role, the organization gate) — just the BC logo above.
- */
-const InvoiceInformationPage: FC<{ standalone?: boolean }> = ({ standalone }) => {
-  const { theme } = useTheme();
-  if (!standalone) return <Content />;
-  const logoSrc = theme === 'g100' ? '/bc-gov-logo-rev.png' : '/bc-gov-logo.png';
-  return (
-    <div style={{ padding: '2rem', maxWidth: '72rem', margin: '0 auto' }}>
-      <img src={logoSrc} alt="BC Government" width={160} style={{ marginBottom: '1.5rem' }} />
-      <Content />
-    </div>
-  );
-};
+const InvoiceInformationPage: FC = () => <Content />;
 
 export default InvoiceInformationPage;

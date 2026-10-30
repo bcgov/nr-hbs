@@ -31,13 +31,13 @@ export const pageHeading = (page: Page): Locator => page.getByRole('heading', { 
 export async function runScreen(page: Page, area: string, screenId: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString();
   await gotoProtected(page, `/${area}/${screenId}${qs ? `?${qs}` : ''}`);
-  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 60_000 });
+  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 20_000 });
 }
 
 /** Open a registry screen without running a search. */
 export async function openScreen(page: Page, area: string, screenId: string) {
   await gotoProtected(page, `/${area}/${screenId}`);
-  await expect(pageHeading(page)).toBeVisible({ timeout: 30_000 });
+  await expect(pageHeading(page)).toBeVisible({ timeout: 15_000 });
 }
 
 /** A field's label text, whitespace collapsed ("To * (up to 12 months)"). */
@@ -71,7 +71,7 @@ export const localDate = (daysAgo = 0): string => {
  * failure message. Soft assertions, so a crawl reports every broken page.
  */
 export async function expectHealthyPage(page: Page, label: string): Promise<void> {
-  await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => undefined);
+  await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => undefined);
   await expect.soft(page.getByTestId('forbidden-title'), `${label}: Forbidden page`).toHaveCount(0);
   await expect
     .soft(page.getByText('Couldn’t load data'), `${label}: "Couldn’t load data"`)

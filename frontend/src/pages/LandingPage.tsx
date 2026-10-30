@@ -85,14 +85,7 @@ const LandingPage: FC = () => {
               </div>
 
               <div className="landing-request-access">
-                {/* Legacy public menu (mainmenu_public.jsp): the public queries
-                    need no login; "Register" became "How to get access". */}
-                <Link to="/public" className="landing-request-access__link" data-testid="landing-public-link">
-                  Public queries — no login required
-                </Link>
-                <p className="landing-request-access__note">
-                  Harvest reports, invoice and statement copies, timber mark information and sampling plans
-                </p>
+                {/* Legacy "Register" (mainmenu_public.jsp), now "How to get access". */}
                 <Link to="/public/access" className="landing-request-access__link">
                   Request access to HBS
                 </Link>

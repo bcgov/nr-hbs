@@ -29,14 +29,15 @@ const AREAS = [
 
 for (const area of AREAS) {
   test(`every ${area} screen opens cleanly`, async ({ page }) => {
-    test.setTimeout(10 * 60_000);
+    // Several screens per test; the slowest area took ~15s against TEST.
+    test.setTimeout(3 * 60_000);
 
     await gotoProtected(page, `/${area}`);
     if (await page.getByTestId('forbidden-title').isVisible().catch(() => false)) {
       test.skip(true, `The E2E account has no access to ${area}`);
     }
     const tiles = page.locator('.welcome__tile');
-    await expect(pageHeading(page)).toBeVisible({ timeout: 30_000 });
+    await expect(pageHeading(page)).toBeVisible({ timeout: 15_000 });
     const labels = (await tiles.locator('.welcome__tile-label').allInnerTexts()).map((l) => l.trim());
     test.info().annotations.push({ type: 'screens', description: `${labels.length} in ${area}` });
     if (labels.length === 0) test.skip(true, `No ${area} screens for the E2E account`);
@@ -45,8 +46,8 @@ for (const area of AREAS) {
       await test.step(label, async () => {
         await gotoProtected(page, `/${area}`);
         await page.locator('.welcome__tile').nth(i).click();
-        await page.waitForURL((url) => url.pathname !== `/${area}`, { timeout: 30_000 });
-        await expect.soft(pageHeading(page), `${label}: heading`).toBeVisible({ timeout: 30_000 });
+        await page.waitForURL((url) => url.pathname !== `/${area}`, { timeout: 15_000 });
+        await expect.soft(pageHeading(page), `${label}: heading`).toBeVisible({ timeout: 15_000 });
         await expectHealthyPage(page, `${label} (${new URL(page.url()).pathname})`);
       });
     }

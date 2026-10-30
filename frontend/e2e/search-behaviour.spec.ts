@@ -116,6 +116,6 @@ test.describe('Transmissions of Issued Statements', () => {
     await link.click();
     await expect(page).toHaveURL(new RegExp(`/queries/statement-transmissions\\?fromDate=${localDate(30)}`));
     await expect(page.locator('#statement-transmissions-fromDate')).toHaveValue(localDate(30));
-    await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 60_000 });
+    await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 20_000 });
   });
 });
