@@ -15,12 +15,11 @@ import { baseURL, STORAGE_STATE } from './e2e/utils';
  * Override the target with E2E_BASE_URL (e.g. http://localhost:3000 for local).
  */
 export default defineConfig({
-  // 60s is a generous ceiling for a single test against the shared, slower
-  // TEST/preview infra — the proc-heavy flows still finish well under it.
-  // Keeping it tight bounds the blast radius of any hang: with retries: 2 a
-  // stuck test now costs ~3 min instead of ~9, and fails legibly rather than
-  // masquerading as "slow CI".
-  timeout: 60_000,
+  // Tests finish in seconds against TEST (the whole suite runs in ~1.5 min),
+  // so 30s is still generous and keeps a hang cheap: with one CI retry a stuck
+  // test costs ~1 min, not ~3. Waits inside the helpers are capped below it.
+  // The screen crawl and the PDF download set their own longer budgets.
+  timeout: 30_000,
   testDir: './e2e',
   // Serial execution. We share one SSO refresh token via storageState
   // across runs; parallel workers race that refresh and intermittently leave
@@ -28,7 +27,7 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   reporter: [['line'], ['list', { printSteps: true }], ['html', { open: 'never' }]],
   use: {
     baseURL,

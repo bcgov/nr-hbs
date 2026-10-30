@@ -36,6 +36,6 @@ export const PAGES = {
 export async function gotoPage(page: Page, def: PageDef): Promise<void> {
   await gotoProtected(page, def.path);
   await expect(page.getByRole('heading', { name: def.heading, level: 1 })).toBeVisible({
-    timeout: 30_000,
+    timeout: 15_000,
   });
 }

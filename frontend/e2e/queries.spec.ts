@@ -51,7 +51,7 @@ test.describe.serial('issued documents → download → timber mark', () => {
   });
 
   test('a statement PDF downloads', async ({ page }) => {
-    test.setTimeout(2 * 60_000);
+    test.setTimeout(60_000);
     await runScreen(page, 'queries', 'issued-documents', {
       issueDateFrom: localDate(30),
       issueDateTo: localDate(0),
@@ -60,7 +60,7 @@ test.describe.serial('issued documents → download → timber mark', () => {
 
     const actions = resultRows(page).first().locator('td').nth(await columnIndex(page, 'Actions'));
     const [download] = await Promise.all([
-      page.waitForEvent('download', { timeout: 90_000 }),
+      page.waitForEvent('download', { timeout: 45_000 }),
       actions.getByRole('button', { name: 'PDF' }).click(),
     ]);
     expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
@@ -76,7 +76,7 @@ test.describe.serial('issued documents → download → timber mark', () => {
 
     await expect(page).toHaveURL(/\/queries\/timber-mark\?/);
     await expect(pageHeading(page)).toHaveText('Timber Mark Query');
-    await expect(page.getByText('Timber Mark Information')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('Timber Mark Information')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByLabel('Timber Mark Query summary')).toHaveCount(0);
     await expectHealthyPage(page, 'timber mark record');
   });

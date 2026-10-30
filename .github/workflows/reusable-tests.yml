@@ -50,9 +50,8 @@ jobs:
       run:
         working-directory: frontend
     runs-on: ubuntu-24.04
-    # The screen crawl (e2e/screens.crawl.spec.ts) opens every screen; 15 was
-    # too tight once it was added.
-    timeout-minutes: 30
+    # Install (~3 min) + the suite (~1.5 min) + one retry pass leaves plenty of room.
+    timeout-minutes: 15
     permissions:
       contents: read
     strategy:

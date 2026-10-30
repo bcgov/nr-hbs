@@ -23,7 +23,7 @@ const PUBLIC_SCREENS = [
 
 test('the public home lists the public reports and offers a login', async ({ page }) => {
   await page.goto('/public');
-  await expect(page.getByTestId('hbs-public__header')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('hbs-public__header')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('heading', { level: 1, name: 'Harvest Billing System' })).toBeVisible();
   await expect(page.getByTestId('hbs-public__login')).toBeVisible();
   for (const section of ['Harvest Reports', 'Invoice Copies', 'Stratum Advisor']) {
@@ -34,7 +34,7 @@ test('the public home lists the public reports and offers a login', async ({ pag
 for (const id of PUBLIC_SCREENS) {
   test(`public screen opens: ${id}`, async ({ page }) => {
     await page.goto(`/public/${id}`);
-    await expect(page.getByTestId('hbs-public__header')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId('hbs-public__header')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByTestId('forbidden-title')).toHaveCount(0);
     await expect(page.getByText('Couldn’t load data')).toHaveCount(0);
@@ -45,7 +45,7 @@ test('a public issued-documents search runs, with no report buttons', async ({ p
   await page.goto(
     `/public/issued-documents?issueDateFrom=${localDate(30)}&issueDateTo=${localDate(0)}`,
   );
-  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 60_000 });
+  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 20_000 });
   await expect(toast(page, 'error')).toHaveCount(0);
   // Reports are logged-in only (they can carry personal information).
   await expect(page.getByRole('button', { name: /^Print/ })).toHaveCount(0);
@@ -54,15 +54,50 @@ test('a public issued-documents search runs, with no report buttons', async ({ p
 test('the "How to get access" page renders', async ({ page }) => {
   await page.goto('/public/access');
   await expect(page.getByRole('heading', { level: 1, name: 'How to get access' })).toBeVisible({
-    timeout: 30_000,
+    timeout: 15_000,
   });
 });
 
-test('a protected page shows the login landing to a visitor', async ({ page }) => {
+test('a protected page shows the login landing to a visitor, with no public-queries link', async ({ page }) => {
   await page.goto('/queries/billing-history');
-  await expect(page.getByTestId('landing-title')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('landing-title')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByTestId('landing-button__idir')).toBeVisible();
-  await expect(page.getByTestId('landing-public-link')).toBeVisible();
+  await expect(page.getByTestId('landing-public-link')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Request access to HBS' })).toHaveAttribute('href', '/public/access');
+});
+
+test('the public side nav lists the public pages, all under /public', async ({ page }) => {
+  await page.goto('/public');
+  const nav = page.getByRole('navigation', { name: 'Main navigation' });
+  await expect(nav).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId('side-nav-link-public-home')).toHaveAttribute('href', '/public');
+  for (const section of ['Harvest Reports', 'Invoices & Statements', 'Timber Marks', 'Stratum Advisor', 'Public User Services']) {
+    await expect(nav.getByRole('button', { name: section, exact: true })).toBeVisible();
+  }
+  const hrefs = await nav.locator('a[href]').evaluateAll((links) =>
+    links.map((a) => a.getAttribute('href') ?? '').filter((h) => !h.startsWith('mailto:')),
+  );
+  expect(hrefs.length).toBeGreaterThan(5);
+  for (const href of hrefs) expect(href, 'every public menu entry stays under /public').toMatch(/^\/public(\/|$)/);
+});
+
+test('a public menu entry opens its page and opens its section', async ({ page }) => {
+  await page.goto('/public');
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Harvest Reports', exact: true }).click();
+  await page.getByTestId('side-nav-link-public-billing-history').click();
+  await expect(page).toHaveURL(/\/public\/billing-history$/);
+  await expect(page.getByTestId('side-nav-link-public-billing-history')).toHaveClass(/cds--side-nav__link--current/);
+  await page.reload();
+  await expect(
+    page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Harvest Reports', exact: true }),
+  ).toHaveAttribute('aria-expanded', 'true');
+});
+
+test('invoice information lives under /public; the old address redirects', async ({ page }) => {
+  await page.goto('/invoice-information');
+  await expect(page).toHaveURL(/\/public\/invoice-information$/);
+  await expect(page.getByTestId('hbs-public__header')).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
 
 test('the API refuses a request without a token', async ({ request }) => {

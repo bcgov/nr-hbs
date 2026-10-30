@@ -52,14 +52,21 @@ const KeepLink = ({ children }: { children: ReactNode }) => {
 
 // The public (anonymous) read-only area — legacy mainmenu_public.jsp. Outside
 // every auth gate: anyone, logged in or not, with or without HBS roles, can
-// open /public/… (docs/public-access.md).
+// open /public/… (docs/public-access.md). Every public page lives here.
 const withPublicLayout = (node: ReactNode) => <PublicLayout>{node}</PublicLayout>;
 const publicRoutes = (
-  <Route path="/public">
-    <Route index element={withPublicLayout(<PublicHomePage />)} />
-    <Route path="access" element={withPublicLayout(<PublicAccessPage />)} />
-    <Route path=":screenId" element={withPublicLayout(<PublicScreenPage />)} />
-  </Route>
+  <>
+    <Route path="/public">
+      <Route index element={withPublicLayout(<PublicHomePage />)} />
+      <Route path="access" element={withPublicLayout(<PublicAccessPage />)} />
+      {/* The statement e-mails' "Explanation of Symbols" page. */}
+      <Route path="invoice-information" element={withPublicLayout(<InvoiceInformationPage />)} />
+      <Route path=":screenId" element={withPublicLayout(<PublicScreenPage />)} />
+    </Route>
+    {/* Its old address, still in statement e-mails already sent and in the
+        legacy batch setting until that is changed (docs/coexistence.md). */}
+    <Route path="/invoice-information" element={<Navigate to="/public/invoice-information" replace />} />
+  </>
 );
 
 // ── App ────────────────────────────────────────────────────
@@ -85,7 +92,6 @@ export default function App() {
         <Routes>
           {publicRoutes}
           <Route path="/authCallback" element={<AuthCallback />} />
-          <Route path="/invoice-information" element={<InvoiceInformationPage standalone />} />
           <Route path="*" element={<UnauthorizedPage />} />
         </Routes>
       ) : isLoggedIn && needsOrgSelection ? (
@@ -93,7 +99,6 @@ export default function App() {
           {publicRoutes}
           <Route path="/authCallback" element={<AuthCallback />} />
           <Route path="/org-select" element={<OrgSelectionPage />} />
-          <Route path="/invoice-information" element={<InvoiceInformationPage standalone />} />
           <Route
             path="/StatementDelivery/*"
             element={
@@ -130,8 +135,6 @@ export default function App() {
             path="/StatementDelivery/statements/:type/:file"
             element={withLayout(<StatementDeliveryPage kind="statements" />)}
           />
-          {/* Public reference page linked from the statement e-mails. */}
-          <Route path="/invoice-information" element={withLayout(<InvoiceInformationPage />)} />
           {/* P230/P231 — HBS_RATES OUT-parameter procs, not a registry query. */}
           <Route path="/rating/stumpage-rate" element={withLayout(<StumpageRatePage />)} />
           <Route path="/scale-returns/summary-return-children" element={withLayout(<SummaryReturnGridPage />)} />
@@ -152,7 +155,6 @@ export default function App() {
           {/* MUST stay above the catch-all: the session doesn't exist until
               this route exchanges the authorization code (same as nr-fta). */}
           <Route path="/authCallback" element={<AuthCallback />} />
-          <Route path="/invoice-information" element={<InvoiceInformationPage standalone />} />
           <Route
             path="/StatementDelivery/*"
             element={

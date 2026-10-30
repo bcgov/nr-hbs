@@ -1,8 +1,3 @@
-// Public (anonymous) area — no side nav, so the content starts at the left edge.
-.hbs-public .hbs-public__content {
-  margin-left: 0;
-}
-
 .hbs-public__sections {
   display: flex;
   flex-direction: column;

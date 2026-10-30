@@ -8,7 +8,7 @@ project (`auth.setup.ts`, programmatic in CI via `E2E_IDIR_USER` /
 | Spec | Kind | What it checks |
 |---|---|---|
 | `smoke.spec.ts` | unauthenticated | the deployed frontend serves `/` |
-| `public.spec.ts` | anonymous (no session) | the public home and every public search screen render; a public issued-documents search runs and offers no reports; a protected page shows the login landing; the API answers 401 without a token |
+| `public.spec.ts` | anonymous (no session) | the public home and every public search screen render; the public side nav lists every public page, all under `/public`, and opens the current page's section; `/invoice-information` redirects to `/public/invoice-information`; a public issued-documents search runs and offers no reports; a protected page shows the login landing without a public-queries link; the API answers 401 without a token |
 | `pages.smoke.spec.ts` | real | Home, every legacy-tab landing page and key registry screens render; two deep-link searches round-trip |
 | `screens.crawl.spec.ts` | real | every screen each area's landing page offers the account opens cleanly: heading shown, not Forbidden, no "Couldn't load data", no error toast. One test per area, soft assertions so a run lists every broken screen |
 | `navigation.spec.ts` | real | Home is a root link (no "General" section); icons on section headings only; only the current page is bold; the current page's section opens on load; the collapsed rail; the support mail link; unknown routes land on Home |

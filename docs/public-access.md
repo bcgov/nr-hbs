@@ -5,8 +5,13 @@ read-only area that replaces the legacy app's anonymous pages. Anyone can use
 it without logging in. Everything else in HBS still needs an IDIR or Business
 BCeID login and an HBS role ([roles-and-security.md](roles-and-security.md)).
 
-- SPA: `/public` (menu), `/public/<screen-id>`, `/public/access`. Linked from
-  the landing page and from the "Access not granted" page.
+- SPA: every public page is under `/public`: `/public` (home),
+  `/public/<screen-id>`, `/public/access` and `/public/invoice-information`
+  (the statement e-mails' "Explanation of Symbols"; the old
+  `/invoice-information` redirects there). The public layout has its own side
+  nav (`pages/public/publicMenu.ts`, rendered by the shared `LayoutSideNav`).
+  The login page links only to "How to get access" (`/public/access`), not to
+  the public queries; the "Access not granted" page links to both.
 - API: `GET /api/v1/hbs/public/**` only. No token is needed, and any token sent
   is ignored.
 
