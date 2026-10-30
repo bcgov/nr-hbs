@@ -27,14 +27,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: bcgov/actions-openshift/route-tls@ea9651011c0bf9d15aad22cf5aa2fae93c096edf # v0.3.2
+      - uses: bcgov/actions-openshift/route-tls@46f2614322f7ba1a5ad88a7e4e1b98569c80dcf7 # v0.6.0
         with:
           hostname: ${{ vars.ROUTE_HOST }}
+          route_name: ${{ github.event.repository.name }}-vanity-url
           target_service: ${{ github.event.repository.name }}-frontend-prod
           tls_certificate: ${{ secrets.TLS_CERTIFICATE }}
           tls_private_key: ${{ secrets.TLS_PRIVATE_KEY }}
           tls_ca_certificate: ${{ secrets.TLS_CA_CERTIFICATE }}
-          oc_namespace: ${{ secrets.oc_namespace }}
-          oc_server: ${{ vars.oc_server }}
-          oc_token: ${{ secrets.oc_token }}
+          oc_namespace: ${{ secrets.OC_NAMESPACE }}
+          oc_server: ${{ vars.OC_SERVER }}
+          oc_token: ${{ secrets.OC_TOKEN }}
           dry_run: ${{ inputs.dry_run }}
