@@ -6,7 +6,6 @@ import jakarta.validation.ConstraintViolation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -182,7 +181,16 @@ public class ApiError implements Serializable {
    */
   private void addValidationError(ConstraintViolation<?> cv) {
     this.addValidationError(cv.getRootBeanClass().getSimpleName(),
-            ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(), cv.getInvalidValue(), cv.getMessage());
+            leafName(cv.getPropertyPath()), cv.getInvalidValue(), cv.getMessage());
+  }
+
+  /** The last node of a violation's property path (e.g. "timberMark" of "search.criteria.timberMark"). */
+  private static String leafName(jakarta.validation.Path path) {
+    String leaf = null;
+    for (jakarta.validation.Path.Node node : path) {
+      leaf = node.getName();
+    }
+    return leaf;
   }
 
   /**

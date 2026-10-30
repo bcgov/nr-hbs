@@ -22,6 +22,21 @@ export const STORAGE_STATE = path.join(import.meta.dirname, '.auth', 'user.json'
 export const SESSION_STORAGE_STATE = path.join(import.meta.dirname, '.auth', 'session.json');
 
 /**
+ * The sessionStorage keys worth carrying between tests: oidc-client-ts's
+ * (`oidc.user:…` holds the tokens). Everything else in sessionStorage is the
+ * app's own per-tab state — each screen's last criteria and search
+ * (`hbs.screen.*`) — and carrying that over would start a test on a form a
+ * previous test (or run) filled in.
+ */
+export const isAuthKey = (key: string): boolean => key.startsWith('oidc.');
+
+/** sessionStorage as JSON, auth keys only — run in the page via `page.evaluate`. */
+export const authSessionJson = (): string =>
+  JSON.stringify(
+    Object.fromEntries(Object.entries(window.sessionStorage).filter(([key]) => key.startsWith('oidc.'))),
+  );
+
+/**
  * Unique-ish identifier suffix for test artifacts so concurrent runs and
  * leftover rows don't collide. Format: e2e-<base36 timestamp>-<rand>.
  */

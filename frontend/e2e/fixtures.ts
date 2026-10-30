@@ -2,12 +2,13 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 import { test as base } from '@playwright/test';
 
-import { SESSION_STORAGE_STATE, STORAGE_STATE } from './utils';
+import { authSessionJson, isAuthKey, SESSION_STORAGE_STATE, STORAGE_STATE } from './utils';
 
-/** The saved sessionStorage snapshot, or null when there isn't one yet. */
+/** The saved sessionStorage snapshot (auth keys only), or null when there isn't one yet. */
 const readSessionSnapshot = (): Record<string, string> | null => {
   try {
-    return JSON.parse(readFileSync(SESSION_STORAGE_STATE, 'utf-8')) as Record<string, string>;
+    const all = JSON.parse(readFileSync(SESSION_STORAGE_STATE, 'utf-8')) as Record<string, string>;
+    return Object.fromEntries(Object.entries(all).filter(([key]) => isAuthKey(key)));
   } catch {
     return null;
   }
@@ -29,7 +30,9 @@ const readSessionSnapshot = (): Record<string, string> | null => {
  *   2. **sessionStorage**, which is where oidc-client-ts keeps the tokens.
  *      Playwright does not capture it at all, so it is snapshotted by hand:
  *      injected with `addInitScript` before any page script runs, and written
- *      back after each test.
+ *      back after each test. Only the `oidc.` keys travel (see `isAuthKey`):
+ *      the app also keeps each screen's criteria there, and carrying those
+ *      over would start a test on a form an earlier test filled in.
  *
  * Safe because the suite runs serially (workers: 1) — no two contexts ever hold
  * the same refresh token concurrently. The `auth.setup` project is unaffected;
@@ -64,9 +67,7 @@ export const test = base.extend<{ persistRotatedTokens: void }>({
 
       // Both may fail if a test tore its own context down; ignore and let the
       // next test fall back to the prior snapshot.
-      const session = await page
-        .evaluate(() => JSON.stringify(window.sessionStorage))
-        .catch(() => null);
+      const session = await page.evaluate(authSessionJson).catch(() => null);
       if (session) {
         writeFileSync(SESSION_STORAGE_STATE, session);
       }

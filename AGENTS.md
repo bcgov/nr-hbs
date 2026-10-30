@@ -3,7 +3,7 @@
 Repository facts for automated coding assistants. Teams may edit or remove this file.
 
 ## Layout
-- Same architecture as the sister app nr-fsp-new: `backend/` (Spring Boot 3.5, Java 21, plain JDBC over the shared Oracle `THE` schema — no ORM, no owned schema, no Flyway), `frontend/` (Vite, React 19, Carbon, Caddy + Coraza)
+- Same architecture as the sister app nr-fsp-new: `backend/` (Spring Boot 4 on Tomcat — nr-fsp-new is still on 3.5 / Undertow — Java 21, plain JDBC over the shared Oracle `THE` schema — no ORM, no owned schema, no Flyway), `frontend/` (Vite, React 19, Carbon, Caddy + Coraza)
 - Legacy screens are declared, not hand-built: backend `backend/src/main/java/ca/bc/gov/nrs/hbs/api/catalog/*Catalog.java` + frontend `frontend/src/screens/areas/*.ts` (see `docs/screen-framework.md`)
 - OpenShift templates (not Helm): `backend/openshift.deploy.yml`, `frontend/openshift.deploy.yml`, `frontend/openshift.route.yml`
 - Workflows: `.github/workflows/` (PR deploys via `reusable-deploy.yml`, tests via `reusable-tests.yml`, PROD vanity TLS via `route-tls.yml`)

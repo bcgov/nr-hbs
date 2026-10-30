@@ -37,7 +37,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=5 \
 #
 # 60% leaves ~40% for the non-heap footprint this app actually uses:
 # Metaspace (capped at 200m below), JIT code cache, ~50 thread stacks, and
-# the direct ByteBuffers Undertow allocates for I/O. That overhead is roughly
+# Tomcat's I/O buffers. That overhead is roughly
 # fixed at ~250-300MB regardless of heap size, so at the 1Gi limit the prod
 # namespace quota allows it is a large fraction of the container — hence 60
 # rather than a more typical 70-75. Raising this risks the kernel OOM-killing

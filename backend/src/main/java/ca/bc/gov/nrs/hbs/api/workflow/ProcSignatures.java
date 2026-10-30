@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.workflow;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -71,13 +71,14 @@ public final class ProcSignatures {
   }
 
   private static ProcSignatures read() {
-    record Raw(String kind, String source, List<Param> params, boolean proposed) {}
+    // `proposed` is absent on most entries (Jackson 3 won't map a missing value to a primitive).
+    record Raw(String kind, String source, List<Param> params, Boolean proposed) {}
     try (InputStream in = new ClassPathResource(RESOURCE).getInputStream()) {
       Map<String, Raw> raw = new ObjectMapper().readValue(in, new TypeReference<>() {});
       return new ProcSignatures(raw.entrySet().stream().collect(Collectors.toUnmodifiableMap(
           Map.Entry::getKey,
           e -> new Signature(e.getKey(), e.getValue().kind(), e.getValue().source(), e.getValue().params(),
-              e.getValue().proposed()))));
+              Boolean.TRUE.equals(e.getValue().proposed())))));
     } catch (IOException ex) {
       throw new UncheckedIOException("Cannot read " + RESOURCE, ex);
     }

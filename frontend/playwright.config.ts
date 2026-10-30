@@ -22,7 +22,7 @@ export default defineConfig({
   // masquerading as "slow CI".
   timeout: 60_000,
   testDir: './e2e',
-  // Serial execution. We share one Cognito refresh token via storageState
+  // Serial execution. We share one SSO refresh token via storageState
   // across runs; parallel workers race that refresh and intermittently leave
   // some contexts stuck on the white `<Loading>` overlay.
   workers: 1,
@@ -40,7 +40,10 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
-      use: { ...devices['Desktop Chrome'] },
+      // A trace records every call's arguments, so a retried login would carry
+      // the password and TOTP code into the uploaded report. Screenshots of the
+      // Microsoft pages add nothing worth that.
+      use: { ...devices['Desktop Chrome'], trace: 'off', screenshot: 'off' },
     },
     {
       name: 'chromium',

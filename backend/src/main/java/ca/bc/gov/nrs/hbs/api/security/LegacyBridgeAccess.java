@@ -1,6 +1,5 @@
 package ca.bc.gov.nrs.hbs.api.security;
 
-import java.util.function.Supplier;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -26,8 +25,7 @@ public final class LegacyBridgeAccess {
 
   /** Authenticated, and not a service-account token. */
   public static AuthorizationManager<RequestAuthorizationContext> authenticatedPerson() {
-    return (Supplier<Authentication> authentication, RequestAuthorizationContext context) ->
-        new AuthorizationDecision(isPerson(authentication.get()));
+    return (authentication, context) -> new AuthorizationDecision(isPerson(authentication.get()));
   }
 
   static boolean isPerson(Authentication auth) {

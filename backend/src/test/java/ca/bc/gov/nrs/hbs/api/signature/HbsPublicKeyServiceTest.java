@@ -47,7 +47,7 @@ class HbsPublicKeyServiceTest {
   @Test
   void marshalsKeysWithCertificatesInLegacyFormat() throws Exception {
     KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-    gen.initialize(1024);
+    gen.initialize(2048);
     RSAPublicKey pub = (RSAPublicKey) gen.generateKeyPair().getPublic();
     Map<String, Certificate> store = Map.of("hbs2017", cert(pub));
 

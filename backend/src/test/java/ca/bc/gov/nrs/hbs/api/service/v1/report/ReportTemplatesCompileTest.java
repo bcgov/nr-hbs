@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.service.v1.report;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;

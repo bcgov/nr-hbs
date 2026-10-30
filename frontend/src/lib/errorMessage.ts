@@ -19,13 +19,13 @@ const TECHNICAL_MARKERS: readonly RegExp[] = [
   /\bSQL(?:State|Exception|Data|Syntax)?\b/i,
   /\bException\b/,
   /\bat [\w$.]+\([\w.]+:\d+\)/, // Java stack frame: at pkg.Class(File.java:12)
-  /\bat (?:ca\.bc|org\.springframework|java\.|jakarta\.|oracle\.|io\.undertow)/,
+  /\bat (?:ca\.bc|org\.springframework|java\.|jakarta\.|oracle\.|io\.undertow|org\.apache\.(?:catalina|tomcat|coyote))/,
   /value larger than specified precision/i,
   /nested exception|Caused by:/i,
   /\bBEGIN\b[\s\S]*\bEND\b/i, // PL/SQL call block
   /"(?:timestamp|status|error|path|trace)"\s*:/, // Spring default error JSON
   /server_http_/,
-  /JdbcTemplate|Undertow|Servlet|DataIntegrityViolation|DataAccess/i,
+  /JdbcTemplate|Undertow|Tomcat|Catalina|Servlet|DataIntegrityViolation|DataAccess/i,
   // Spring request-plumbing phrases — technical, never meant for a user.
   /malformed json/i,
   /json parse error/i,
