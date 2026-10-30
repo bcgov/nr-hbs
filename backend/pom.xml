@@ -10,11 +10,13 @@
   <description>Harvest Billing System API</description>
 
   <!--
-    Dependency set mirrors nr-fsp-new (the sister FSPTS app) so the two
-    backends stay on one stack: Spring Boot 3.5 / Java 21 / Undertow / plain
-    JDBC over the shared Oracle THE schema / Cognito resource server /
-    JasperReports / ShedLock-coordinated schedulers. The FSP-only spatial
-    libraries (JTS, proj4j) are intentionally not carried over.
+    Dependency set started from nr-fsp-new (the sister FSPTS app): Java 21 /
+    plain JDBC over the shared Oracle THE schema / OAuth2 resource server /
+    JasperReports / ShedLock-coordinated schedulers. HBS has since moved to
+    Spring Boot 4 on Tomcat (Boot 4 dropped Undertow); nr-fsp-new is still on
+    Boot 3.5 / Undertow. JasperReports stays on 6.x until the report templates
+    are converted to the 7.x JRXML format (Jaspersoft Studio 7). The FSP-only
+    spatial libraries (JTS, proj4j) are intentionally not carried over.
   -->
   <properties>
     <sonar.language>java</sonar.language>
@@ -24,13 +26,10 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
-    <!-- 5.x is the Spring Boot 3 / Spring 6 compatible line. -->
-    <shedlock.version>5.16.0</shedlock.version>
-    <lombok.version>1.18.30</lombok.version>
+    <!-- 7.x is the Spring Boot 4 / Spring 7 compatible line. -->
+    <shedlock.version>7.10.1</shedlock.version>
     <ojdbc.version>21.3.0.0</ojdbc.version>
-    <guava.version>33.3.1-jre</guava.version>
-    <!-- Same CVE-2026-41710 override as nr-fsp-new. -->
-    <spring-retry.version>2.0.13</spring-retry.version>
+    <guava.version>33.7.2-jre</guava.version>
     <!-- Overridable so parallel local builds don't share one target/ dir. -->
     <hbs.build.dir>${project.basedir}/target</hbs.build.dir>
   </properties>
@@ -38,32 +37,17 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.13</version>
+    <version>4.1.2</version>
   </parent>
 
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+      <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-undertow</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-core</artifactId>
-      <version>2.4.0.Beta1</version>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -79,7 +63,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-aop</artifactId>
+      <artifactId>spring-boot-starter-aspectj</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -134,7 +118,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.8.9</version>
+      <version>3.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -148,10 +132,6 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.retry</groupId>
-      <artifactId>spring-retry</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -213,8 +193,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

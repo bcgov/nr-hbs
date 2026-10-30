@@ -5,7 +5,7 @@ architecture applied to the legacy HBS Oracle data. See
 [../docs/architecture.md](../docs/architecture.md) and
 [../docs/database.md](../docs/database.md).
 
-- **Java 21**, **Spring Boot 3.5**, Undertow, JDBC (`ojdbc11`), Validation, AOP, Cache, Mail, Actuator
+- **Java 21**, **Spring Boot 4.1** (Spring Framework 7, Security 7, Jackson 3), Tomcat, JDBC (`ojdbc11`), Validation, AOP, Cache, Mail, Actuator
 - OAuth2 **resource server** (BC Gov SSO / Keycloak JWTs, `azp` checked) + method security (`@PreAuthorize`)
 - Registry-driven screen queries/commands (no ORM) — [../docs/screen-framework.md](../docs/screen-framework.md)
 - In-process JasperReports for the 79 legacy reports — [../docs/reports.md](../docs/reports.md)

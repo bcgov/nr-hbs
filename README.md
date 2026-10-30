@@ -28,7 +28,7 @@ HBS's business rules lived in Java, not PL/SQL.
 - **Frontend:** React 19 + TypeScript + Vite, BC Gov Carbon, oidc-client-ts (BC Gov SSO / Keycloak, as nr-fta) — the
   nr-fsp-new shell. About 200 legacy screens are declared in a screen
   registry. See [frontend/README.md](frontend/README.md).
-- **Backend:** Java 21 + Spring Boot 3.5 OAuth2 resource server. It provides
+- **Backend:** Java 21 + Spring Boot 4 OAuth2 resource server. It provides
   registry-driven queries and commands, in-process JasperReports, the
   scale-data XML upload, and ShedLock batch jobs. See
   [backend/README.md](backend/README.md).

@@ -53,7 +53,7 @@ What the legacy system used and what replaces it:
 
 | Legacy | New |
 |---|---|
-| WebLogic 10.3.6 EAR: Struts 1.1 + EJB 2.x (319 EJBs) | Spring Boot 3.5 / Java 21 API + React 19 SPA (nr-fsp-new stack) |
+| WebLogic 10.3.6 EAR: Struts 1.1 + EJB 2.x (319 EJBs) | Spring Boot 4.1 / Java 21 API + React 19 SPA (nr-fsp-new's stack, moved to Boot 4 / Tomcat) |
 | WebADE (IDIR/BCeID via Siteminder), 28 roles | BC Gov SSO (Keycloak) + FAM, 28 `HBS_*` roles ([roles-and-security.md](roles-and-security.md)) |
 | Crystal → shared JasperReports Server (JCRS) | 79 JCRS units vendored, run in-process ([reports.md](reports.md)) |
 | `hbs-batch` remote-EJB client on Windows + AutoMate 5 | ShedLock-coordinated `@Scheduled` jobs in the API pods ([batch-jobs.md](batch-jobs.md)) |

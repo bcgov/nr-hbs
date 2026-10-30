@@ -1,7 +1,7 @@
 package ca.bc.gov.nrs.hbs.api.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -19,9 +19,9 @@ public class JsonUtil {
    *
    * @param payload the payload
    * @return the json string from object
-   * @throws JsonProcessingException the json processing exception
+   * @throws JacksonException the json processing exception
    */
-  public static String getJsonStringFromObject(Object payload) throws JsonProcessingException {
+  public static String getJsonStringFromObject(Object payload) throws JacksonException {
     return mapper.writeValueAsString(payload);
   }
 
@@ -32,9 +32,9 @@ public class JsonUtil {
    * @param clazz   the clazz
    * @param payload the payload
    * @return the json object from string
-   * @throws JsonProcessingException the json processing exception
+   * @throws JacksonException the json processing exception
    */
-  public static <T> T getJsonObjectFromString(Class<T> clazz, String payload) throws JsonProcessingException {
+  public static <T> T getJsonObjectFromString(Class<T> clazz, String payload) throws JacksonException {
     return mapper.readValue(payload, clazz);
   }
 
@@ -43,9 +43,9 @@ public class JsonUtil {
    *
    * @param payload the payload
    * @return the byte [ ]
-   * @throws JsonProcessingException the json processing exception
+   * @throws JacksonException the json processing exception
    */
-  public static byte[] getJsonBytesFromObject(Object payload) throws JsonProcessingException {
+  public static byte[] getJsonBytesFromObject(Object payload) throws JacksonException {
     return mapper.writeValueAsBytes(payload);
   }
 
@@ -56,7 +56,7 @@ public class JsonUtil {
    * @param clazz   the clazz
    * @param payload the byte [ ]
    * @return the json object from byte []
-   * @throws JsonProcessingException the json processing exception
+   * @throws JacksonException the json processing exception
    */
   public static <T> T getObjectFromJsonBytes(Class<T> clazz, byte[] payload) throws IOException {
     return mapper.readValue(payload, clazz);
