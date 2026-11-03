@@ -111,10 +111,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
-      # v0.5.0 is the first release carrying sysdig-monitor, and it
-      # keeps the __APP__ template substitution that monitoring/alerts/*.json
-      # depend on — don't downgrade this pin.
-      - uses: bcgov/actions/sysdig-monitor@122a9b1c6c082b1b1f18c300020fbdc417b6b0b2 # v0.10.0
+      - uses: bcgov/actions-openshift/sysdig-monitor@46f2614322f7ba1a5ad88a7e4e1b98569c80dcf7 # v0.6.0
         with:
           sysdig_api_token: ${{ secrets.SYSDIG_API_TOKEN }}
           oc_namespace: ${{ secrets.oc_namespace }}
