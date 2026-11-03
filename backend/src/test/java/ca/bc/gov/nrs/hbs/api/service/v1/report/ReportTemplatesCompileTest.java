@@ -2,13 +2,21 @@ package ca.bc.gov.nrs.hbs.api.service.v1.report;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.fonts.FontUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,5 +90,28 @@ class ReportTemplatesCompileTest {
     try (InputStream in = new ClassPathResource("reports/hbs/_shared/HBS_HEADER.jrxml").getInputStream()) {
       assertThat(JasperCompileManager.compileReport(in).getName()).isEqualTo("HBS_HEADER");
     }
+  }
+
+  /**
+   * The runtime image (Alpine) has no Arial or Times New Roman, so every font a
+   * template names must come from the bundled font extension (fonts/*.xml),
+   * not the OS — otherwise the fill fails with JRFontNotFoundException. A
+   * developer Mac has both fonts installed, so only this check catches a gap.
+   */
+  @Test
+  void everyFontTheTemplatesUseIsBundled() throws Exception {
+    Pattern fontName = Pattern.compile("fontName=\"([^\"]+)\"");
+    Set<String> used = new TreeSet<>();
+    for (Resource r : new PathMatchingResourcePatternResolver().getResources("classpath*:reports/hbs/**/*.jrxml")) {
+      try (InputStream in = r.getInputStream()) {
+        fontName.matcher(new String(in.readAllBytes(), StandardCharsets.UTF_8)).results()
+            .forEach(m -> used.add(m.group(1)));
+      }
+    }
+    assertThat(used).contains("Arial");
+    FontUtil fonts = FontUtil.getInstance(DefaultJasperReportsContext.getInstance());
+    assertThat(used.stream().filter(f -> fonts.getFontInfo(f, null) == null).toList())
+        .as("fonts the templates use with no bundled font family")
+        .isEmpty();
   }
 }
