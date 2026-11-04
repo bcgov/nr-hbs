@@ -18,7 +18,7 @@ export default defineConfig({
   // Tests finish in seconds against TEST (the whole suite runs in ~1.5 min),
   // so 30s is still generous and keeps a hang cheap: with one CI retry a stuck
   // test costs ~1 min, not ~3. Waits inside the helpers are capped below it.
-  // The screen crawl and the PDF download set their own longer budgets.
+  // Every test, including login, the screen crawl and the PDF download, uses it.
   timeout: 30_000,
   testDir: './e2e',
   // Serial execution. We share one SSO refresh token via storageState

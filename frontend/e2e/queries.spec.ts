@@ -51,7 +51,6 @@ test.describe.serial('issued documents → download → timber mark', () => {
   });
 
   test('a statement PDF downloads', async ({ page }) => {
-    test.setTimeout(60_000);
     await runScreen(page, 'queries', 'issued-documents', {
       issueDateFrom: localDate(30),
       issueDateTo: localDate(0),
@@ -60,7 +59,7 @@ test.describe.serial('issued documents → download → timber mark', () => {
 
     const actions = resultRows(page).first().locator('td').nth(await columnIndex(page, 'Actions'));
     const [download] = await Promise.all([
-      page.waitForEvent('download', { timeout: 45_000 }),
+      page.waitForEvent('download', { timeout: 30_000 }),
       actions.getByRole('button', { name: 'PDF' }).click(),
     ]);
     expect(download.suggestedFilename()).toMatch(/\.pdf$/i);

@@ -15,6 +15,8 @@ export type NotificationContextData = {
   display: (content: NotificationContent) => void;
   /** Closes an error / warning toast raised on a page other than `pathname`. */
   dismissStaleProblems: (pathname: string) => void;
+  /** Closes the open toast if its title is `title` (any toast when omitted). */
+  dismiss: (title?: string) => void;
 };
 
 export const NotificationContext = createContext<NotificationContextData | undefined>(undefined);
