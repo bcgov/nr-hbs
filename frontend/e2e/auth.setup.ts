@@ -147,7 +147,7 @@ setup('authenticate via IDIR', async ({ page, context }) => {
     // hint. The Microsoft form is what the selectors below target — the old
     // Siteminder/Logon7 `input[name="user"]` fields belonged to Cognito's
     // federation path and no longer appear.
-    await page.waitForURL(/loginproxy|login\.microsoftonline\.com|logon/i, { timeout: 60_000 });
+    await page.waitForURL(/loginproxy|login\.microsoftonline\.com|logon/i, { timeout: 30_000 });
 
     await page.locator('input[type="email"], input[name="loginfmt"]').first().fill(idirUser!);
     await page.locator('input[type="submit"], button[type="submit"]').first().click();
@@ -168,11 +168,8 @@ setup('authenticate via IDIR', async ({ page, context }) => {
   // Whether interactive or programmatic, wait for the redirect back to
   // /home (defaultRouteForUser). The route now passes through
   // /authCallback, where the authorization code is exchanged before the app
-  // replaces the URL. Interactive flow gets 5 min for a human; programmatic
-  // gets 2.
-  await page.waitForURL(onLanding, {
-    timeout: programmatic ? 2 * 60_000 : 5 * 60_000,
-  });
+  // replaces the URL.
+  await page.waitForURL(onLanding, { timeout: 30_000 });
 
   // Sanity check: the side menu should render once auth + roles resolve.
   // Home is a root link visible to every HBS user (ANY_USER) — the simplest
