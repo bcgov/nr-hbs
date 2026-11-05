@@ -48,6 +48,14 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     setNotificationContent(null);
   }, []);
 
+  const dismiss = useCallback((title?: string) => {
+    setNotificationContent((current) => {
+      if (current === null || (title !== undefined && current.title !== title)) return current;
+      problemPath.current = null;
+      return null;
+    });
+  }, []);
+
   const onClose = useCallback(() => {
     problemPath.current = null;
     setNotificationClass('slide-out');
@@ -67,7 +75,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, [notificationClass, notificationContent]);
 
   return (
-    <NotificationContext.Provider value={{ display, dismissStaleProblems }}>
+    <NotificationContext.Provider value={{ display, dismissStaleProblems, dismiss }}>
       {children}
       {notificationContent && (
         <ToastNotification

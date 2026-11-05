@@ -29,9 +29,8 @@ const AREAS = [
 
 for (const area of AREAS) {
   test(`every ${area} screen opens cleanly`, async ({ page }) => {
-    // Several screens per test; the slowest area took ~15s against TEST.
-    test.setTimeout(3 * 60_000);
-
+    // Several screens per test, under the default 30s budget; the slowest
+    // area took ~15s against TEST.
     await gotoProtected(page, `/${area}`);
     if (await page.getByTestId('forbidden-title').isVisible().catch(() => false)) {
       test.skip(true, `The E2E account has no access to ${area}`);

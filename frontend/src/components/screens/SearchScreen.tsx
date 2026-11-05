@@ -45,6 +45,8 @@ const SearchingIcon = () => <Loading small withOverlay={false} description="" />
 /** nr-fta's paging (services/paging.ts). */
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZES = [10, 25, 50, 100];
+/** Title of the snackbar raised when a "one of" criteria rule is unmet. */
+const MORE_CRITERIA_TITLE = 'More criteria needed';
 
 type Criteria = Record<string, string>;
 type Sort = { by?: string; dir: 'asc' | 'desc' };
@@ -77,7 +79,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
   const navigate = useNavigate();
   const user = useScopedUser();
   const [searchParams] = useSearchParams();
-  const { display } = useNotification();
+  const { display, dismiss } = useNotification();
   const here = useHereAsOrigin(screen.title);
   const api = useScreenApi();
 
@@ -126,7 +128,10 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
     });
     setErrors(next);
     // Required fields first: the "one of" check waits until they're filled.
-    if (Object.keys(next).length > 0) return false;
+    if (Object.keys(next).length > 0) {
+      dismiss(MORE_CRITERIA_TITLE);
+      return false;
+    }
     if (screen.requireOneOf && !screen.requireOneOf.some((n) => criteria[n]?.trim())) {
       // Two groups can share a label ("Client No" under Trading Partner and
       // under Site Owner), so a repeated label carries its group.
@@ -139,9 +144,11 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
         })
         .join(', ');
       // One snackbar; none of the candidates is wrong on its own.
-      display({ kind: 'warning', title: 'More criteria needed', subtitle: `Enter at least one of: ${labels}.`, timeout: 0 });
+      display({ kind: 'warning', title: MORE_CRITERIA_TITLE, subtitle: `Enter at least one of: ${labels}.`, timeout: 0 });
       return false;
     }
+    // Enough criteria now: clear the snackbar from an earlier attempt.
+    dismiss(MORE_CRITERIA_TITLE);
     return true;
   };
 
