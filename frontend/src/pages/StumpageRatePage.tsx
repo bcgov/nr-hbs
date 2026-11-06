@@ -16,9 +16,10 @@ import DefinitionGrid from '@/components/DefinitionGrid';
 import SectionTile from '@/components/SectionTile';
 import FieldGrid from '@/components/screens/FieldGrid';
 import { formatValue } from '@/components/screens/format';
+import { useNotification } from '@/context/notification/useNotification';
 import { useScopedUser } from '@/context/org/useOrg';
 import { can } from '@/routes/access';
-import { getJson, HBS_API } from '@/services/common';
+import { ApiFieldError, getJson, HBS_API } from '@/services/common';
 import type { FieldDef } from '@/screens/types';
 
 import ForbiddenPage from './ForbiddenPage';
@@ -80,6 +81,9 @@ interface LookupResult {
 
 const money = (v: unknown) => formatValue(v, 'money');
 
+/** Same title as the search screens' snackbar, so the two read alike. */
+const MORE_CRITERIA_TITLE = 'More criteria needed';
+
 /**
  * P230 / P231 Search for Stumpage Rate. Bespoke because the legacy lookup is
  * the HBS_RATES OUT-parameter procedures (backend StumpageRateController), not
@@ -93,12 +97,28 @@ const StumpageRatePage: FC = () => {
   const [result, setResult] = useState<LookupResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { display, dismiss } = useNotification();
   const onChange = useCallback((n: string, v: string) => setValues((p) => ({ ...p, [n]: v })), []);
 
   if (!can(user, 'RATING_VIEW')) return <ForbiddenPage />;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    // Required criteria are checked here, not by the server: a snackbar names
+    // what's missing and the fields are marked, instead of a failed-search banner.
+    const missing = FIELDS.filter((f) => f.required && !values[f.name]?.trim());
+    setErrors(Object.fromEntries(missing.map((f) => [f.name, `${f.label} is required`])));
+    if (missing.length > 0) {
+      display({
+        kind: 'warning',
+        title: MORE_CRITERIA_TITLE,
+        subtitle: `Enter: ${missing.map((f) => f.label).join(', ')}.`,
+        timeout: 0,
+      });
+      return;
+    }
+    dismiss(MORE_CRITERIA_TITLE);
     setBusy(true);
     setError(null);
     setResult(null);
@@ -111,6 +131,8 @@ const StumpageRatePage: FC = () => {
       setCriteria({ ...values });
       setResult(r);
     } catch (err) {
+      // Business-rule checks name the criteria they concern: mark those fields.
+      if (err instanceof ApiFieldError) setErrors(err.fieldErrors);
       setError((err as Error).message);
     } finally {
       setBusy(false);
@@ -125,7 +147,7 @@ const StumpageRatePage: FC = () => {
     <PageLayout title="Search for Stumpage Rate" subtitle="The stumpage rate HBS would apply to one segregation. P230">
       <SectionTile title="Search criteria" icon={Search}>
         <form className="hbs-form" onSubmit={onSubmit} noValidate>
-          <FieldGrid fields={FIELDS} values={values} onChange={onChange} idPrefix="stumpage-rate" mode="form" />
+          <FieldGrid fields={FIELDS} values={values} onChange={onChange} idPrefix="stumpage-rate" mode="form" errors={errors} />
           <div className="detail-edit__actions">
             <Button kind="primary" size="md" type="submit" disabled={busy}>
               {busy ? 'Searching…' : 'Search'}

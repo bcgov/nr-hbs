@@ -259,6 +259,8 @@ export interface SearchScreenDef extends BaseScreen {
   /** At least one of these criteria must be filled (legacy "enter at least one…"). */
   requireOneOf?: string[];
   reports?: ReportLinkDef[];
+  /** Offer `reports` as one dropdown with a single Print button instead of a button each. */
+  reportsAsMenu?: boolean;
   /** One button opening a modal of report-only prompts, with a button per report (P403 average rates). */
   reportDialog?: ReportDialogDef;
   /**

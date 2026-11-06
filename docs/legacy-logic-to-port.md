@@ -7,8 +7,8 @@ procs. Each area doc has a precise list with legacy file paths; this page is
 the index and the recommended order.
 
 Screens whose writes depend on unported logic still render. Their action
-buttons are **hidden** and their forms show "Saving isn't available yet",
-because the SPA only enables commands the backend has registered
+buttons are **hidden** and their forms open **read-only** (no Save, Back
+instead of Cancel; the same as for a user without the role to save), because the SPA only enables commands the backend has registered
 (`GET /api/v1/hbs/commands`). Nothing is faked.
 
 ## By area

@@ -31,7 +31,9 @@ public class BatchConfig {
   public LockProvider lockProvider(DataSource dataSource) {
     return new JdbcTemplateLockProvider(JdbcTemplateLockProvider.Configuration.builder()
         .withJdbcTemplate(new JdbcTemplate(dataSource))
-        .withTableName("HBS_SHEDLOCK")
+        // Schema-qualified: the PUBLIC synonym in docs/db/hbs-shedlock.sql is
+        // not on every environment (TEST has the table and grants, no synonym).
+        .withTableName("THE.HBS_SHEDLOCK")
         .usingDbTime()
         .build());
   }

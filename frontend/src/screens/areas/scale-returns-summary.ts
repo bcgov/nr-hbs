@@ -331,8 +331,6 @@ export const screens: ScreenDef[] = [
       { key: 'withinLimit', header: 'Available', format: 'yesno' },
     ],
     rowLink: TO_DETAIL,
-    notes:
-      'Available = No means the document is older than the seven-year limit (legacy P174 "Summary Document Unavailable"); it cannot be opened.',
   },
 
   // ── P052 / P102 / P152 view (+ P055/P056/P105/P106/P107/P155/P156 sub-pages) ──

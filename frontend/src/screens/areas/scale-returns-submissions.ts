@@ -329,13 +329,6 @@ export const screens: ScreenDef[] = [
     nav: false,
     query: 'submissions.batch',
     keys: ['batchId'],
-    // P027 In Error / Ready / Other links → detail document list (P551; ledgers P701).
-    editLink: {
-      screen: 'detail-workbench',
-      label: 'View Documents',
-      params: { batchId: 'batchId', returnType: 'docType' },
-      capability: 'SCALE_RETURNS_VIEW',
-    },
     reports: [
       {
         reportId: 'HBS2R032',

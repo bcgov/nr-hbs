@@ -261,8 +261,6 @@ export const screens: ScreenDef[] = [
       { key: 'ratioType', header: 'Ratio Type' },
     ],
     rowLink: { screen: 'sampling-plan', params: { planId: 'planId' } },
-    notes:
-      'Industry users see Active plans plus their own plans in any status. "In Associated Districts" is not yet applied as a filter (all districts are listed); choose a Region/District to narrow the list.',
   },
   // ── P883 View Sampling Plan ──
   {
@@ -359,8 +357,6 @@ export const screens: ScreenDef[] = [
     ],
     editLink: { screen: 'sampling-plan-edit', params: { planId: 'planId' }, label: 'Edit', capability: 'SAMPLING_ADMIN' },
     actions: planActions,
-    notes:
-      'Edit, Add Stratum, Propose and Delete apply to In Progress plans (district administrators and the owning client\'s Stratum Planner administrators); Approve and Reject to Awaiting Approval plans (ministry district administrators); Create New Plan From Actuals to Active plans. Adding or changing a stratum clears the plan precisions: Save & Calculate before proposing. The comparison applies to Active, sample-based plans; reports apply to Active plans.',
   },
   // ── P891 Add Sampling Plan (+ P892 Confirm Add Population) ──
   {

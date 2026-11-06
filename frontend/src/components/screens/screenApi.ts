@@ -1,6 +1,8 @@
 import { createContext, useContext } from 'react';
 
+import type { FamLoginUser } from '@/context/auth/types';
 import type { NavOrigin } from '@/lib/navOrigin';
+import { can } from '@/routes/access';
 import { getBlob, type CodeOption, type PageableResponse, type PageRequest } from '@/services/common';
 import {
   codeList,
@@ -40,8 +42,12 @@ export interface ScreenApi {
   codeList: (queryId: string) => Promise<CodeOption[]>;
   /** Download an API path (`/v1/hbs/…`, the `/api` prefix already stripped). */
   download: (path: string, label: string) => Promise<{ blob: Blob; filename: string | null }>;
-  /** SPA path of a screen id, or null when the screen can't be linked to here. */
-  screenHref: (screenId: string) => string | null;
+  /**
+   * SPA path of a screen id, or null when the screen can't be linked to here
+   * — including a screen `user` may not open, so no link leads to the
+   * Unauthorized page.
+   */
+  screenHref: (screenId: string, user?: FamLoginUser) => string | null;
   /** Back link for a record reached without an origin (null = the screen's area landing). */
   home?: NavOrigin;
 }
@@ -55,9 +61,9 @@ export const authenticatedScreenApi: ScreenApi = {
   exportQueryPdf,
   codeList,
   download: (path, label) => getBlob(path, label),
-  screenHref: (screenId) => {
+  screenHref: (screenId, user) => {
     const target = SCREENS_BY_ID.get(screenId);
-    return target ? screenPath(target) : null;
+    return target && can(user, target.capability) ? screenPath(target) : null;
   },
 };
 

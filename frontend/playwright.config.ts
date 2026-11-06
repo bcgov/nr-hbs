@@ -15,10 +15,12 @@ import { baseURL, STORAGE_STATE } from './e2e/utils';
  * Override the target with E2E_BASE_URL (e.g. http://localhost:3000 for local).
  */
 export default defineConfig({
+  // 30s ceiling per test attempt (and per individual wait in the specs).
   // Tests finish in seconds against TEST (the whole suite runs in ~1.5 min),
-  // so 30s is still generous and keeps a hang cheap: with one CI retry a stuck
-  // test costs ~1 min, not ~3. Waits inside the helpers are capped below it.
-  // Every test, including login, the screen crawl and the PDF download, uses it.
+  // so keeping it tight bounds the blast radius of any hang: with retries: 2 a
+  // stuck test costs ~1.5 min, and fails legibly rather than masquerading as
+  // "slow CI". The screen crawl and the PDF download use it too; the sign-in
+  // setup project keeps its own longer budget below.
   timeout: 30_000,
   testDir: './e2e',
   // Serial execution. We share one SSO refresh token via storageState
@@ -27,11 +29,20 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 0,
+  // Stop the whole run as soon as one test has failed for good. Playwright
+  // only counts a test here once it has exhausted its retries, so a flaky
+  // test that passes on retry #1/#2 doesn't trip it — but a real failure
+  // ends the run instead of burning time on the rest of the suite.
+  maxFailures: 1,
   reporter: [['line'], ['list', { printSteps: true }], ['html', { open: 'never' }]],
   use: {
     baseURL,
-    trace: 'on-first-retry',
+    // Never trace in CI. Every trace embeds the context's storageState, i.e.
+    // the e2e account's SSO cookies and tokens, and CI uploads
+    // playwright-report as an artifact. Playwright offers no way to scrub it.
+    // Reproduce locally with traces instead.
+    trace: process.env.CI ? 'off' : 'on-first-retry',
     screenshot: 'only-on-failure',
   },
 
@@ -39,10 +50,16 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
-      // A trace records every call's arguments, so a retried login would carry
-      // the password and TOTP code into the uploaded report. Screenshots of the
-      // Microsoft pages add nothing worth that.
-      use: { ...devices['Desktop Chrome'], trace: 'off', screenshot: 'off' },
+      // Sign-in spans Keycloak → Azure AD → TOTP, and the TOTP helper can
+      // wait up to ~30s for a fresh code window, so it can't fit in 30s.
+      // (Each wait inside it is still capped at 30s.)
+      timeout: 60_000,
+      // No trace, screenshot or video for sign-in. A trace records every
+      // action's arguments verbatim (Playwright redacts nothing), so a retried
+      // setup would write the IDIR password into playwright-report, which CI
+      // uploads as an artifact. A screenshot can catch the MFA page. Debug
+      // sign-in locally instead.
+      use: { ...devices['Desktop Chrome'], trace: 'off', screenshot: 'off', video: 'off' },
     },
     {
       name: 'chromium',

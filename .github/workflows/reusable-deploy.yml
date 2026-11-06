@@ -213,6 +213,8 @@ jobs:
             -p CLAMAV_PORT="${{ vars.CLAMAV_PORT || '3310' }}"
             -p CLAMAV_FAIL_OPEN="${{ vars.CLAMAV_FAIL_OPEN || 'false' }}"
             -p EMAIL_SEND_ENABLED="${{ vars.EMAIL_SEND_ENABLED || 'true' }}"
+            -p HBS_BATCH_ENABLED="${{ vars.HBS_BATCH_ENABLED || 'false' }}"
+            -p HBS_BATCH_UNPACK_ENABLED="${{ vars.HBS_BATCH_UNPACK_ENABLED || 'false' }}"
             -p DATABASE_HOST="${{ secrets.database_host }}"
             -p DATABASE_SERVICE_NAME="${{ secrets.database_service_name }}"
             -p DATABASE_USER="${{ secrets.database_user }}"

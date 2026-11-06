@@ -37,6 +37,7 @@ import { formatValue } from './format';
 import { linkHref, reportApplies } from './links';
 import ReportButton from './ReportButton';
 import ReportDialogButton from './ReportDialogButton';
+import ReportMenu from './ReportMenu';
 import ScreenLayout from './ScreenLayout';
 import { useScreenApi } from './screenApi';
 
@@ -262,7 +263,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
     });
 
   const createVisible = screen.createLink && can(user, screen.createLink.capability);
-  const createHref = screen.createLink ? linkHref(screen.createLink, form, api.screenHref) : null;
+  const createHref = screen.createLink ? linkHref(screen.createLink, form, (id) => api.screenHref(id, user)) : null;
   const open = (href: string) => navigate(href, { state: originState(here) });
 
   return (
@@ -342,9 +343,17 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                     {total.toLocaleString()} {total === 1 ? 'result' : 'results'} found
                   </span>
                   <span className="hbs-search__results-actions">
-                    {(screen.reports ?? []).filter((r) => reportApplies(r, reportSource)).map((r) => (
-                      <ReportButton key={r.reportId + r.label} report={r} source={reportSource} size="sm" kind="ghost" />
-                    ))}
+                    {screen.reportsAsMenu ? (
+                      <ReportMenu
+                        reports={(screen.reports ?? []).filter((r) => reportApplies(r, reportSource))}
+                        source={reportSource}
+                        id={`${screen.id}-report`}
+                      />
+                    ) : (
+                      (screen.reports ?? []).filter((r) => reportApplies(r, reportSource)).map((r) => (
+                        <ReportButton key={r.reportId + r.label} report={r} source={reportSource} size="sm" kind="ghost" />
+                      ))
+                    )}
                     {screen.reportDialog && (
                       <ReportDialogButton
                         dialog={screen.reportDialog}
@@ -423,7 +432,7 @@ export const SearchScreen: FC<{ screen: SearchScreenDef }> = ({ screen }) => {
                           <TableBody>
                             {dtRows.map((dtRow, i) => {
                               const source = rows[i] ?? {};
-                              const href = screen.rowLink ? linkHref(screen.rowLink, source, api.screenHref) : null;
+                              const href = screen.rowLink ? linkHref(screen.rowLink, source, (id) => api.screenHref(id, user)) : null;
                               const { key: _rk, ...rp } = getRowProps({ row: dtRow });
                               return (
                                 <TableRow

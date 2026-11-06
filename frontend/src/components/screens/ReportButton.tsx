@@ -23,11 +23,12 @@ interface ReportButtonProps {
  * it. While it generates, a spinner sits beside the button and the button
  * stays disabled — the same treatment as the CSV export.
  */
-export const ReportButton: FC<ReportButtonProps> = ({ report, source, size = 'md', kind = 'tertiary' }) => {
+/** Runs a report and downloads it; `busy` while it generates. Shared with ReportMenu. */
+export const useRunReport = () => {
   const { display } = useNotification();
   const [busy, setBusy] = useState(false);
-  const format = report.format ?? 'PDF';
-  const onClick = async () => {
+  const run = async (report: ReportLinkDef, source: Record<string, unknown>) => {
+    const format = report.format ?? 'PDF';
     setBusy(true);
     try {
       const { blob, filename } = await runReport(report.reportId, reportParams(report, source), format);
@@ -39,6 +40,13 @@ export const ReportButton: FC<ReportButtonProps> = ({ report, source, size = 'md
       setBusy(false);
     }
   };
+  return { busy, run };
+};
+
+export const ReportButton: FC<ReportButtonProps> = ({ report, source, size = 'md', kind = 'tertiary' }) => {
+  const { busy, run } = useRunReport();
+  const format = report.format ?? 'PDF';
+  const onClick = () => run(report, source);
   return (
     <span className="export-csv">
       <Button kind={kind} size={size} renderIcon={format === 'CSV' ? DocumentDownload : DocumentPdf} disabled={busy} onClick={() => void onClick()}>
