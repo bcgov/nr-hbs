@@ -36,6 +36,17 @@
   gap: 0.5rem;
 }
 
+/* Several reports as one picker + Print (ReportMenu.tsx). */
+.hbs-report-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hbs-report-menu .cds--select {
+  min-width: 18rem;
+}
+
 /* Bulk actions over a table with a check-box column (BulkActions.tsx). */
 .hbs-bulk {
   display: flex;

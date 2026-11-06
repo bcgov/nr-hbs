@@ -195,6 +195,7 @@ export const screens: ScreenDef[] = [
     ],
     rowLink: { screen: 'scale-anomaly-detail', params: { anomalyId: 'anomalyId' } },
     createLink: { screen: 'anomaly-windows-view', params: {}, label: 'View Assessment Windows', capability: 'SCALE_CONTROL_VIEW' },
+    reportsAsMenu: true,
     reports: [
       anomalyReport('HBS2R912', 'Print Scaling Event Gaps and Duplicates'),
       anomalyReport('HBS2R914', 'Print Weighing Event Gaps and Duplicates'),

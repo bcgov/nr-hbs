@@ -90,6 +90,7 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
 }) => {
   const navigate = useNavigate();
   const api = useScreenApi();
+  const user = useScopedUser();
   const table = section.table!;
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState<string | undefined>();
@@ -160,7 +161,7 @@ const SectionTable: FC<{ section: DetailSection; record: Row; origin: ReturnType
                 </TableHead>
                 <TableBody>
                   {rows.map((r, i) => {
-                    const href = table.rowLink ? linkHref(table.rowLink, r, api.screenHref) : null;
+                    const href = table.rowLink ? linkHref(table.rowLink, r, (id) => api.screenHref(id, user)) : null;
                     const open = () => href && navigate(href, { state: originState(origin) });
                     return (
                       <TableRow
@@ -309,7 +310,7 @@ export const DetailScreen: FC<{ screen: DetailScreenDef }> = ({ screen }) => {
 
   const editHref =
     record && screen.editLink && can(user, screen.editLink.capability) && offered(screen.actionsAvailable?.editAction)
-      ? linkHref(screen.editLink, record, api.screenHref)
+      ? linkHref(screen.editLink, record, (id) => api.screenHref(id, user))
       : null;
   const extraLinks = (screen.extraLinks ?? []).filter((l) => record && can(user, l.capability) && offered(l.requiresAction));
   const shownActions = (screen.actions ?? []).filter((a) => offered(a.id));

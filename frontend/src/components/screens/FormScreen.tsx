@@ -1,4 +1,4 @@
-import { Button, InlineNotification } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { DocumentAdd, Edit } from '@carbon/icons-react';
 import { useEffect, useMemo, useState, type FC, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -88,6 +88,10 @@ export const FormScreen: FC<{ screen: FormScreenDef }> = ({ screen }) => {
     };
   }, [initial, isEdit, keys, screen.fields, screen.loadQuery, attempt]);
 
+  // The save command isn't one this user may run (missing role, or not ported
+  // yet): show the record read-only, with Back instead of Cancel / Save.
+  const viewOnly = registered === false;
+
   const dirty = screen.fields.some((f) => (values[f.name] ?? '') !== (loaded[f.name] ?? ''));
   const leave = () => (origin ? navigate(origin.path) : navigate(-1));
 
@@ -124,15 +128,6 @@ export const FormScreen: FC<{ screen: FormScreenDef }> = ({ screen }) => {
 
   return (
     <ScreenLayout screen={screen} backDisabled={dirty && !saving}>
-      {registered === false && (
-        <InlineNotification
-          kind="warning"
-          lowContrast
-          hideCloseButton
-          title="Saving isn't available yet"
-          subtitle="This screen can't be saved yet, or you don't have permission to save it."
-        />
-      )}
       <AsyncBoundary
         loading={loading}
         error={loadError}
@@ -150,16 +145,18 @@ export const FormScreen: FC<{ screen: FormScreenDef }> = ({ screen }) => {
               }}
               idPrefix={screen.id}
               errors={errors}
-              readOnly={(f) => (isEdit && !!f.readOnlyOnEdit) || saving}
+              readOnly={(f) => viewOnly || (isEdit && !!f.readOnlyOnEdit) || saving}
               mode="form"
             />
             <div className="detail-edit__actions">
               <Button kind="tertiary" size="md" type="button" onClick={leave} disabled={saving}>
-                Cancel
+                {viewOnly ? 'Back' : 'Cancel'}
               </Button>
-              <Button kind="primary" size="md" type="submit" disabled={saving || registered !== true}>
-                {saving ? 'Saving…' : (screen.submitLabel ?? (isEdit ? 'Save changes' : 'Save'))}
-              </Button>
+              {!viewOnly && (
+                <Button kind="primary" size="md" type="submit" disabled={saving || registered !== true}>
+                  {saving ? 'Saving…' : (screen.submitLabel ?? (isEdit ? 'Save changes' : 'Save'))}
+                </Button>
+              )}
             </div>
           </form>
         </SectionTile>

@@ -519,9 +519,9 @@ export const screens: ScreenDef[] = [
     capability: 'SCALE_RETURNS_VIEW',
     query: 'detailReturns.search',
     criteria: [
-      { name: 'ddn', label: 'Detail Document Number', maxLength: 13, upper: true, group: '1. Any Document Type' },
-      { name: 'scaleSite', label: 'Scale Site', maxLength: 4, upper: true, group: '2. Weigh Slip' },
-      { name: 'weighSlipNumber', label: 'Weigh Slip', maxLength: 10, upper: true, group: '2. Weigh Slip' },
+      { name: 'ddn', label: 'Detail Document Number', maxLength: 13, upper: true, group: 'Any Document Type' },
+      { name: 'scaleSite', label: 'Scale Site', maxLength: 4, upper: true, group: 'Weigh Slip' },
+      { name: 'weighSlipNumber', label: 'Weigh Slip', maxLength: 10, upper: true, group: 'Weigh Slip' },
       {
         name: 'returnType',
         label: 'Return Type',
@@ -531,10 +531,10 @@ export const screens: ScreenDef[] = [
           { value: 'S', label: 'Sample Tally' },
           { value: 'A', label: 'Arrival Ledger' },
         ],
-        group: '3-5. Log Tally / Sample Tally / Arrival Ledger',
+        group: 'Log Tally / Sample Tally / Arrival Ledger',
       },
-      { name: 'scalerLicence', label: 'Scaler Licence', maxLength: 4, upper: true, group: '3-5. Log Tally / Sample Tally / Arrival Ledger' },
-      { name: 'returnNumber', label: 'Return Number', type: 'number', maxLength: 4, group: '3-5. Log Tally / Sample Tally / Arrival Ledger' },
+      { name: 'scalerLicence', label: 'Scaler Licence', maxLength: 4, upper: true, group: 'Log Tally / Sample Tally / Arrival Ledger' },
+      { name: 'returnNumber', label: 'Return Number', type: 'number', maxLength: 4, group: 'Log Tally / Sample Tally / Arrival Ledger' },
       { name: 'activeOnly', label: 'Only active versions', type: yesNo, defaultValue: 'Y', helperText: 'Only active version will be returned.' },
     ],
     requireOneOf: ['ddn', 'weighSlipNumber', 'returnNumber'],
@@ -605,9 +605,6 @@ export const screens: ScreenDef[] = [
     capability: 'SCALE_RETURNS_VIEW',
     query: 'detailReturns.version',
     keys: ['ddn', 'version'],
-    notes:
-      'Fields that do not apply to this return type are shown as —. Use "Edit / Log Details" to change the return, ' +
-      'its log details and defects, or to change its event type; workflow buttons appear for the states that allow them.',
     actions: DETAIL_ACTIONS,
     editLink: {
       screen: 'detail-entry',
