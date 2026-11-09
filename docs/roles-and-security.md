@@ -39,7 +39,9 @@ differs.
 The legacy authorization matrix is the WebADE grant script
 `trunk/scripts/5.3.0/08/dml/hbs_action_lnk.sql` (25 roles → `web:/<path>`
 grants), plus the `include/userAccountAdmin*Roles.jsp` role pickers. Each
-legacy role becomes one FAM client role, prefixed `HBS_` unless it already was:
+legacy role becomes one FAM client role, prefixed `HBS_` unless it already was.
+A proposal to collapse these into fewer roles is in
+[role-rationalization.md](role-rationalization.md).
 
 | Legacy role | FAM role | Label | User type | Client-scoped |
 |---|---|---|---|---|

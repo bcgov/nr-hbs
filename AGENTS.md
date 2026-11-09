@@ -15,6 +15,10 @@ Repository facts for automated coding assistants. Teams may edit or remove this 
 - Frontend (`cd frontend`): `npm ci`, `npm run typecheck`, `npm run build`; e2e: `npx playwright install --with-deps chromium`, then `npx playwright test --project="chromium"`
 - Deploys to OpenShift run from GitHub Actions (PR open, merge), not from a workstation
 
+## User manual
+- The end-user manual is `docs/manual/` (IDIR and BCeID users, not developers). Any change to user-visible behaviour (screens, menu, fields, buttons, workflows, validation, roles/capabilities, reports, public area) updates the affected chapter in the same change.
+- Conventions, the source → chapter mapping and the secrets/personal-data sweep (text, screenshots, PDF) required before publishing: `.claude/skills/update-manual/SKILL.md`. A Stop hook (`.claude/hooks/check-manual.sh`, wired in `.claude/settings.json`) sends Claude back once if `frontend/src` or `backend/src/main` changed without a `docs/manual/` change.
+
 ## Data rules
 - Never write HBS tables with DML: the app's DB role is SELECT-only; writes go through the legacy `HBS_CREATE_*` / `HBS_STORE_*` / `HBS_REMOVE_*` procs (`CommandDefinition`)
 - Every query value is a bound parameter; client-owned data declares `clientScope`

@@ -4,11 +4,13 @@ Start with the [root README](../README.md). Then:
 
 | Doc | Read it when you need to… |
 |---|---|
+| [manual/](manual/README.md) | read or update the end-user manual (one chapter per area) |
 | [pinch-points.md](pinch-points.md) | understand what makes this modernization hard and what's still open |
 | [questions.md](questions.md) | see the decisions blocking parts of the build |
 | [architecture.md](architecture.md) | understand the layers, request flow and the legacy → new mapping |
 | [screen-framework.md](screen-framework.md) | add or change a screen (frontend registry + backend catalog) |
 | [roles-and-security.md](roles-and-security.md) | know the 28 roles, the capability matrix, the client fence and FOI severing |
+| [role-rationalization.md](role-rationalization.md) | see what each legacy role really does and the proposed smaller role set (proposal) |
 | [public-access.md](public-access.md) | work on the public (anonymous) read-only area: what is public, its rules, rate limits, adding a public page |
 | [database.md](database.md) | write SQL or call procs against the shared `THE` schema |
 | [coexistence.md](coexistence.md) | understand how the new UI runs alongside the legacy batch (what runs where, hazards, asks) |
