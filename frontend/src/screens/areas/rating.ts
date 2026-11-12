@@ -418,7 +418,9 @@ export const screens: ScreenDef[] = [
     area: 'rating',
     title: 'Update Default Rate',
     nav: false,
-    capability: 'RATING_MINISTRY_VIEW',
+    // The save (rating.districtRate.update) needs RATE_ADMIN; gating the form the
+    // same way also makes the search rows plain text for everyone else.
+    capability: 'RATE_ADMIN',
     command: 'rating.districtRate.update',
     loadQuery: 'rating.districtRates.detail',
     keys: ['distrtId'],

@@ -1,0 +1,149 @@
+Area,Page,Menu item,Path,Legacy,Type,VIEWER,RETURNS,SCALING_ADMIN,RATE_ADMIN,WASTE_RATE_ADMIN,BILLING_ADMIN,BILLING_APPROVER,SYSTEM_MANAGER,USER_ADMIN,CLIENT_VIEWER,CLIENT_ADMIN,CLIENT_RETURNS,CLIENT_CRUISE,CLIENT_SAMPLING,SUBMISSION_AGENT
+Administration,Harvest Billing System Alert and Processing Parameters,Harvest Billing System Alert and Processing Parameters,/admin/processing-parameters,P038,detail,,,,,,,,R,,,,,,,
+Administration,User Data Domains,User Data Domains,/admin/user-data-domains,P015/P011,search,,,,,,,,,R,,R,,,,
+Administration,Harvest Billing System User Details,,/admin/user-data-domain,P017/P018/P019,detail,,,,,,,,,RW,,RW,,,,
+Administration,Update Associated Districts,,/admin/user-district-domains,P019,search,,,,,,,,,RD,,RD,,,,
+Administration,Update Associated Sites,,/admin/user-site-domains,P017/P018,search,,,,,,,,,RD,,RD,,,,
+Administration,Update Associated Client Locations,,/admin/user-location-domains,P017 (Associated Locations),search,,,,,,,,,RD,,RD,,,,
+Billing,Piece Scale Tally Summarization,Force Piece Scale Tally Summarization,/billing/force-piece-summarization,P811/P812,search,,,,,,,,RWU,,,,,,,
+Billing,Force Next Piece Scale Tally Summarization Date,,/billing/force-piece-summarization-all,P811/P812,form,,,,,,,,W,,,,,,,
+Billing,Weight Slip Summarization,Force Weigh Slip Summarization,/billing/force-weigh-slip-summarization,P813/P814,search,,,,,,,,RWU,,,,,,,
+Billing,Force Next Weight Slip Summarization Date,,/billing/force-weigh-slip-summarization-all,P813/P814,form,,,,,,,,W,,,,,,,
+Billing,Force Ratio Computation,Force Ratio Computation,/billing/force-ratio-computation,P823/P824,search,,,,,,,,RU,,,,,,,
+Billing,Final Bill Status Summary,Final Bill Status Summary,/billing/final-bill-status,P828/P829,search,R,R,R,R,R,RU,R,RU,R,R,R,R,R,R,
+Billing,Final Bill Status Summary (Single Population w/Stratum List),,/billing/final-bill-status-strata,P830,search,R,R,R,R,R,RU,R,RU,R,R,R,R,R,R,
+Billing,Search For Unissued Final Bills,Search For Unissued Final Bills,/billing/unissued-final-bills,P831/P832,search,,,,,,RU,,RU,,,,,,,
+Billing,Search For Non-Renewable Tenures That Receive Final Bills,Non-Renewable Tenures That Receive Final Bills,/billing/final-bill-tenures,P833/P834,search,,,,,,RW,,RW,,,,,,,
+Billing,Add a Non-Renewable Tenure That Receives Final Bills,,/billing/final-bill-tenure-add,P835,form,,,,,,W,,W,,,,,,,
+Billing,Update a Non-Renewable Tenure That Receives Final Bills,,/billing/final-bill-tenure,P836,detail,,,,,,RUD,,RUD,,,,,,,
+Billing,Update a Non-Renewable Tenure That Receives Final Bills,,/billing/final-bill-tenure-edit,P836,form,,,,,,U,,U,,,,,,,
+Billing,Search For Non-Renewable Tenures Not Receiving Final Bills,Non-Renewable Tenures Not Receiving Final Bills,/billing/frozen-ratio-tenures,P837/P838,search,,,,,,R,,R,,,,,,,
+Billing,Search for Scale Returns From Field Scaled Decks,Field Scaled Decks,/billing/field-scaled-decks,P840,search,,,R,,,R,,R,,,,,,,
+Billing,Field Scale Overview,,/billing/field-scale-overview,P841/P842/P843/P844,detail,,,RU,,,RU,,RU,,,,,,,
+Profiles,Search for a Client Profile,Client Profile,/profiles/client-profile-search,P310,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,Client Profile,,/profiles/client-profile,P311,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,Search for Scale Site Profiles,Scale Site Profiles,/profiles/scale-site-profiles,P320/P321,search,R,R,RW,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,Update Scale Site Profile,,/profiles/scale-site-profile-update,P322,form,,,U,,,,,,,,,,,,
+Profiles,Add Scale Site Profile,,/profiles/scale-site-profile-add,P323,form,,,W,,,,,,,,,,,,
+Profiles,Search for Population Profiles,Population Profiles,/profiles/population-profiles,P330/P331,search,R,R,RW,R,R,R,R,R,R,R,R,R,R,RW,
+Profiles,Population Profile,,/profiles/population-profile,P332,detail,R,R,RUD,R,R,R,R,R,R,R,R,R,R,RUD,
+Profiles,Update Population Profile,,/profiles/population-profile-update,P332,form,,,U,,,,,,,,,,,U,
+Profiles,Add Population Profile,,/profiles/population-profile-add,P333,form,,,W,,,,,,,,,,,W,
+Profiles,Search for Mark Holder Profiles,Mark Holder Profiles,/profiles/mark-holder-profiles,P340/P341,search,R,R,R,R,R,RW,R,R,R,R,R,R,R,R,
+Profiles,Mark Holder Profile,,/profiles/mark-holder-profile,P342/P344,detail,R,R,R,R,R,RUD,R,R,R,R,R,R,R,R,
+Profiles,Update Mark Holder Profile,,/profiles/mark-holder-profile-update,P342,form,,,,,,U,,,,,,,,,
+Profiles,Add Mark Holder Profile,,/profiles/mark-holder-profile-add,P343,form,,,,,,W,,,,,,,,,
+Profiles,Search for Scaler Profile,Scaler Profile,/profiles/scaler-profile-search,P360,search,,,R,,,,,,,,,R,,,
+Profiles,Select Scaler to Update,Scalers with Expiring Authentication Keys,/profiles/scaler-expiring-keys,P360/P364,search,,,R,,,,,,,,,,,,
+Profiles,Update Scaler Profile,,/profiles/scaler-profile,P362,detail,,,RW,,,,,,,,,RW,,,
+Profiles,Search for Statement Delivery Profiles,Statement Delivery Profiles,/profiles/delivery-profiles,P370/P371,search,R,R,R,R,R,RW,R,R,R,R,R,R,R,R,
+Profiles,Statement Delivery Profile,,/profiles/delivery-profile,P372/P374,detail,R,R,R,R,R,RUD,R,R,R,R,R,R,R,R,
+Profiles,Update Statement Delivery Profile,,/profiles/delivery-profile-update,P372,form,,,,,,U,,,,,,,,,
+Profiles,Add Statement Delivery Profile,,/profiles/delivery-profile-add,P373,form,,,,,,W,,,,,,,,,
+Profiles,Search for Cruise Based Billing Profiles,Cruise Based Billing Profiles,/profiles/cruise-based-profiles,P380/P381,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,View Cruise Based Billing Profile,,/profiles/cruise-based-profile,P385/P383,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,Update Cruise Based Billing Profile,,/profiles/cruise-based-ratios,P383,search,,,,,,RWD,,,,,,,,,
+Profiles,Add Cruise Based Billing Profile Row,,/profiles/cruise-based-ratio-add,P383,form,,,,,,W,,,,,,,,,
+Profiles,Update Cruise Based Billing Profile Row,,/profiles/cruise-based-ratio-update,P383,form,,,,,,U,,,,,,,,,
+Queries,Mark Monthly Billing History,Billing History (By Date of Invoice),/queries/billing-history,P431/P432,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Mark Monthly Scaling History,Scaling History (By Date of Scale),/queries/scaling-history,P441/P442,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Search for A Single Issued Document,Single Invoice / Statement,/queries/issued-document,P449,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Search for Issued Documents,Multiple Invoices / Statements,/queries/issued-documents,P450/P451/P461/P456/P466/P471/P476,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Search for Transmissions of Issued Statements,Transmission Records for Invoices and Statements,/queries/statement-transmissions,P452/P453,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Billing Summary Selection,List of Invoices and Volume Statements,/queries/billing-summary,P421,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Scale Site Summary Report,Scale Site Summary,/queries/scale-site-summary,P401,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Aged Unbilled Scale Report,Aged Unbilled Scale,/queries/aged-unbilled-scale,P403,search,R,R,R,R,R,R,R,R,R,,,,,,
+Queries,Cut to Cruise Comparison Report,Cut to Cruise Comparison,/queries/cut-to-cruise,P490,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Timber Mark Query,Timber Mark Information,/queries/timber-mark-search,P480,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Queries,Timber Mark Query,,/queries/timber-mark,P481,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Rating,Search for Override Rules,Override Rates,/rating/override-rules,P200/P201,search,R,R,R,RW,R,R,R,R,R,,,,,,
+Rating,View Override Rule,,/rating/override-rule,P202/P206/P207/P208,detail,R,R,R,RWU,R,R,R,R,R,,,,,,
+Rating,Override Rate Detail,,/rating/override-rate,P204/P207,detail,R,R,R,RUD,R,R,R,R,R,,,,,,
+Rating,Update Override Rate Detail,,/rating/override-rate-edit,P204/P207,form,,,,U,,,,,,,,,,,
+Rating,Update Override Rate Rule,,/rating/override-rule-edit,P207,form,,,,U,,,,,,,,,,,
+Rating,Add Override Date Rule,,/rating/override-date-rule-add,P203,form,,,,W,,,,,,,,,,,
+Rating,Add Override Rate Rule,,/rating/override-rate-rule-add,P204,form,,,,W,,,,,,,,,,,
+Rating,Search for District Default Rates,District Default Rates,/rating/district-default-rates,P210/P211,search,R,R,R,RW,R,R,R,R,R,,,,,,
+Rating,Add New Default Rate,,/rating/district-default-rate-add,P212,form,,,,W,,,,,,,,,,,
+Rating,Update Default Rate,,/rating/district-default-rate-edit,P213,form,,,,U,,,,,,,,,,,
+Rating,Search for Waste & Residue Rates,Waste & Residue Rates,/rating/waste-residue-rates,P220/P221,search,R,R,R,R,RW,R,R,R,R,R,R,R,R,R,
+Rating,Waste & Residue Rate,,/rating/waste-residue-rate,P223,detail,R,R,R,R,RUD,R,R,R,R,R,R,R,R,R,
+Rating,Update A Waste & Residue Rate,,/rating/waste-residue-rate-edit,P223,form,,,,,U,,,,,,,,,,
+Rating,Add A Waste & Residue Rate,,/rating/waste-residue-rate-add,P222,form,,,,,W,,,,,,,,,,
+Rating,Compute Waste & Residue Average Rate,Compute Waste & Residue Average Rate,/rating/waste-residue-average-rate,P240/P241,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Search Scale Return Change Log,Scale Return Change Log,/scale-control/change-log,P961/P962,search,R,R,R,R,R,R,R,R,R,,,,,,
+Scale Control,Scale Return Change Log,,/scale-control/change-log-document,P962,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Search for Scale Site Software Use,Scale Site Software Use,/scale-control/software-use,P991/P993,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Control,Software Anomalies,Scale Site Software Anomalies,/scale-control/software-anomalies,P991/P992,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Search for Timber Transport Events,Search for Timber Transport Events,/scale-control/transport-events,P971/P972,search,R,R,R,R,R,R,R,R,R,,,,,,
+Scale Control,Search for Load Description Slip Registry Entries,Search for Load Description Slip Registry Entries,/scale-control/lds-registry,P975/P976,search,R,R,RW,R,R,R,R,R,R,,,,,,
+Scale Control,Load Description Slip Registry Entry,,/scale-control/lds-registry-detail,P978/P979,detail,R,R,RUD,R,R,R,R,R,R,,,,,,
+Scale Control,Add A Load Description Slip Registry Entry,,/scale-control/lds-registry-add,P977,form,,,W,,,,,,,,,,,,
+Scale Control,Update A Load Description Slip Registry Entry,,/scale-control/lds-registry-edit,P978,form,,,U,,,,,,,,,,,,
+Scale Control,Search for Load Description Slip Registry Violations,Search for Load Description Slip Registry Violations,/scale-control/lds-violations,P981/P982,search,R,R,R,R,R,R,R,R,R,,,,,,
+Scale Control,Search for Late Submissions,Late Submissions,/scale-control/late-submissions,P901/P902,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Search for Scale Event Anomalies,Scale Event Anomalies,/scale-control/scale-anomalies,P911/P912/P914/P922/P932/P933/P942/P952/P953,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Scale Event Anomaly,,/scale-control/scale-anomaly-detail,P954/P955,detail,R,R,RU,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Anomaly Assessment Windows,,/scale-control/anomaly-windows-view,P908,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Scale Control,Anomaly Assessment Windows,,/scale-control/anomaly-windows,P908/P909,form,,,,,,,,U,,,,,,,
+Scale Returns,Search for Detail Scale Data,Detail Returns: A Set of Returns,/scale-returns/detail-search,P046 / P551 / P581 / P601 / P651 / P701,search,R,RU,RU,R,R,R,R,R,R,R,R,RU,R,R,R
+Scale Returns,Search for Scale Returns in Submitted Detail Batches,Detail Returns: Returns in Submitted Batches,/scale-returns/detail-batch-search,P047,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Search for a Single Detail Scale Return,Detail Returns: A Single Return,/scale-returns/detail-single-search,P048,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Detail Scale Return Status,,/scale-returns/detail-workbench,searchWorkbenchFilter (Home) / P551 / P701,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Error Categories,,/scale-returns/detail-error-categories,searchErrorCategory (Home) / P551 / P701,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,View a Detail Scale Return,,/scale-returns/detail-return,P552 / P602 / P652 / P752 / P702 / P556 / P656 / P756,detail,R,RUD,RUD,R,R,RU,RU,R,R,R,R,RUD,R,R,R
+Scale Returns,Log Defects,,/scale-returns/detail-log-defects,P557 / P657,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Search for Detail Scale Transmissions,Detail Scale Transmissions: XML,/scale-returns/xml-transmissions,P041/P032,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Received Transmission (XML),,/scale-returns/xml-transmission-detail,P032,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Search for Submitted Detail Batches,Submitted Batches: Detail,/scale-returns/detail-batches,P024/P027,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Submitted Detail Scale Data Batch (XML),,/scale-returns/detail-batch,P027,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Search for Batch Slip,,/scale-returns/batch-slips,P281/P282,search,R,RW,RW,R,R,RW,R,RW,R,,,,,,
+Scale Returns,Batch Slip,,/scale-returns/batch-slip,P283,detail,R,RU,RU,R,R,RU,R,RU,R,,,,,,
+Scale Returns,Generate a Batch Slip,,/scale-returns/batch-slip-add,P280,form,,W,W,,,W,,W,,,,,,,
+Scale Returns,Update a Batch Slip,,/scale-returns/batch-slip-update,P283,form,,U,U,,,U,,U,,,,,,,
+Scale Returns,Search for Summary Scale Returns,Summary Returns,/scale-returns/summary-returns,P045/P051/P101/P151,search,R,RW,RW,R,R,RW,R,R,R,R,R,RW,RW,R,RW
+Scale Returns,Search for Summary Scale Return,Single Summary Return,/scale-returns/summary-return-find,P042,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Summary Scale Return,,/scale-returns/summary-return,P052/P102/P152,detail,R,RUD,RUD,R,R,RUD,RU,R,R,R,R,RUD,RUD,R,RUD
+Scale Returns,Add A Piece Scale Submitted Summary Return,Add Summary Return: Piece / Estimates,/scale-returns/summary-return-add-piece,P050,form,,W,W,,,W,,,,,,W,W,,W
+Scale Returns,Weight Scale Summary Return,Add Summary Return: Weight,/scale-returns/summary-return-add-weight,P100,form,,W,,,,,,,,,,,,,
+Scale Returns,Add A Sample Scale Submitted Summary Return,Add Summary Return: Sample,/scale-returns/summary-return-add-sample,P150,form,,W,,,,,,,,,,,,,
+Scale Returns,Update Summary Scale Return,,/scale-returns/summary-return-update,P053/P103/P153,form,,U,U,,,U,,,,,,U,U,,U
+Stratum Planner,Search For Sampling Plans,Sampling Plans,/stratum-planner/sampling-plans,P854/P880,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,View Sampling Plan,,/stratum-planner/sampling-plan,P883,detail,R,R,RWUD,R,R,R,R,R,R,R,R,R,R,RWUD,
+Stratum Planner,Add Sampling Plan,,/stratum-planner/sampling-plan-add,P891/P892,form,,,W,,,,,,,,,,,W,
+Stratum Planner,Edit Sampling Plan,,/stratum-planner/sampling-plan-edit,P881,form,,,U,,,,,,,,,,,U,
+Stratum Planner,View Stratum Plan Details,,/stratum-planner/stratum-plan,P888/P884,detail,R,R,RWUD,R,R,R,R,R,R,R,R,R,R,RWUD,
+Stratum Planner,Edit Stratum Plan,,/stratum-planner/stratum-plan-edit,P886/P887,form,,,U,,,,,,,,,,,U,
+Stratum Planner,Default Ratio,,/stratum-planner/stratum-composition,P885,detail,R,R,RUD,R,R,R,R,R,R,R,R,R,R,RUD,
+Stratum Planner,Update Default Ratio,,/stratum-planner/stratum-composition-edit,P885,form,,,U,,,,,,,,,,,U,
+Stratum Planner,Search For Populations,Populations,/stratum-planner/sampling-populations,P851/P852,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,Search For Strata,Strata,/stratum-planner/sampling-strata,P853/P860,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,Species / Grades / Segregations in Population,Population Species / Grades,/stratum-planner/sampling-population-stats,P861/P862/P863,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,Species / Grades / Segregations in Stratum,,/stratum-planner/sampling-stratum-stats,P866/P867/P868,search,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,List of Samples in a Stratum,,/stratum-planner/stratum-samples,P865/P870/P875/P876/P877,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Stratum Planner,Species / Grades / Segregations in a Sample,,/stratum-planner/sample-statistics,P871/P872/P873,detail,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Home,"Home (work queues, quick links)",,/home,home.jsp,bespoke,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Submit File of Detail Returns,,/scale-returns/submit,P565,bespoke,,W,W,,,,,,,,,W,,,W
+Scale Returns,Download HBS Public Key,,/scale-returns/public-key,P567,bespoke,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Scale Returns,Detail Return entry / view,,/scale-returns/detail-entry,"P004, P550–P760",bespoke,R,RWUD,RWUD,R,R,RU,RU,R,R,R,R,RWUD,R,R,R
+Scale Returns,Detail Returns bulk requests,,/scale-returns/detail-bulk,P560A/P561,bespoke,,RUD,RUD,,,,,,,,,RUD,,,
+Scale Returns,Summary return segregations / notations / daily loads,,/scale-returns/summary-return-children,P053/P054,bespoke,,U,U,,,U,,,,,,U,U,,U
+Rating,Stumpage Rate,,/rating/stumpage-rate,P230/P231,bespoke,R,R,R,R,R,R,R,R,R,R,R,R,R,R,
+Profiles,Request a new scaler key,,/profiles/scaler-key-request,P362/P363,bespoke,,,W,,,,,,,,,W,,,
+Statement delivery,Statement / transmission download links,,/StatementDelivery/…,B2065,bespoke,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Public home,,/public,,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),How to get access,,/public/access,,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Invoice Information,,/public/invoice-information,,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Mark Monthly Billing History,,/public/billing-history,P431/P432,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Mark Monthly Scaling History,,/public/scaling-history,P441/P442,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Search for A Single Issued Document,,/public/issued-document,P449,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Search for Issued Documents,,/public/issued-documents,P450/P451/P461/P456/P466/P471/P476,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Timber Mark Query,,/public/timber-mark-search,P480,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Timber Mark Query,,/public/timber-mark,P481,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Search For Sampling Plans,,/public/sampling-plans,P854/P880,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),View Sampling Plan,,/public/sampling-plan,P883,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),View Stratum Plan Details,,/public/stratum-plan,P888/P884,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Search For Populations,,/public/sampling-populations,P851/P852,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Search For Strata,,/public/sampling-strata,P853/P860,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Species / Grades / Segregations in Population,,/public/sampling-population-stats,P861/P862/P863,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
+Public (no login),Species / Grades / Segregations in Stratum,,/public/sampling-stratum-stats,P866/P867/P868,public,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R
