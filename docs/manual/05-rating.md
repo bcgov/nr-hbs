@@ -32,5 +32,16 @@ are also visible to forest-industry users.
 To bill a mark (or field deck) at the rates of a different date instead,
 add an **Override Date Rule** from the same screen.
 
+### Update a district default rate
+
+*Rate Administrator role.*
+
+1. **Rating › District Default Rates** and search.
+2. Select a rate in the results to open **Update Default Rate**, change it
+   and save.
+
+Without the Rate Administrator role the results are read-only: the rows
+are not links.
+
 Changing rates needs the Rate Administrator role. Changing waste and residue
 rates needs the Waste/Residue Rate Administrator role.

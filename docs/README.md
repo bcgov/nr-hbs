@@ -11,6 +11,7 @@ Start with the [root README](../README.md). Then:
 | [screen-framework.md](screen-framework.md) | add or change a screen (frontend registry + backend catalog) |
 | [roles-and-security.md](roles-and-security.md) | know the 28 roles, the capability matrix, the client fence and FOI severing |
 | [role-rationalization.md](role-rationalization.md) | see what each legacy role really does and the proposed smaller role set (proposal) |
+| [access-matrix.md](access-matrix.md) | see what every role can read, create, update and delete on every page, today and under the proposed roles (generated spreadsheets) |
 | [public-access.md](public-access.md) | work on the public (anonymous) read-only area: what is public, its rules, rate limits, adding a public page |
 | [database.md](database.md) | write SQL or call procs against the shared `THE` schema |
 | [coexistence.md](coexistence.md) | understand how the new UI runs alongside the legacy batch (what runs where, hazards, asks) |

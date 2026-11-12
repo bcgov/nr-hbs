@@ -48,6 +48,7 @@
     "e2e:ui": "playwright test --ui",
     "e2e:report": "playwright show-report",
     "manual:pdf": "node scripts/build-manual-pdf.mjs",
+    "access:matrix": "node scripts/build-access-matrix.mjs",
     "manual:screenshots": "MANUAL_SCREENSHOTS=1 playwright test e2e/manual.screenshots.spec.ts --project=chromium --no-deps --max-failures=0"
   }
 }

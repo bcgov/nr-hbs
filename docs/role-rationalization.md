@@ -6,6 +6,10 @@ This page lists what each of those roles actually does in the new app, and
 proposes a smaller set of FAM roles to replace them. Nothing here changes
 until the business agrees to the open decisions at the end.
 
+For every page and what each role can do on it, see the generated
+[access matrix](access-matrix.md); `access-matrix-proposed.xlsx` shows the
+same for the proposed roles below and what each current holder gains or loses.
+
 Sources: `security/HbsRoles.java`, `security/HbsAuthorities.java`,
 `query/Capability.java`, `summaryreturns/SummaryButtons.java`,
 `detailreturns/DetailAuthority.java`.
