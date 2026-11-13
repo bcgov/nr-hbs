@@ -1,6 +1,9 @@
 # Scale data API: FTP → REST migration spec
 
-**Status: draft proposal, not built, not signed off.** Replaces the FTP
+**Status: built in the backend (November 2026), not signed off.** The seven
+endpoints, their security and the OpenAPI document are in
+`backend/.../scaledata/` ([what is built](#what-is-built-november-2026)); the
+detail edits (B1021) are not ported yet. Replaces the FTP
 channel scale-software vendors and clients use today (pinch point 5,
 [questions.md](questions.md) Q3). **Assumes the legacy batch is retired when
 the API goes live:** intake, detail edits and everything after them run in
@@ -41,6 +44,41 @@ Where S3 fits, and where it doesn't:
   file goes through the API.
 - **Not on the critical path.** The API can ship on the PVC and move to S3
   later without clients noticing.
+
+## What is built (November 2026)
+
+| Part | State |
+|---|---|
+| Endpoints 1–7, error contract, paging cursors | Built (`ScaleDataSubmissionController`, `ScaleDataStatementController`) |
+| Security: own filter chain and decoder, role + **OAuth scope per endpoint**, account-to-client mapping, read fence | Built ([roles-and-security.md](roles-and-security.md#service-accounts-scale-data-api)) |
+| Receive (virus scan, schema, transmission row), shared with P505 | Built (`SubmissionService.receive`) |
+| Unpack in the request, row-locked against `UnpackJob`; large files on a worker | Built (`ScaleDataWorker`) |
+| Duplicates and `Idempotency-Key` | Built, on the XML volume instead of a new table (`SubmissionClaims`; question 6) |
+| Dry run (`:validate`) | Built: virus, schema and the unpack's format edits, nothing written (`FormatCheck`) |
+| Client OpenAPI document | `/v3/api-docs/scale-data` (springdoc group); staff document `/v3/api-docs/hbs` |
+| Detail edits in the request (B1021) and the re-edit trigger | **Not built** (depends on the B1021 port) |
+| Exposure: the gateway calls the backend Service in-cluster (NetworkPolicy for the gateway's namespace) | Built; deployed once the gateway's namespace is set ([hosting](scale-data-api-hosting.md#status-2026-11-12)) |
+
+Until B1021 is ported, a normal file is unpacked in the request and answered
+**`202` with status `PROCESSING`** (UNP/CSA), with every file, batch and
+format-edit error already in the body; the legacy batch runs the detail edits as
+it does for P505 uploads, and `GET /submissions/{id}` shows `PROCESSED` after
+that. `201` appears once the edits run in the request.
+
+Decisions taken in the build (change them in one place if the business decides
+otherwise):
+
+- **Account mapping** (question 2): the `SCALE_DATA_API_ACCOUNTS` key of the
+  settings ConfigMap, re-read on change.
+- **FXA04** (question 4): API files follow FTP and are **not** subject to it;
+  it still applies to the P505 web page (`UnpackService`, channel recorded in
+  the submitter sidecar).
+- **Duplicate store** (question 6): claim files under
+  `<xml-root>/api-claims/`, created with an exclusive hard link, so no DDL is
+  needed. A table remains the option if the files move to S3.
+- **Reads cover all channels**: `GET /submissions` lists files received for the
+  account's clients by API, web upload or FTP (`RECD_CLIENT_NUMBER`), in the
+  last 400 days.
 
 ## How FTP works today
 
@@ -166,7 +204,9 @@ the `202` path.
 
 Each submitting organization gets its own OAuth 2.0 client-credentials account
 in BC Gov SSO (Keycloak, standard realm), carrying one new service role,
-`HBS_SUBMISSION_API`. This is the same pattern the legacy share bridge uses
+`HBS_SUBMISSION_API`, and the OAuth scopes of the endpoints it may call:
+`hbs.scale-data.submit`, `hbs.scale-data.read`, `hbs.statements.read`
+(details in [roles-and-security.md](roles-and-security.md#service-accounts-scale-data-api)). This is the same pattern the legacy share bridge uses
 (`HBS_LEGACY_BRIDGE`, [legacy-share-bridge.md](legacy-share-bridge.md)).
 
 - **Token.** The client posts its client id and secret to the realm's token
@@ -361,8 +401,13 @@ too.
 }
 ```
 
-Document `status`: `READY`, `ERROR`, `SIGNATURE_FAILED`, `SUMMARIZED` (locked
-into a summary return; legacy LCK).
+Document `status` (from the version state, `stateCode` in the body):
+`ACCEPTED` (ACC, not yet through the detail edits), `READY` (RDY), `ERROR`
+(ERR), `SIGNATURE_FAILED` (DSF), `SUMMARIZED` (LCK), `INVOICED` (ISS), `HELD`,
+`AWAITING_APPROVAL`, `CORRECTION_PENDING`, `SUPERSEDED`, `CANCELLED`,
+`DISCARDED`, `NOT_BILLED`, `OTHER`; and for a document that created no
+version, `REJECTED` (refused by a format edit) or `TEST_PASSED` (a test-file
+document that passed the format edits).
 
 ### 6 and 7. Statements
 
@@ -563,11 +608,11 @@ One cutover for every client, so the risk sits before the date, not after it:
 | # | Question | Who decides | Blocks |
 |---|---|---|---|
 | 1 | Which clients and vendors use FTP today, for inbound and for statements, and on which software? ([questions.md](questions.md) Q3; answerable from `dtl_scl_doc_transmission` and the statement delivery methods) | Team + business | Notice, onboarding |
-| 2 | Where the account-to-client mapping lives: the settings ConfigMap, a new table, or FAM | Team | Build |
+| 2 | Where the account-to-client mapping lives: the settings ConfigMap, a new table, or FAM | Team | **Decided for the build: ConfigMap** |
 | 3 | Which B1021 edits depend on other documents, and so which versions a new file should re-edit | Team (trace in `hba-archive`) | Build |
-| 4 | Edit FXA04 rejects production files from software-vendor users on the web. FTP let vendors send production files. Does the API follow FTP (allow) or the web (reject)? | Business | Build |
+| 4 | Edit FXA04 rejects production files from software-vendor users on the web. FTP let vendors send production files. Does the API follow FTP (allow) or the web (reject)? | Business | Built as FTP (allow); confirm |
 | 5 | Queueing threshold, hard size limit (proposed 10 MB) and rate limit (proposed 60 a minute) | Team, from TEST load tests | Build |
-| 6 | The `HBS_API_SUBMISSION` duplicate-check table and its create proc in nr-mof-db; the 30-day window | DBA (with [questions.md](questions.md) Q10) | Build |
+| 6 | The `HBS_API_SUBMISSION` duplicate-check table and its create proc in nr-mof-db; the 30-day window | DBA (with [questions.md](questions.md) Q10) | Not needed for now: claims on the XML volume |
 | 7 | S3 provider (OCIO Object Storage or NRS ECS) and retention for submitted XML ([questions.md](questions.md) Q7) | Team + Records | Storage move, not the API |
 | 8 | Clients whose statement delivery method is FTP: move them to the API feed, to e-mail, or both | Business | Statement delivery port |
 | 9 | Polling only, or also a webhook to the client when a transmission or document changes | Team + pilot clients | Nothing; can follow later |

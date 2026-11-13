@@ -74,6 +74,20 @@ parameters:
   - name: KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID
     required: false
     value: ""
+  # Scale data API (the FTP replacement, docs/scale-data-api.md): kill switch,
+  # and the gateway's base URL for the client OpenAPI document. Which accounts
+  # may call it is the SCALE_DATA_API_ACCOUNTS key of the settings ConfigMap.
+  - name: HBS_SCALE_DATA_API_ENABLED
+    required: false
+    value: "true"
+  - name: SCALE_DATA_API_PUBLIC_BASE_URL
+    required: false
+    value: ""
+  # true = also accept the API's scopes as CSS client roles (HBS_SCALE_DATA_SUBMIT,
+  # HBS_SCALE_DATA_READ, HBS_STATEMENTS_READ) when the issuer can't add custom scopes.
+  - name: SCALE_DATA_API_ACCEPT_ROLE_SCOPES
+    required: false
+    value: "false"
   # nr-user-lookup-api (IDIR/BCeID lookups) — replaces the retired FAM
   # identity-lookup. Not required so PR previews (which skip the Keycloak
   # service-account step) deploy fine with these blank; the backend degrades
@@ -240,6 +254,12 @@ objects:
                   value: ${KEYCLOAK_CLIENT_ID}
                 - name: KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID
                   value: ${KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID}
+                - name: HBS_SCALE_DATA_API_ENABLED
+                  value: ${HBS_SCALE_DATA_API_ENABLED}
+                - name: SCALE_DATA_API_PUBLIC_BASE_URL
+                  value: ${SCALE_DATA_API_PUBLIC_BASE_URL}
+                - name: SCALE_DATA_API_ACCEPT_ROLE_SCOPES
+                  value: ${SCALE_DATA_API_ACCEPT_ROLE_SCOPES}
                 - name: USER_LOOKUP_BASE_URL
                   value: ${USER_LOOKUP_BASE_URL}
                 - name: USER_LOOKUP_TOKEN_URL

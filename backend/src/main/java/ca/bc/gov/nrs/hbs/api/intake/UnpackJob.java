@@ -11,7 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * B1012 for files uploaded through this app's P505 page: unpacks every
+ * B1012 for files uploaded through this app's P505 page and the scale data
+ * API (the sweep for API files that were queued or interrupted): unpacks every
  * transmission this app received (RECD_DIRECTORY = a {@code SubmissionStorage}
  * key) that waits at RECEIVING/SUCCESS, one transaction each, then moves its
  * file to the archive area. FTP submissions stay with legacy B1011/B1012,
@@ -65,6 +66,10 @@ public class UnpackJob {
       }
       try {
         TransmissionUnpacker.Outcome outcome = service.unpack(pending, key);
+        if (outcome == null) {
+          // Unpacked meanwhile by the scale data API's in-request path, which archives its own file.
+          continue;
+        }
         documents += outcome.documents();
         if (TransmissionUnpacker.STATUS_SUCCESS.equals(outcome.status())) {
           unpacked++;

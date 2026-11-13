@@ -68,26 +68,59 @@ public class SubmissionService {
       return new SubmissionResult(0, fileName, errors);
     }
 
-    String user = RequestUtil.getCurrentAuditUserId();
     String client = RequestUtil.isMinistryUser() ? null : RequestUtil.getCurrentClientNumber();
-    Long id = jdbc.queryForObject("SELECT DTL_SCL_DOC_TRANSMISSION_SEQ.NEXTVAL FROM DUAL", Long.class);
-    long transmissionId = id == null ? 0 : id;
-    Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+    long transmissionId = nextTransmissionId();
+    receive(new Incoming(transmissionId, bytes, fileName, client, RequestUtil.getCurrentAuditUserId(),
+        SubmissionStorage.Channel.WEB, RequestUtil.getCurrentRoles().contains(HbsRoles.SPC_SFTWR_VNDR)));
+    return new SubmissionResult(transmissionId, fileName, List.of());
+  }
 
-    String key = storage.store(SubmissionStorage.Area.INPUT, client, transmissionId, new ByteArrayInputStream(bytes));
-    // For the unpack's edit FXA04 (no production files from software vendors on the web).
-    storage.storeSubmitter(client, transmissionId, RequestUtil.getCurrentRoles().contains(HbsRoles.SPC_SFTWR_VNDR));
+  /**
+   * A file that passed the virus scan and the schema check, ready to record.
+   *
+   * @param recdClientNumber the client it was received for (null for a ministry web upload)
+   * @param softwareVendor   for the unpack's edit FXA04 (web uploads only)
+   */
+  public record Incoming(long transmissionId, byte[] bytes, String fileName, String recdClientNumber,
+      String auditUser, SubmissionStorage.Channel channel, boolean softwareVendor) {}
+
+  /** A new DTL_SCL_DOC_TRANSMISSION id (the caller may need it before {@link #receive}). */
+  public long nextTransmissionId() {
+    Long id = jdbc.queryForObject("SELECT DTL_SCL_DOC_TRANSMISSION_SEQ.NEXTVAL FROM DUAL", Long.class);
+    if (id == null || id <= 0) {
+      throw new IllegalStateException("DTL_SCL_DOC_TRANSMISSION_SEQ returned no id");
+    }
+    return id;
+  }
+
+  /**
+   * Records a checked file, the same way for the P505 page and the scale data
+   * API: stores it for the unpack ({@code input/<client>/<id>.xml} plus the
+   * submitter sidecar), creates the transmission at RCD/PRC and marks it
+   * RCD/CSA ({@code receivingComplete()}). The caller has already scanned and
+   * schema-checked {@code bytes}.
+   *
+   * @return the storage key (the transmission's RECD_DIRECTORY)
+   */
+  public String receive(Incoming in) {
+    long transmissionId = in.transmissionId();
+    Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+    String key = storage.store(SubmissionStorage.Area.INPUT, in.recdClientNumber(), transmissionId,
+        new ByteArrayInputStream(in.bytes()));
+    storage.storeSubmitter(in.recdClientNumber(), transmissionId, in.softwareVendor(), in.channel());
 
     callTransmissionProc("HBS_CREATE_DTL_SCL_DOC_TRANS", transmissionId, STATUS_PROCESSING,
-        fileName, user, now, key, client, null, null);
+        in.fileName(), in.auditUser(), now, key, in.recdClientNumber(), null, null);
     // receivingComplete(): RCD/PRC → RCD/CSA. The app role has no UPDATE
     // grant, so this goes through the store proc (as the legacy
     // TransmissionEntityBean.ejbStore did).
     callTransmissionProc("HBS_STORE_DTL_SCL_DOC_TRANS", transmissionId, STATUS_SUCCESS,
-        fileName, user, now, key, client, user, Timestamp.valueOf(LocalDateTime.now()));
+        in.fileName(), in.auditUser(), now, key, in.recdClientNumber(), in.auditUser(),
+        Timestamp.valueOf(LocalDateTime.now()));
 
-    log.info("Received scale data file {} as transmission {} ({})", fileName, transmissionId, key);
-    return new SubmissionResult(transmissionId, fileName, List.of());
+    log.info("Received scale data file {} as transmission {} ({}, {})", in.fileName(), transmissionId, key,
+        in.channel());
+    return key;
   }
 
   /**
@@ -127,8 +160,15 @@ public class SubmissionService {
     });
   }
 
-  private static String sanitizeName(String original) {
-    String name = original == null ? "upload.xml" : original.replaceAll("[\\\\/]", "_").trim();
+  /**
+   * A FILE_NAME (VARCHAR2(100 BYTE)) from a client-supplied name: printable
+   * ASCII only (so 100 characters fit 100 bytes), no path separators.
+   */
+  public static String sanitizeName(String original) {
+    String name = original == null ? "" : original.replaceAll("[^\\x20-\\x7E]|[\\\\/]", "_").trim();
+    if (name.isEmpty()) {
+      name = "upload.xml";
+    }
     return name.length() > 100 ? name.substring(name.length() - 100) : name;
   }
 }

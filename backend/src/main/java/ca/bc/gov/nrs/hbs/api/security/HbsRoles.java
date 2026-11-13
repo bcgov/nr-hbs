@@ -74,6 +74,14 @@ public final class HbsRoles {
   public static final String LEGACY_BRIDGE = "HBS_LEGACY_BRIDGE";
 
   /**
+   * A client's or software vendor's scale-data submission account (one per
+   * submitting organization, docs/scale-data-api.md). Accepted only on
+   * {@code /api/v1/hbs/integrations/scale-data/**}, and only from a client id
+   * listed in the scale-data account mapping ({@code scaledata.ApiAccountRegistry}).
+   */
+  public static final String SUBMISSION_API = "HBS_SUBMISSION_API";
+
+  /**
    * Every canonical role.
    */
   public static final List<String> ALL = List.of(
@@ -83,7 +91,7 @@ public final class HbsRoles {
       DISABLED_BYPASS, SUMM_DATA_CORR, SUMM_DATA_CTL, INV_CORR_APP, DTL_DATA_ENT,
       SCALE_ADMIN, RATE_ADMIN, BILL_ADMIN, SUPER_MGR, SMP_ADMIN, WRA_ADMIN,
       HELP_DESK, PROD_CTL, MOF_SCALER, MOF_ADMIN, MOF_USER, MOF_MGR,
-      LEGACY_BRIDGE
+      LEGACY_BRIDGE, SUBMISSION_API
   );
 
   /** Ministry (IDIR) roles — never client-scoped. */
@@ -105,7 +113,7 @@ public final class HbsRoles {
   );
 
   /** Service-account roles: neither ministry nor client-scoped (legacy user type PUB). */
-  public static final Set<String> SERVICE = Set.of(LEGACY_BRIDGE);
+  public static final Set<String> SERVICE = Set.of(LEGACY_BRIDGE, SUBMISSION_API);
 
   private HbsRoles() {}
 

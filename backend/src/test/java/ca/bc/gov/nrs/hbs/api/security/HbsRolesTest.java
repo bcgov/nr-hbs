@@ -41,7 +41,7 @@ class HbsRolesTest {
           + (HbsRoles.SERVICE.contains(role) ? 1 : 0);
       assertThat(buckets).as(role).isEqualTo(1);
     }
-    assertThat(HbsRoles.ALL).hasSize(29);
+    assertThat(HbsRoles.ALL).hasSize(30);
   }
 
   @Test

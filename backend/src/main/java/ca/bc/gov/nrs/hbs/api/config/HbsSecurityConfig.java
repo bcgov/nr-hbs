@@ -67,7 +67,10 @@ public class HbsSecurityConfig {
     NimbusJwtDecoder decoder = buildJwtDecoder(jwkSetUri);
     decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
         JwtValidators.createDefaultWithIssuer(issuerUri),
-        new AuthorizedPartyValidator(expectedClientId, serviceAccounts),
+        // Bridge client ids may carry only the bridge role; scale-data accounts are
+        // decoded by their own chain (scaledata.ScaleDataApiSecurityConfig) and never here.
+        new AuthorizedPartyValidator(expectedClientId, serviceAccounts,
+            java.util.Set.of(ca.bc.gov.nrs.hbs.api.security.HbsRoles.LEGACY_BRIDGE)),
         new HbsRoleValidator()));
     return decoder;
   }
@@ -84,7 +87,7 @@ public class HbsSecurityConfig {
    * explicit timeouts (nr-fta's decoder, which replaced Spring's default after
    * intermittent "Connect timed out" 401s).
    */
-  private static NimbusJwtDecoder buildJwtDecoder(String jwkSetUri) {
+  public static NimbusJwtDecoder buildJwtDecoder(String jwkSetUri) {
     URL jwkSetUrl;
     try {
       jwkSetUrl = new URI(jwkSetUri).toURL();

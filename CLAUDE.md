@@ -49,6 +49,7 @@ Security (`docs/roles-and-security.md`):
   - The backend is authoritative.
   - SPA links and buttons render only when `can(user, capability)`.
   - Per-record rules live in `DetailAuthority` / `SummaryButtons` (backend), with the backend-decided `actionsAvailable` for summary returns.
+- **Service accounts** never reach staff endpoints (`LegacyBridgeAccess` refuses every `HbsRoles.SERVICE` role). The scale data API (FTP replacement, `scaledata/`, `/api/v1/hbs/integrations/scale-data/**`) has its own filter chain and JWT decoder: mapped accounts only (`SCALE_DATA_API_ACCOUNTS` in the settings ConfigMap), role `HBS_SUBMISSION_API` plus one OAuth scope per endpoint, and controller-local exception handlers for its `{code, message, errors, correlationId}` contract. See `docs/scale-data-api*.md`.
 - `docs/role-rationalization.md` holds the proposed 29 → 16 role consolidation. The access-matrix generator parses its tables, so keep the table format when you edit it.
 
 Reports: 79 legacy Jasper (JCRS) reports compiled in-process (`reports/hbs/catalog.json` lists their prompts); screens link to them through `reports`.

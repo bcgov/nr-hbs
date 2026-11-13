@@ -49,7 +49,17 @@ E-mail the HBS help desk with:
 - your scale software's name and version.
 
 You receive TEST credentials first: a **client id**, a **client secret** (sent
-through a one-time link), a **token URL** and an **API base URL**. Production
+through a one-time link), a **token URL** and an **API base URL**. Your account
+is set up for the client numbers you named and is given the **scopes** for what
+you do:
+
+| Scope | Lets you |
+|---|---|
+| `hbs.scale-data.submit` | Send files and check them (`POST /submissions`, `POST /submissions:validate`) |
+| `hbs.scale-data.read` | Read results (`GET /submissions...`) |
+| `hbs.statements.read` | List and download statements (`GET /statements...`) |
+
+A call without its scope is refused with `403` and `INSUFFICIENT_SCOPE`. Production
 credentials follow once your TEST run passes, and work from the cutover date.
 
 Keep the secret in a secret store or in a file only your job's service account
@@ -76,6 +86,9 @@ $Token = (Invoke-RestMethod -Method Post -Uri $TokenUrl -Body @{
 ```
 
 Send the token on every API call as `Authorization: Bearer <token>`.
+
+The API is described in OpenAPI at `{API base URL}/v3/api-docs/scale-data`;
+most HTTP client generators can build a client from it.
 
 ## 3. Send a file
 
@@ -117,8 +130,18 @@ Allow up to 5 minutes for the response before treating it as a timeout. Most
 files answer in seconds.
 
 To check a file without submitting it, for example when testing a new release
-of your software, `POST` it to `/submissions:validate` instead. You get the
-same file checks and errors, and nothing is stored.
+of your software, `POST` it to `/submissions:validate` instead. It runs the
+virus scan, the schema check and the format edits, and stores nothing. Schema
+errors answer `422` as below; otherwise you get `200`:
+
+```json
+{ "valid": false, "clientNumber": "00012345", "testFile": true, "batchCount": 3, "documentCount": 214,
+  "errors": [ { "level": "BATCH", "code": "FBA04", "message": "…", "batch": "W", "batchNumber": "…" } ] }
+```
+
+The dry run can't check what needs the file to be stored (dates older than
+seven years, replacement versions, the same document twice in one file), or
+the detail edits; a real submission reports those.
 
 ## 4. Read the result
 
@@ -213,10 +236,17 @@ Authorization: Bearer <token>
 
 | Document status | Meaning |
 |---|---|
+| `ACCEPTED` | Unpacked; the detail edits haven't run on it yet. |
 | `READY` | Accepted. |
 | `ERROR` | Failed one or more edits; see `errors`. |
 | `SIGNATURE_FAILED` | The scaler's digital signature didn't verify. |
-| `SUMMARIZED` | Accepted and included in a summary return for billing. |
+| `REJECTED` | Refused by a format edit; nothing was stored for it. Correct it and send it again. |
+| `TEST_PASSED` | A document in a test file that passed the format edits (test files are never stored as returns). |
+| `SUMMARIZED`, `INVOICED` | Included in a summary return for billing, or billed. |
+| `HELD`, `AWAITING_APPROVAL`, `CORRECTION_PENDING`, `SUPERSEDED`, `CANCELLED`, `DISCARDED`, `NOT_BILLED` | Later states set by HBS staff or billing. |
+
+Each document also carries `stateCode`, the HBS code behind its status, for
+the help desk.
 
 **A document in error can become ready later.** Some edits fail only because
 related data (for example the samples for a weigh slip) hasn't arrived yet.
@@ -253,7 +283,7 @@ Download each item from its `pdfUrl` and `xmlUrl` with the same token. Save the
 ## Errors and retries
 
 Every error has the same body. Quote the `correlationId` when you contact the
-help desk.
+help desk; every response also carries it in the `X-Correlation-ID` header.
 
 ```json
 { "code": "SCHEMA_INVALID", "message": "The file does not match HBS_Schema_V6_1b.",
@@ -262,14 +292,18 @@ help desk.
 
 | HTTP | Code | Retry? | What to do |
 |---|---|---|---|
-| `401` | — | yes, after a new token | Get a new token and try again. |
+| `400` | `CLIENT_NUMBER_REQUIRED`, `CLIENT_NUMBER_INVALID`, `IDEMPOTENCY_KEY_INVALID`, `FILE_EMPTY`, `BAD_REQUEST` | no | Fix the request: `message` says what is wrong. |
+| `401` | `UNAUTHORIZED`, `INVALID_TOKEN` | yes, after a new token | Get a new token and try again. |
 | `403` | `CLIENT_NOT_PERMITTED` | no | Your account isn't set up for that client number. Contact the help desk. |
+| `403` | `INSUFFICIENT_SCOPE` | no | Your account doesn't have the scope this call needs. Contact the help desk. |
+| `404` | `NOT_FOUND` | no | No such transmission or statement for your clients. |
+| `415` | `UNSUPPORTED_MEDIA_TYPE` | no | Send `application/xml`, or `multipart/form-data` with a `file` part. |
 | `409` | `IDEMPOTENCY_KEY_REUSED` | no | Only if you send `Idempotency-Key`: you reused a key for a different file. Use a new key. |
 | `413` | `FILE_TOO_LARGE` | no | Split the file. |
 | `422` | `SCHEMA_INVALID`, `VIRUS_DETECTED`, `FILE_REJECTED` | no | Fix the file; `errors` lists each problem. |
-| `429` | — | yes | Too many requests (limit 60 a minute, *to be confirmed*). Wait for the `Retry-After` header. |
+| `429` | `RATE_LIMITED` (or the gateway's own body) | yes | Too many requests (limit 60 a minute, *to be confirmed*). Wait for the `Retry-After` header. |
 | `503` | `VIRUS_SCAN_UNAVAILABLE` | yes | Wait for `Retry-After`, then send the same file again. |
-| `500` or no response | — | yes | Send the same file again, waiting 1, 2, 4, then 8 minutes. |
+| `500` or no response | `INTERNAL_ERROR` | yes | Send the same file again, waiting 1, 2, 4, then 8 minutes. |
 
 ### Sending a file again
 

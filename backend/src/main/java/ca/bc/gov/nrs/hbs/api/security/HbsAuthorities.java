@@ -125,4 +125,16 @@ public final class HbsAuthorities {
   // ── Service accounts ──────────────────────────────────────────────
   /** Legacy share bridge (client-credentials service account): /integrations/legacy/**. */
   public static final String LEGACY_BRIDGE = "hasRole('HBS_LEGACY_BRIDGE')";
+
+  // Scale data API (client-credentials submission accounts, /integrations/scale-data/**):
+  // the service role AND the endpoint's OAuth scope (scaledata.ScaleDataApi). The filter
+  // chain checks the same pair; these repeat it on the controller methods.
+  private static final String SUBMISSION_API = "hasRole('HBS_SUBMISSION_API') and hasAuthority('SCOPE_";
+
+  /** Submit and dry-run scale data files. */
+  public static final String SCALE_DATA_SUBMIT = SUBMISSION_API + "hbs.scale-data.submit')";
+  /** Read transmission results. */
+  public static final String SCALE_DATA_READ = SUBMISSION_API + "hbs.scale-data.read')";
+  /** List and download statements. */
+  public static final String SCALE_DATA_STATEMENTS = SUBMISSION_API + "hbs.statements.read')";
 }

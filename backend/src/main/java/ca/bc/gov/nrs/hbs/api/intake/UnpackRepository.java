@@ -23,6 +23,17 @@ public interface UnpackRepository extends ReferenceLookups {
    */
   List<Pending> pendingTransmissions();
 
+  /** One transmission of {@link #pendingTransmissions()} by id, or null when it is not (or no longer) waiting. */
+  Pending pendingTransmission(long transmissionId);
+
+  /**
+   * Locks the transmission row for the rest of the transaction
+   * ({@code SELECT ... FOR UPDATE}) and says whether it still waits at
+   * RCD/CSA. The in-request unpack of the scale data API and {@link UnpackJob}
+   * both take it, so one transmission is never unpacked twice.
+   */
+  boolean lockReceived(long transmissionId);
+
   /** DTL_SCL_DOC_TRANSMISSION row, or null. */
   Map<String, Object> transmission(long transmissionId);
 

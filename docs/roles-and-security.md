@@ -74,6 +74,7 @@ A proposal to collapse these into fewer roles is in
 | SPC_SFTWR_VNDR | `HBS_SPC_SFTWR_VNDR_FOREST_CLIENT-<client>` | Software Vendor | BCeID | ✔ |
 | SPC_SUBM_AGNT | `HBS_SPC_SUBM_AGNT_FOREST_CLIENT-<client>` | Data Submission Agent | BCeID | ✔ |
 | — (new) | `HBS_LEGACY_BRIDGE` | Legacy Share Bridge (service account, see below) | client credentials | — |
+| — (new) | `HBS_SUBMISSION_API` | Scale data API account (service account, see below) | client credentials | — |
 
 FAM puts a client-tied grant's scope in the role name and nowhere else:
 `HBS_CLI_SCALER_FOREST_CLIENT-00012345` (`RoleScope`, ported from nr-fta;
@@ -202,16 +203,60 @@ client role `HBS_LEGACY_BRIDGE` (no person ever holds it).
 - **Token acceptance** (`AuthorizedPartyValidator`): a service-account token's
   `azp` is its own client, not `KEYCLOAK_CLIENT_ID`. Client ids listed in
   `hbs.keycloak.legacy-bridge-client-id` (`KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID`,
-  comma-separated, blank = none) are accepted **only** when every HBS role on
-  the token is a service role (`HbsRoles.SERVICE`).
+  comma-separated, blank = none) are accepted **only** when the only HBS role
+  on the token is `HBS_LEGACY_BRIDGE`.
 - **Confinement** (`HbsApiResourceApplication` + `LegacyBridgeAccess`):
   `/api/v1/hbs/integrations/legacy/**` requires `ROLE_HBS_LEGACY_BRIDGE`; every
-  other authenticated path refuses a token carrying it. People can't call the
-  bridge endpoint; the bridge can't call anything else.
+  other authenticated path refuses a token carrying any service role
+  (`HbsRoles.SERVICE`). People can't call the bridge endpoint; the bridge
+  can't call anything else.
 - `HBS_LEGACY_BRIDGE` is neither ministry nor client-scoped (legacy user type `PUB`).
 - Setup (Keycloak / FAM): create the service-account client, grant it the
   `HBS_LEGACY_BRIDGE` client role so it appears in the token's `client_roles`,
   and set `KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID` in the backend deployment.
+
+## Service accounts: scale data API
+
+Clients and software vendors send scale data files and collect statements
+through `/api/v1/hbs/integrations/scale-data/**`
+([scale-data-api.md](scale-data-api.md)), each with a **client-credentials**
+token of its own CSS service-account client. Security is layered; each layer
+holds even if the one before it is misconfigured or bypassed
+(`scaledata.ScaleDataApiSecurityConfig`):
+
+| Layer | Check | Refusal |
+|---|---|---|
+| API gateway | Exposes only the scale-data paths and `/v3/api-docs/scale-data`; rate and size limits | gateway's own |
+| Own filter chain and JWT decoder | Signature (realm JWKS), issuer, expiry; `azp` is a mapped account (below); the **only** HBS role is `HBS_SUBMISSION_API`; no IDIR/BCeID identity claims | 401 `INVALID_TOKEN` |
+| Role and **scope** per endpoint | `HBS_SUBMISSION_API` **and** the endpoint's OAuth scope, checked in the filter chain and again with `@PreAuthorize` | 403 `INSUFFICIENT_SCOPE` (RFC 6750 `insufficient_scope` challenge) |
+| Client mapping | The client named in `X-HBS-Client-Number` / `clientNumber` must be one of the account's | 403 `CLIENT_NOT_PERMITTED` |
+| Read fence | Transmissions received for, and statements issued to, the account's clients only | 404 (ids can't be probed) |
+| Request hygiene | Size limit before the body is read; per-account backstop rate limit; no sessions or cookies (CSRF off) | 413, 429 |
+
+| Scope | Endpoints |
+|---|---|
+| `hbs.scale-data.submit` | `POST /submissions`, `POST /submissions:validate` |
+| `hbs.scale-data.read` | `GET /submissions`, `GET /submissions/{id}`, `GET /submissions/{id}/documents` |
+| `hbs.statements.read` | `GET /statements`, `GET /statements/{id}.pdf` and `.xml` |
+
+- **Scopes** come from the token's `scope` claim (Keycloak client scopes
+  assigned to the account's client). If the issuer can't add custom client
+  scopes, set `SCALE_DATA_API_ACCEPT_ROLE_SCOPES=true` and grant the client
+  roles `HBS_SCALE_DATA_SUBMIT`, `HBS_SCALE_DATA_READ`, `HBS_STATEMENTS_READ`
+  instead; they count as the matching scopes and as nothing else.
+- **Accounts** are the `SCALE_DATA_API_ACCOUNTS` key of the backend settings
+  ConfigMap, one line per account: `<CSS client id> = <client number>, ...`.
+  The file is re-read when it changes; removing a line shuts the account out
+  within about a minute.
+- **Isolation both ways.** The staff chain's decoder never accepts a
+  submission account's `azp` (bridge client ids may carry only the bridge
+  role), so these tokens are 401 on every staff endpoint; and the scale-data
+  decoder refuses staff, BCeID and bridge tokens.
+- **Audit user** on the transmission rows is `API\<client id>` (30
+  characters), so P032 shows the channel and the account.
+- Setup per account: create the CSS service-account client, grant it the
+  `HBS_SUBMISSION_API` role and the scopes it needs (usually all three), add
+  its line to the ConfigMap, and send the secret through a one-time link.
 
 ## Data domains
 

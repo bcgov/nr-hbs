@@ -20,9 +20,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * <p>Service accounts: a client-credentials token is issued to the service
  * account's own CSS client, so its {@code azp} is not HBS's. The configured
  * service-account client ids ({@code hbs.keycloak.legacy-bridge-client-id})
- * are accepted <em>only</em> when every HBS role on the token is a service
- * role ({@link HbsRoles#SERVICE}); the filter chain then confines such tokens
- * to their endpoints ({@link LegacyBridgeAccess}).
+ * are accepted <em>only</em> when every HBS role on the token is one of the
+ * roles those accounts may carry (by default any {@link HbsRoles#SERVICE}
+ * role; the main chain allows only {@link HbsRoles#LEGACY_BRIDGE}); the filter
+ * chain then confines such tokens to their endpoints ({@link LegacyBridgeAccess}).
+ * Scale-data submission accounts are not accepted here at all: their tokens
+ * are only decoded by the scale-data chain.
  */
 public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
 
@@ -30,12 +33,22 @@ public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
 
   private final String expectedClientId;
   private final Set<String> serviceAccountClientIds;
+  private final Set<String> serviceAccountRoles;
 
   public AuthorizedPartyValidator(String expectedClientId) {
     this(expectedClientId, List.of());
   }
 
   public AuthorizedPartyValidator(String expectedClientId, Collection<String> serviceAccountClientIds) {
+    this(expectedClientId, serviceAccountClientIds, HbsRoles.SERVICE);
+  }
+
+  /**
+   * @param serviceAccountRoles the only roles a token from one of the
+   *     {@code serviceAccountClientIds} may carry (a subset of {@link HbsRoles#SERVICE})
+   */
+  public AuthorizedPartyValidator(String expectedClientId, Collection<String> serviceAccountClientIds,
+      Set<String> serviceAccountRoles) {
     if (expectedClientId == null || expectedClientId.isBlank()) {
       throw new IllegalStateException(
           "hbs.keycloak.client-id (KEYCLOAK_CLIENT_ID) must be set — a blank value "
@@ -46,6 +59,10 @@ public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
         .filter(id -> id != null && !id.isBlank())
         .map(String::trim)
         .collect(java.util.stream.Collectors.toUnmodifiableSet());
+    if (!HbsRoles.SERVICE.containsAll(serviceAccountRoles)) {
+      throw new IllegalArgumentException("Service accounts may only carry service roles: " + serviceAccountRoles);
+    }
+    this.serviceAccountRoles = Set.copyOf(serviceAccountRoles);
   }
 
   @Override
@@ -56,7 +73,7 @@ public class AuthorizedPartyValidator implements OAuth2TokenValidator<Jwt> {
     }
     if (azp != null && serviceAccountClientIds.contains(azp)) {
       Set<String> roles = TokenRoles.hbsRolesFrom(token);
-      if (!roles.isEmpty() && HbsRoles.SERVICE.containsAll(roles)) {
+      if (!roles.isEmpty() && serviceAccountRoles.containsAll(roles)) {
         return OAuth2TokenValidatorResult.success();
       }
       LOG.warn("Rejected a service-account token for client '{}' carrying non-service roles {}.", azp, roles);

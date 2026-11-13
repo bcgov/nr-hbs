@@ -1,6 +1,6 @@
 # Scale data API: where it runs
 
-**Status: decision, 2026-11-12. Not built yet.** Records where the scale data
+**Status: decision, 2026-11-12. Built in nr-hbs except change 11 (below).** Records where the scale data
 API ([scale-data-api.md](scale-data-api.md)) runs and what nr-hbs has to change
 to host it. The API contract in the spec and the
 [client guide](scale-data-api-client-guide.md) is unchanged; this doc covers
@@ -166,6 +166,21 @@ from inside the cluster.
 15. Add this doc to [README.md](README.md), and the new role to
     [roles-and-security.md](roles-and-security.md).
 
+## Status (2026-11-12)
+
+| Change | State |
+|---|---|
+| 1–3 Security: `HBS_SUBMISSION_API`, any service role refused on staff paths, per-role allow-list | Done. Instead of a `submission-client-ids` property, the scale-data chain has **its own JWT decoder** that accepts only client ids in the account mapping; the staff decoder never accepts them. |
+| 4 Account-to-client mapping | Done: `SCALE_DATA_API_ACCOUNTS` in the settings ConfigMap. |
+| 5 Audit user `API\<account>` | Done. |
+| 6 Controllers | Done; `POST /submissions` shares `SubmissionService.receive` with P505 and unpacks in the request. |
+| 7 Size limit | Done: `Content-Length` checked before authentication, bytes counted in the controller (`413`). |
+| 8 Error body | Done, scoped to the scale-data controllers. |
+| 9 Client-only OpenAPI document | Done: `/v3/api-docs/scale-data` (staff document: `/v3/api-docs/hbs`). |
+| 10 Correlation id | Done: the `hbs.scale-data-api.request-id-header` (default `X-Request-ID`) or `X-Correlation-ID`, else a UUID; MDC `correlationId`, response header, every error body. |
+| 11 Exposure | Done: **the gateway is registered against the backend Service's in-cluster URL** (`http://nr-hbs-backend-<zone>.<namespace>.svc:8080`, decided 2026-11-12), so there is no Route, public host or IP allowlist, and the frontend's Caddy and WAF are unchanged. `backend/openshift.scale-data-gateway.yml` adds a NetworkPolicy admitting the gateway's namespace to the backend pods on 8080. `reusable-deploy.yml` applies it in TEST and PROD only, when the environment variable `SCALE_DATA_GATEWAY_NAMESPACE` is set. The gateway's service configuration exposes only the scale-data paths and `/v3/api-docs/scale-data`; the backend refuses submission tokens everywhere else regardless. |
+| 12 Config | Done: `HBS_SCALE_DATA_API_ENABLED`, `SCALE_DATA_API_PUBLIC_BASE_URL`, `SCALE_DATA_API_ACCEPT_ROLE_SCOPES` in `backend/openshift.deploy.yml` and `reusable-deploy.yml`. |
+
 ## Open questions
 
 These add to the open questions in [scale-data-api.md](scale-data-api.md).
@@ -173,6 +188,6 @@ These add to the open questions in [scale-data-api.md](scale-data-api.md).
 | # | Question | Who decides | Blocks |
 |---|---|---|---|
 | 1 | Which gateway (for example the BC Gov API Gateway), who owns its configuration, and whether it does its own authentication in addition to passing the SSO token | Team + gateway owners | Exposure, client guide |
-| 2 | What the gateway targets: the frontend's Caddy route or a new backend route (change 11) | Team + gateway owners | Deployment |
+| 2 | What the gateway targets: the frontend's Caddy route or a new backend route (change 11) | Team + gateway owners | **Decided: the backend Service, in-cluster.** Still needed: the gateway's namespace |
 | 3 | Where rate limiting sits if the gateway can't key it per SSO account (per client id) | Team | Build |
 | 4 | Name of the request-id header the gateway forwards | Team + gateway owners | Correlation id |
