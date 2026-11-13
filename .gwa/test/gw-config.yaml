@@ -1,0 +1,103 @@
+# API gateway (Kong, API Services Portal) configuration for the scale data API,
+# HBS TEST. See .gwa/README.md for the placeholders and how to publish.
+#
+# Exposes only the client-facing scale data API and its OpenAPI document. Every
+# other backend path (staff API, actuator, Swagger UI, the staff OpenAPI group)
+# has no route here, so the gateway answers 404 for it.
+#
+# Upstream is the backend Service in-cluster (Gold); the NetworkPolicy
+# backend/openshift.scale-data-gateway.yml admits the APS gateway namespace.
+kind: GatewayService
+name: nr-hbs-scale-data-test
+tags: [ns.<gatewayId>.test]
+host: nr-hbs-backend-test.<licence>-test.svc
+port: 8080
+protocol: http
+# POST /submissions must not be replayed by the gateway; clients retry with an
+# Idempotency-Key instead.
+retries: 0
+connect_timeout: 10000
+# A large file is unpacked in the request (up to the backend's 300 s budget).
+read_timeout: 300000
+write_timeout: 300000
+routes:
+  # The API. The backend checks the token again (issuer, mapped client id,
+  # HBS_SUBMISSION_API role, the endpoint's scope) and owns the error contract.
+  - name: nr-hbs-scale-data-test-api
+    tags: [ns.<gatewayId>.test]
+    hosts: [nr-hbs-scale-data-test.api.gov.bc.ca]
+    protocols: [https]
+    methods: [GET, POST]
+    paths: [/api/v1/hbs/integrations/scale-data/]
+    strip_path: false
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+    plugins:
+      # Rejects a missing, expired or foreign token before it reaches HBS.
+      # Authorization is passed through unchanged; the backend validates it
+      # again. Roles and scopes are checked by the backend only: the SSO
+      # standard realm puts client roles in `client_roles`, which this plugin's
+      # `client_roles` option (resource_access) does not read.
+      - name: jwt-keycloak
+        tags: [ns.<gatewayId>.test]
+        enabled: true
+        config:
+          allowed_iss:
+            - https://test.loginproxy.gov.bc.ca/auth/realms/standard
+          algorithm: RS256
+          claims_to_verify: [exp]
+          # Token in the Authorization header only, never a cookie or ?jwt=.
+          uri_param_names: []
+          cookie_names: []
+          consumer_match: false
+          anonymous: null
+      # Just above the backend's 10 MB file limit plus multipart overhead, so the
+      # backend still answers an oversized file with its own FILE_TOO_LARGE body.
+      - name: request-size-limiting
+        tags: [ns.<gatewayId>.test]
+        enabled: true
+        config:
+          allowed_payload_size: 11
+          size_unit: megabytes
+          require_content_length: false
+  # The client OpenAPI document only (not Swagger UI, not the staff group).
+  - name: nr-hbs-scale-data-test-openapi
+    tags: [ns.<gatewayId>.test]
+    hosts: [nr-hbs-scale-data-test.api.gov.bc.ca]
+    protocols: [https]
+    methods: [GET]
+    paths: ["~/v3/api-docs/scale-data$"]
+    strip_path: false
+    https_redirect_status_code: 426
+plugins:
+  # Coarse per-IP protection; the backend also limits per account
+  # (SCALE_DATA_API_RATE_*), which the gateway cannot key without consumers.
+  - name: rate-limiting
+    tags: [ns.<gatewayId>.test]
+    enabled: true
+    config:
+      policy: local
+      fault_tolerant: true
+      hide_client_headers: false
+      limit_by: ip
+      minute: 120
+      hour: 2000
+  # Request id for logs on both sides. A client's own X-Request-ID is kept;
+  # otherwise the gateway makes one. The backend reads X-Request-ID
+  # (hbs.scale-data-api.request-id-header) and returns it as X-Correlation-ID.
+  - name: correlation-id
+    tags: [ns.<gatewayId>.test]
+    enabled: true
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: true
+  # Turn off APS's global error rewrite (413/500/502/503/504 bodies), which
+  # would replace the API's {code, message, errors, correlationId} body.
+  - name: post-function
+    tags: [ns.<gatewayId>.test]
+    enabled: true
+    config:
+      rewrite:
+        - "--"
