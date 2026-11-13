@@ -57,7 +57,7 @@ Where S3 fits, and where it doesn't:
 | Dry run (`:validate`) | Built: virus, schema and the unpack's format edits, nothing written (`FormatCheck`) |
 | Client OpenAPI document | `/v3/api-docs/scale-data` (springdoc group); staff document `/v3/api-docs/hbs` |
 | Detail edits in the request (B1021) and the re-edit trigger | **Not built** (depends on the B1021 port) |
-| Exposure: the gateway calls the backend Service in-cluster (NetworkPolicy for the gateway's namespace) | Built; deployed once the gateway's namespace is set ([hosting](scale-data-api-hosting.md#status-2026-11-12)) |
+| Exposure: the gateway calls the backend Service in-cluster (NetworkPolicy for the gateway's namespace) | Built; gateway configuration in [`.gwa/`](../.gwa/README.md), applied once APS sets the Gateway up on Gold ([hosting](scale-data-api-hosting.md#status-2026-11-12)) |
 
 Until B1021 is ported, a normal file is unpacked in the request and answered
 **`202` with status `PROCESSING`** (UNP/CSA), with every file, batch and

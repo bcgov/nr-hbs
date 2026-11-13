@@ -1,12 +1,16 @@
 ---
 # Lets the API gateway reach the backend for the scale data API
-# (docs/scale-data-api-hosting.md, change 11).
+# (docs/scale-data-api-hosting.md, change 11; gateway config in .gwa/).
 #
 # The gateway is registered against the backend Service's in-cluster URL,
 #   http://nr-hbs-backend-<zone>.<namespace>.svc:8080
 # so its traffic never passes the OpenShift router: no Route, no public host,
 # no IP allowlist. The backend's own ingress policy admits only the same-zone
-# frontend and monitoring; this adds the gateway's namespace, on port 8080.
+# frontend and monitoring; this adds the APS Kong data plane, on port 8080.
+#
+# The selector is APS's, from "Set Up an Upstream Service" (Gold cluster):
+# the gateway runs in the APS namespace `b8840c` on Gold and Gold DR, test and
+# prod environments, not in ours. Don't change it to our namespace.
 #
 # The gateway's service configuration decides which paths are public (only
 # /api/v1/hbs/integrations/scale-data/** and /v3/api-docs/scale-data). The
@@ -15,7 +19,7 @@
 # path it refuses those tokens (scaledata.ScaleDataApiSecurityConfig).
 #
 # Applied by reusable-deploy.yml for TEST and PROD only, and only when the
-# environment variable SCALE_DATA_GATEWAY_NAMESPACE is set.
+# environment variable SCALE_DATA_GATEWAY_ENABLED is 'true'.
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
@@ -27,9 +31,9 @@ parameters:
   - name: ZONE
     description: test or prod (must match the deploy's object suffix)
     required: true
-  - name: GATEWAY_NAMESPACE
-    description: Namespace of the API gateway's data plane (from the gateway's onboarding docs)
-    required: true
+  - name: APS_NAMESPACE
+    description: APS's gateway namespace label on this cluster (Gold and Gold DR b8840c, Silver 264e6f, Emerald cc9a8a)
+    value: b8840c
 objects:
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -46,7 +50,12 @@ objects:
         - from:
             - namespaceSelector:
                 matchLabels:
-                  kubernetes.io/metadata.name: ${GATEWAY_NAMESPACE}
+                  environment: test
+                  name: ${APS_NAMESPACE}
+            - namespaceSelector:
+                matchLabels:
+                  environment: prod
+                  name: ${APS_NAMESPACE}
           ports:
             - protocol: TCP
               port: 8080

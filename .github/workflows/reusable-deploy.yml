@@ -294,7 +294,7 @@ jobs:
       # (backend/openshift.scale-data-gateway.yml): TEST and PROD only, and only once the
       # environment's gateway namespace is set. PR previews never get it.
       - name: Scale data API gateway access
-        if: (inputs.target == 'test' || inputs.target == 'prod') && vars.SCALE_DATA_GATEWAY_NAMESPACE != ''
+        if: (inputs.target == 'test' || inputs.target == 'prod') && vars.SCALE_DATA_GATEWAY_ENABLED == 'true'
         uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
         with:
           file: backend/openshift.scale-data-gateway.yml
@@ -306,6 +306,5 @@ jobs:
           parameters:
             -p NAME="nr-hbs"
             -p ZONE="${{ inputs.target }}"
-            -p GATEWAY_NAMESPACE="${{ vars.SCALE_DATA_GATEWAY_NAMESPACE }}"
           triggers: ${{ inputs.triggers }}
 

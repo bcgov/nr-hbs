@@ -49,7 +49,9 @@ E-mail the HBS help desk with:
 - your scale software's name and version.
 
 You receive TEST credentials first: a **client id**, a **client secret** (sent
-through a one-time link), a **token URL** and an **API base URL**. Your account
+through a one-time link), a **token URL** and an **API base URL**
+(TEST `https://nr-hbs-scale-data-test.api.gov.bc.ca`, production
+`https://nr-hbs-scale-data.api.gov.bc.ca`). Your account
 is set up for the client numbers you named and is given the **scopes** for what
 you do:
 
@@ -293,13 +295,13 @@ help desk; every response also carries it in the `X-Correlation-ID` header.
 | HTTP | Code | Retry? | What to do |
 |---|---|---|---|
 | `400` | `CLIENT_NUMBER_REQUIRED`, `CLIENT_NUMBER_INVALID`, `IDEMPOTENCY_KEY_INVALID`, `FILE_EMPTY`, `BAD_REQUEST` | no | Fix the request: `message` says what is wrong. |
-| `401` | `UNAUTHORIZED`, `INVALID_TOKEN` | yes, after a new token | Get a new token and try again. |
+| `401` | `UNAUTHORIZED`, `INVALID_TOKEN` (or the gateway's own body, `{"message": …}`, for a missing or expired token) | yes, after a new token | Get a new token and try again. |
 | `403` | `CLIENT_NOT_PERMITTED` | no | Your account isn't set up for that client number. Contact the help desk. |
 | `403` | `INSUFFICIENT_SCOPE` | no | Your account doesn't have the scope this call needs. Contact the help desk. |
 | `404` | `NOT_FOUND` | no | No such transmission or statement for your clients. |
 | `415` | `UNSUPPORTED_MEDIA_TYPE` | no | Send `application/xml`, or `multipart/form-data` with a `file` part. |
 | `409` | `IDEMPOTENCY_KEY_REUSED` | no | Only if you send `Idempotency-Key`: you reused a key for a different file. Use a new key. |
-| `413` | `FILE_TOO_LARGE` | no | Split the file. |
+| `413` | `FILE_TOO_LARGE` (or the gateway's own body for a request over 11 MB) | no | Split the file. |
 | `422` | `SCHEMA_INVALID`, `VIRUS_DETECTED`, `FILE_REJECTED` | no | Fix the file; `errors` lists each problem. |
 | `429` | `RATE_LIMITED` (or the gateway's own body) | yes | Too many requests (limit 60 a minute, *to be confirmed*). Wait for the `Retry-After` header. |
 | `503` | `VIRUS_SCAN_UNAVAILABLE` | yes | Wait for `Retry-After`, then send the same file again. |
