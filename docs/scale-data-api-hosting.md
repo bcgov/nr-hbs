@@ -178,7 +178,7 @@ from inside the cluster.
 | 8 Error body | Done, scoped to the scale-data controllers. |
 | 9 Client-only OpenAPI document | Done: `/v3/api-docs/scale-data` (staff document: `/v3/api-docs/hbs`). |
 | 10 Correlation id | Done: the `hbs.scale-data-api.request-id-header` (default `X-Request-ID`) or `X-Correlation-ID`, else a UUID; MDC `correlationId`, response header, every error body. |
-| 11 Exposure | Done: **the gateway is registered against the backend Service's in-cluster URL** (`http://nr-hbs-backend-<zone>.<namespace>.svc:8080`, decided 2026-11-12), so there is no Route, public host or IP allowlist, and the frontend's Caddy and WAF are unchanged. `backend/openshift.scale-data-gateway.yml` adds a NetworkPolicy admitting the gateway's namespace to the backend pods on 8080. `reusable-deploy.yml` applies it in TEST and PROD only, when the environment variable `SCALE_DATA_GATEWAY_NAMESPACE` is set. The gateway's service configuration exposes only the scale-data paths and `/v3/api-docs/scale-data`; the backend refuses submission tokens everywhere else regardless. |
+| 11 Exposure | Done: **the gateway is registered against the backend Service's in-cluster URL** (`http://nr-hbs-backend-<zone>.<namespace>.svc:8080`, decided 2026-11-12), so there is no Route, public host or IP allowlist, and the frontend's Caddy and WAF are unchanged. `backend/openshift.scale-data-gateway.yml` adds a NetworkPolicy admitting the APS Kong data plane (Gold namespace `b8840c`, per APS "Set Up an Upstream Service") to the backend pods on 8080. `reusable-deploy.yml` applies it in TEST and PROD only, when the environment variable `SCALE_DATA_GATEWAY_ENABLED` is `true`. The gateway configuration is in [`.gwa/`](../.gwa/README.md) (2026-11-13): it exposes only the scale-data paths and `/v3/api-docs/scale-data`; the backend refuses submission tokens everywhere else regardless. |
 | 12 Config | Done: `HBS_SCALE_DATA_API_ENABLED`, `SCALE_DATA_API_PUBLIC_BASE_URL`, `SCALE_DATA_API_ACCEPT_ROLE_SCOPES` in `backend/openshift.deploy.yml` and `reusable-deploy.yml`. |
 
 ## Open questions
@@ -187,7 +187,7 @@ These add to the open questions in [scale-data-api.md](scale-data-api.md).
 
 | # | Question | Who decides | Blocks |
 |---|---|---|---|
-| 1 | Which gateway (for example the BC Gov API Gateway), who owns its configuration, and whether it does its own authentication in addition to passing the SSO token | Team + gateway owners | Exposure, client guide |
-| 2 | What the gateway targets: the frontend's Caddy route or a new backend route (change 11) | Team + gateway owners | **Decided: the backend Service, in-cluster.** Still needed: the gateway's namespace |
-| 3 | Where rate limiting sits if the gateway can't key it per SSO account (per client id) | Team | Build |
-| 4 | Name of the request-id header the gateway forwards | Team + gateway owners | Correlation id |
+| 1 | Which gateway (for example the BC Gov API Gateway), who owns its configuration, and whether it does its own authentication in addition to passing the SSO token | Team + gateway owners | **Decided: the BC Gov API Gateway (APS, Kong), configured by the team from `.gwa/`.** It checks the SSO token's signature, issuer and expiry (`jwt-keycloak`) and passes `Authorization` through; roles and scopes are checked by the backend. A request the gateway refuses gets Kong's body, not the API's error contract. |
+| 2 | What the gateway targets: the frontend's Caddy route or a new backend route (change 11) | Team + gateway owners | **Decided: the backend Service, in-cluster**, admitted from APS's Gold namespace `b8840c` |
+| 3 | Where rate limiting sits if the gateway can't key it per SSO account (per client id) | Team | **Decided: both.** The gateway limits per IP (it has no consumer per account); the backend limits per account. |
+| 4 | Name of the request-id header the gateway forwards | Team + gateway owners | **Decided: `X-Request-ID`** (Kong `correlation-id` plugin; a client's own value is kept). |
