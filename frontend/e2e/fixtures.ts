@@ -2,7 +2,13 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 import { test as base } from '@playwright/test';
 
-import { authSessionJson, isAuthKey, SESSION_STORAGE_STATE, STORAGE_STATE } from './utils';
+import {
+  authSessionJson,
+  installStaticAssetCache,
+  isAuthKey,
+  SESSION_STORAGE_STATE,
+  STORAGE_STATE,
+} from './utils';
 
 /** The saved sessionStorage snapshot (auth keys only), or null when there isn't one yet. */
 const readSessionSnapshot = (): Record<string, string> | null => {
@@ -56,6 +62,9 @@ export const test = base.extend<{ persistRotatedTokens: void }>({
         }
       }, snapshot);
     }
+
+    // Serve the Vite bundle from memory after its first download (see utils).
+    await installStaticAssetCache(context);
 
     const page = await context.newPage();
     await runTest(page);

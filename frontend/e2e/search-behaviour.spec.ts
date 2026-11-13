@@ -1,5 +1,13 @@
 import { expect, test, type Page } from './fixtures';
-import { labelText, localDate, openScreen, pageHeading, resultsOrEmpty, toast } from './helpers/screens';
+import {
+  expectSearchDone,
+  labelText,
+  localDate,
+  openScreen,
+  pageHeading,
+  resultsOrEmpty,
+  toast,
+} from './helpers/screens';
 import { gotoProtected } from './utils';
 
 /**
@@ -21,8 +29,18 @@ const markerColours = (page: Page, inputId: string) =>
 
 test.describe('history screens', () => {
   for (const s of [
-    { id: 'billing-history', title: 'Mark Monthly Billing History', from: 'billingFrom', to: 'billingTo' },
-    { id: 'scaling-history', title: 'Mark Monthly Scaling History', from: 'scalingFrom', to: 'scalingTo' },
+    {
+      id: 'billing-history',
+      title: 'Mark Monthly Billing History',
+      from: 'billingFrom',
+      to: 'billingTo',
+    },
+    {
+      id: 'scaling-history',
+      title: 'Mark Monthly Scaling History',
+      from: 'scalingFrom',
+      to: 'scalingTo',
+    },
   ]) {
     test(`${s.id}: no subtitle, interval labels, red required markers`, async ({ page }) => {
       await openScreen(page, 'queries', s.id);
@@ -49,7 +67,9 @@ test.describe('history screens', () => {
     });
   }
 
-  test('a missing "one of" criterion warns, and the warning closes on leaving the page', async ({ page }) => {
+  test('a missing "one of" criterion warns, and the warning closes on leaving the page', async ({
+    page,
+  }) => {
     // The interval alone isn't enough: one of region, holder, file type, … is required.
     const from = localDate(60).slice(0, 7) + '-01';
     const to = localDate(0);
@@ -112,10 +132,15 @@ test.describe('Transmissions of Issued Statements', () => {
   test('the Home "Recent" link searches the last 30 days', async ({ page }) => {
     await gotoProtected(page, '/home');
     const link = page.getByRole('link', { name: 'Recent Transmissions of Issued Statements' });
-    test.skip((await link.count()) === 0, 'The E2E account does not see the statements block on Home');
+    test.skip(
+      (await link.count()) === 0,
+      'The E2E account does not see the statements block on Home',
+    );
     await link.click();
-    await expect(page).toHaveURL(new RegExp(`/queries/statement-transmissions\\?fromDate=${localDate(30)}`));
+    await expect(page).toHaveURL(
+      new RegExp(`/queries/statement-transmissions\\?fromDate=${localDate(30)}`),
+    );
     await expect(page.locator('#statement-transmissions-fromDate')).toHaveValue(localDate(30));
-    await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 20_000 });
+    await expectSearchDone(page);
   });
 });

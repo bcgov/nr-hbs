@@ -164,6 +164,13 @@ parameters:
     required: true
   - name: KEYSTORE_SECRET
     required: true
+  # IMAGE_TAG is the same on every push to a PR (its number); without a value
+  # that changes, `oc apply` can find the Deployment unchanged and keep the
+  # old pods (nr-fta #53).
+  - name: DEPLOY_ID
+    required: false
+    description: The commit being deployed; a new value rolls the pods
+    value: ""
 
 objects:
   # ── Deployment ────────────────────────────────────────────
@@ -193,6 +200,8 @@ objects:
             app: ${NAME}-backend-${ZONE}
             app.kubernetes.io/instance: ${ZONE}
           annotations:
+            # Changes on every deploy, so the pods restart and pull the new image.
+            hbs/deploy-id: "${DEPLOY_ID}"
             prometheus.io/path: /actuator/prometheus
             prometheus.io/port: '8080'
             prometheus.io/scrape: 'true'
