@@ -15,13 +15,12 @@ import { baseURL, STORAGE_STATE } from './e2e/utils';
  * Override the target with E2E_BASE_URL (e.g. http://localhost:3000 for local).
  */
 export default defineConfig({
-  // 30s ceiling per test attempt (and per individual wait in the specs).
-  // Tests finish in seconds against TEST (the whole suite runs in ~1.5 min),
-  // so keeping it tight bounds the blast radius of any hang: with retries: 2 a
-  // stuck test costs ~1.5 min, and fails legibly rather than masquerading as
-  // "slow CI". The screen crawl and the PDF download use it too; the sign-in
-  // setup project keeps its own longer budget below.
-  timeout: 30_000,
+  // Ceiling per test attempt. Most tests finish in seconds against TEST, but
+  // this leaves room for gotoWithRetry/gotoProtected to ride out a refused or
+  // stalled navigation (up to 4 tries with backoff) and for the screen crawl.
+  // Each search adds its own 45s on top (expectSearchDone in helpers/screens).
+  // Same approach as nr-fta #53.
+  timeout: 90_000,
   testDir: './e2e',
   // Serial execution. We share one SSO refresh token via storageState
   // across runs; parallel workers race that refresh and intermittently leave
@@ -29,12 +28,11 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
+  // Per-test retries on top of the per-navigation retries in e2e/utils.ts.
+  // There is no maxFailures: the run completes, so the report shows every
+  // failing test rather than the first one (CI re-runs the suite at most once
+  // more, see "Run Playwright" in .github/workflows/reusable-tests.yml).
   retries: process.env.CI ? 2 : 0,
-  // Stop the whole run as soon as one test has failed for good. Playwright
-  // only counts a test here once it has exhausted its retries, so a flaky
-  // test that passes on retry #1/#2 doesn't trip it — but a real failure
-  // ends the run instead of burning time on the rest of the suite.
-  maxFailures: 1,
   reporter: [['line'], ['list', { printSteps: true }], ['html', { open: 'never' }]],
   use: {
     baseURL,

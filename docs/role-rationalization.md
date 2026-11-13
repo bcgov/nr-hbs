@@ -67,6 +67,11 @@ Sources: `security/HbsRoles.java`, `security/HbsAuthorities.java`,
 |---|---|
 | `HBS_LEGACY_BRIDGE` | Legacy share bridge only, confined to `/api/v1/hbs/integrations/legacy/**`. No person holds it. |
 
+`HBS_SUBMISSION_API` (November 2026) is a second service role, for the scale
+data API accounts that replace FTP ([roles-and-security.md](roles-and-security.md#service-accounts-scale-data-api)).
+It is new, held by no person, and outside this consolidation; the counts below
+leave it out.
+
 ## Who actually holds what (production grants)
 
 Source: a WebADE extract of HBS grants (`EUSER` × `EAUTHORIZATION` ×

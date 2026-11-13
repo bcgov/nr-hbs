@@ -196,12 +196,16 @@ jobs:
             -p ZONE="${{ inputs.target }}"
             -p NAME="nr-hbs"
             -p IMAGE_TAG="${{ inputs.tag }}"
+            -p DEPLOY_ID="${{ github.sha }}"
             -p MIN_REPLICAS="${{ inputs.backend_replicas }}"
             -p MAX_REPLICAS="${{ inputs.backend_replicas }}"
             -p XML_STORAGE_SIZE="${{ vars.XML_STORAGE_SIZE || '200Mi' }}"
             -p KEYCLOAK_ISSUER_URI="${{ vars.KEYCLOAK_ISSUER_URI }}"
             -p KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
             -p KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID="${{ vars.KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID }}"
+            -p HBS_SCALE_DATA_API_ENABLED="${{ vars.HBS_SCALE_DATA_API_ENABLED || 'true' }}"
+            -p SCALE_DATA_API_PUBLIC_BASE_URL="${{ vars.SCALE_DATA_API_PUBLIC_BASE_URL }}"
+            -p SCALE_DATA_API_ACCEPT_ROLE_SCOPES="${{ vars.SCALE_DATA_API_ACCEPT_ROLE_SCOPES || 'false' }}"
             -p USER_LOOKUP_BASE_URL="$USER_LOOKUP_BASE_URL"
             -p USER_LOOKUP_TOKEN_URL="$USER_LOOKUP_TOKEN_URL"
             -p USER_LOOKUP_CLIENT_ID="${{ steps.keycloak_sa.outputs.client_id }}"
@@ -261,6 +265,7 @@ jobs:
             -p NAME="nr-hbs"
             -p IMAGE_TAG="${{ inputs.tag }}"
             -p REPLICAS="${{ inputs.frontend_replicas }}"
+            -p DEPLOY_ID="${{ github.sha }}"
             -p VITE_KEYCLOAK_URL="${{ vars.KEYCLOAK_ISSUER_URI }}"
             -p VITE_KEYCLOAK_CLIENT_ID="${{ vars.KEYCLOAK_CLIENT_ID }}"
             -p VITE_API_BASE_URL="${{ vars.VITE_API_BASE_URL || '/api' }}"
@@ -283,5 +288,24 @@ jobs:
             -p NAME="nr-hbs"
             -p ZONE="${{ inputs.target }}"
             -p SLOT="${{ inputs.slot || inputs.target }}"
+          triggers: ${{ inputs.triggers }}
+
+      # Lets the API gateway reach the backend Service in-cluster for the scale data API
+      # (backend/openshift.scale-data-gateway.yml): TEST and PROD only, and only once the
+      # environment's gateway namespace is set. PR previews never get it.
+      - name: Scale data API gateway access
+        if: (inputs.target == 'test' || inputs.target == 'prod') && vars.SCALE_DATA_GATEWAY_NAMESPACE != ''
+        uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
+        with:
+          file: backend/openshift.scale-data-gateway.yml
+          oc_namespace: ${{ secrets.oc_namespace }}
+          oc_server: ${{ vars.oc_server }}
+          oc_token: ${{ secrets.oc_token }}
+          debug: false
+          overwrite: true
+          parameters:
+            -p NAME="nr-hbs"
+            -p ZONE="${{ inputs.target }}"
+            -p GATEWAY_NAMESPACE="${{ vars.SCALE_DATA_GATEWAY_NAMESPACE }}"
           triggers: ${{ inputs.triggers }}
 

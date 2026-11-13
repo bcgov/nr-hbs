@@ -1,0 +1,54 @@
+---
+# Lets the API gateway reach the backend for the scale data API
+# (docs/scale-data-api-hosting.md, change 11).
+#
+# The gateway is registered against the backend Service's in-cluster URL,
+#   http://nr-hbs-backend-<zone>.<namespace>.svc:8080
+# so its traffic never passes the OpenShift router: no Route, no public host,
+# no IP allowlist. The backend's own ingress policy admits only the same-zone
+# frontend and monitoring; this adds the gateway's namespace, on port 8080.
+#
+# The gateway's service configuration decides which paths are public (only
+# /api/v1/hbs/integrations/scale-data/** and /v3/api-docs/scale-data). The
+# backend does not rely on that: on the API paths it accepts only a mapped
+# submission account's token with the endpoint's scope, and on every other
+# path it refuses those tokens (scaledata.ScaleDataApiSecurityConfig).
+#
+# Applied by reusable-deploy.yml for TEST and PROD only, and only when the
+# environment variable SCALE_DATA_GATEWAY_NAMESPACE is set.
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: nr-hbs-scale-data-gateway
+parameters:
+  - name: NAME
+    description: App name prefix (must match the main deploy)
+    value: nr-hbs
+  - name: ZONE
+    description: test or prod (must match the deploy's object suffix)
+    required: true
+  - name: GATEWAY_NAMESPACE
+    description: Namespace of the API gateway's data plane (from the gateway's onboarding docs)
+    required: true
+objects:
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: ${NAME}-backend-${ZONE}-ingress-gateway
+      labels:
+        app: ${NAME}-backend-${ZONE}
+        app.kubernetes.io/instance: ${ZONE}
+    spec:
+      podSelector:
+        matchLabels:
+          app: ${NAME}-backend-${ZONE}
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ${GATEWAY_NAMESPACE}
+          ports:
+            - protocol: TCP
+              port: 8080
+      policyTypes:
+        - Ingress

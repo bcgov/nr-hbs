@@ -49,6 +49,30 @@ class TokenValidatorsTest {
   }
 
   @Test
+  void authorizedParty_bridgeClientsMayCarryOnlyTheRolesTheyAreAllowed() {
+    // The staff chain allows only HBS_LEGACY_BRIDGE on bridge client ids: a submission
+    // role on a bridge client is refused, so it can't reach the staff decoder at all.
+    var v = new AuthorizedPartyValidator("hbs-client", List.of("hbs-bridge"), java.util.Set.of(HbsRoles.LEGACY_BRIDGE));
+    assertThat(v.validate(token("hbs-bridge", List.of("HBS_LEGACY_BRIDGE"))).hasErrors()).isFalse();
+    assertThat(v.validate(token("hbs-bridge", List.of("HBS_SUBMISSION_API"))).hasErrors()).isTrue();
+    assertThatThrownBy(() -> new AuthorizedPartyValidator("hbs-client", List.of("x"),
+        java.util.Set.of(HbsRoles.MOF_USER))).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void serviceRoles_areNeverAPerson() {
+    var bridge = new org.springframework.security.authentication.TestingAuthenticationToken("b", null,
+        "ROLE_HBS_LEGACY_BRIDGE");
+    var submission = new org.springframework.security.authentication.TestingAuthenticationToken("s", null,
+        "ROLE_HBS_SUBMISSION_API");
+    var person = new org.springframework.security.authentication.TestingAuthenticationToken("p", null,
+        "ROLE_HBS_MOF_USER");
+    assertThat(LegacyBridgeAccess.isPerson(bridge)).isFalse();
+    assertThat(LegacyBridgeAccess.isPerson(submission)).isFalse();
+    assertThat(LegacyBridgeAccess.isPerson(person)).isTrue();
+  }
+
+  @Test
   void roleValidator_requiresAnHbsRole() {
     var v = new HbsRoleValidator();
     assertThat(v.validate(token("c", List.of("HBS_CLI_USER_FOREST_CLIENT-00012345"))).hasErrors()).isFalse();

@@ -30,6 +30,9 @@ public class SubmissionStorage {
 
   public enum Area { INPUT, ARCHIVE, REJECTED }
 
+  /** How a file arrived: the P505 web page or the scale data API (FTP files never reach this store). */
+  public enum Channel { WEB, API }
+
   private final Path root;
 
   public SubmissionStorage(@Value("${hbs.storage.xml-root:/data/hbs/xml}") String root) {
@@ -74,10 +77,16 @@ public class SubmissionStorage {
    * roles now live in the token, so P505 records the one that matters.
    */
   public void storeSubmitter(String clientNumber, long transmissionId, boolean softwareVendor) {
+    storeSubmitter(clientNumber, transmissionId, softwareVendor, Channel.WEB);
+  }
+
+  /** As {@link #storeSubmitter(String, long, boolean)}, recording the channel too. */
+  public void storeSubmitter(String clientNumber, long transmissionId, boolean softwareVendor, Channel channel) {
     Properties props = new Properties();
     props.setProperty(SOFTWARE_VENDOR, Boolean.toString(softwareVendor));
+    props.setProperty(CHANNEL, channel.name());
     try (var out = Files.newOutputStream(submitterFile(Area.INPUT, clientNumber, transmissionId))) {
-      props.store(out, "P505 submitter");
+      props.store(out, "Submitter");
     } catch (IOException ex) {
       throw new UncheckedIOException("Could not store submitter of transmission " + transmissionId, ex);
     }
@@ -94,6 +103,22 @@ public class SubmissionStorage {
       props.load(in);
     }
     return Boolean.parseBoolean(props.getProperty(SOFTWARE_VENDOR));
+  }
+
+  /**
+   * The channel recorded at upload; {@link Channel#WEB} when none was recorded
+   * (every file before the API existed came from the web page).
+   */
+  public Channel submitterChannel(String clientNumber, long transmissionId) throws IOException {
+    Path file = submitterFile(Area.INPUT, clientNumber, transmissionId);
+    if (!Files.exists(file)) {
+      return Channel.WEB;
+    }
+    Properties props = new Properties();
+    try (var in = Files.newInputStream(file)) {
+      props.load(in);
+    }
+    return "API".equals(props.getProperty(CHANNEL)) ? Channel.API : Channel.WEB;
   }
 
   /** A storage key ({@code <area>/<client>/<id>.xml}) split into its parts, or null when it is not one. */
@@ -117,6 +142,7 @@ public class SubmissionStorage {
   }
 
   private static final String SOFTWARE_VENDOR = "softwareVendor";
+  private static final String CHANNEL = "channel";
 
   /** Every file waiting in INPUT, as {@code client/id.xml} relative keys. */
   public Stream<Path> pending() throws IOException {

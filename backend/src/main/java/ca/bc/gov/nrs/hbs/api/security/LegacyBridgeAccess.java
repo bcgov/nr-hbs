@@ -6,24 +6,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
 /**
- * Confines service-account tokens (the legacy share bridge, role
- * {@link HbsRoles#LEGACY_BRIDGE}) to {@link #PATHS}: the filter chain sends
- * those paths to {@code hasRole('HBS_LEGACY_BRIDGE')} and every other request
- * through {@link #authenticatedPerson()}, which refuses a token carrying a
- * service role. A person's token never carries one (FAM grants it to no
- * user), so nothing changes for the SPA.
+ * Confines service-account tokens to their own endpoints. The legacy share
+ * bridge ({@link HbsRoles#LEGACY_BRIDGE}) may call only {@link #PATHS}; the
+ * scale-data submission accounts ({@link HbsRoles#SUBMISSION_API}) have their
+ * own filter chain ({@code scaledata.ScaleDataApiSecurityConfig}). Every other
+ * request goes through {@link #authenticatedPerson()}, which refuses a token
+ * carrying <em>any</em> service role ({@link HbsRoles#SERVICE}). A person's
+ * token never carries one (FAM grants them to no user), so nothing changes for
+ * the SPA.
  */
 public final class LegacyBridgeAccess {
 
   /** The endpoints the share bridge may call (LegacyBridgeController). */
   public static final String PATHS = "/api/v1/hbs/integrations/legacy/**";
 
-  static final String AUTHORITY = "ROLE_" + HbsRoles.LEGACY_BRIDGE;
+  static final java.util.Set<String> SERVICE_AUTHORITIES = HbsRoles.SERVICE.stream()
+      .map(role -> "ROLE_" + role)
+      .collect(java.util.stream.Collectors.toUnmodifiableSet());
 
   private LegacyBridgeAccess() {
   }
 
-  /** Authenticated, and not a service-account token. */
+  /** Authenticated, and not a service-account token (no role in {@link HbsRoles#SERVICE}). */
   public static AuthorizationManager<RequestAuthorizationContext> authenticatedPerson() {
     return (authentication, context) -> new AuthorizationDecision(isPerson(authentication.get()));
   }
@@ -33,6 +37,6 @@ public final class LegacyBridgeAccess {
         || auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
       return false;
     }
-    return auth.getAuthorities().stream().noneMatch(a -> AUTHORITY.equals(a.getAuthority()));
+    return auth.getAuthorities().stream().noneMatch(a -> SERVICE_AUTHORITIES.contains(a.getAuthority()));
   }
 }

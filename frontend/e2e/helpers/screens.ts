@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { gotoProtected } from '../utils';
 
@@ -9,6 +9,22 @@ import { gotoProtected } from '../utils';
  * would pass for a finished one.
  */
 const RESULTS_TABLE = '.fsp-search__table table:not(.cds--skeleton)';
+
+/**
+ * How long one search may take. A wide search against a cold Oracle cache can
+ * run well past 15s and then pass on a warm re-run (nr-fta #53).
+ */
+export const SEARCH_TIMEOUT_MS = 45_000;
+
+/**
+ * Wait for a search to finish (results or the empty state). The search gets
+ * its own budget on top of the test's, so a slow one is not cut short by the
+ * test timeout in playwright.config.ts.
+ */
+export async function expectSearchDone(page: Page): Promise<void> {
+  test.info().setTimeout(test.info().timeout + SEARCH_TIMEOUT_MS);
+  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: SEARCH_TIMEOUT_MS });
+}
 
 /** A search screen's results table, or its "no records" empty state — the search round-tripped. */
 export const resultsOrEmpty = (page: Page): Locator =>
@@ -28,10 +44,15 @@ export const pageHeading = (page: Page): Locator => page.getByRole('heading', { 
  * Open a registry screen with URL criteria (deep link) and wait for either
  * results or the empty state — i.e. the backend query round-tripped.
  */
-export async function runScreen(page: Page, area: string, screenId: string, params: Record<string, string> = {}) {
+export async function runScreen(
+  page: Page,
+  area: string,
+  screenId: string,
+  params: Record<string, string> = {},
+) {
   const qs = new URLSearchParams(params).toString();
   await gotoProtected(page, `/${area}/${screenId}${qs ? `?${qs}` : ''}`);
-  await expect(resultsOrEmpty(page)).toBeVisible({ timeout: 20_000 });
+  await expectSearchDone(page);
 }
 
 /** Open a registry screen without running a search. */

@@ -42,16 +42,30 @@ public class ScaleDataXmlValidator {
     }
   }
 
-  /** @return validation messages (empty = valid). */
+  /** One schema problem; line and column are null when the parser gave none. */
+  public record SchemaError(Integer line, Integer column, String message) {
+
+    @Override
+    public String toString() {
+      return line == null ? message : "Line " + line + ", column " + column + ": " + message;
+    }
+  }
+
+  /** @return validation messages (empty = valid), at most 50. */
   public List<String> validate(byte[] xml) {
-    List<String> errors = new ArrayList<>();
+    return validateDetailed(xml, MAX_ERRORS).stream().map(SchemaError::toString).toList();
+  }
+
+  /** @return the schema problems (empty = valid), at most {@code maxErrors}. */
+  public List<SchemaError> validateDetailed(byte[] xml, int maxErrors) {
+    List<SchemaError> errors = new ArrayList<>();
     String head = new String(xml, 0, Math.min(xml.length, 4096), StandardCharsets.UTF_8);
     if (head.contains("<!DOCTYPE")) {
-      return List.of("DOCTYPE declarations are not allowed.");
+      return List.of(new SchemaError(null, null, "DOCTYPE declarations are not allowed."));
     }
     if (!head.contains(NAMESPACE)) {
-      return List.of("The file must use the HBS scale data namespace " + NAMESPACE
-          + " (HBS_Schema_V6_1b). Older schema versions are no longer accepted.");
+      return List.of(new SchemaError(null, null, "The file must use the HBS scale data namespace " + NAMESPACE
+          + " (HBS_Schema_V6_1b). Older schema versions are no longer accepted."));
     }
     try {
       Validator validator = schema.newValidator();
@@ -62,16 +76,17 @@ public class ScaleDataXmlValidator {
         @Override public void error(SAXParseException e) { add(e); }
         @Override public void fatalError(SAXParseException e) throws SAXParseException { add(e); throw e; }
         private void add(SAXParseException e) {
-          if (errors.size() < MAX_ERRORS) {
-            errors.add("Line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ": " + e.getMessage());
+          if (errors.size() < maxErrors) {
+            errors.add(new SchemaError(e.getLineNumber() < 0 ? null : e.getLineNumber(),
+                e.getColumnNumber() < 0 ? null : e.getColumnNumber(), e.getMessage()));
           }
         }
       });
       validator.validate(new StreamSource(new ByteArrayInputStream(xml)));
     } catch (SAXException e) {
-      if (errors.isEmpty()) errors.add(e.getMessage());
+      if (errors.isEmpty()) errors.add(new SchemaError(null, null, e.getMessage()));
     } catch (IOException e) {
-      errors.add("The file could not be read.");
+      errors.add(new SchemaError(null, null, "The file could not be read."));
     }
     return errors;
   }

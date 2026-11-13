@@ -51,6 +51,39 @@ public class JdbcUnpackRepository implements UnpackRepository {
   }
 
   @Override
+  public Pending pendingTransmission(long transmissionId) {
+    List<Pending> rows = jdbc.query("""
+        SELECT transmission_id, recd_directory, recd_client_number
+          FROM dtl_scl_doc_transmission
+         WHERE transmission_id = :id
+           AND hbs_xml_trans_step_code = :step
+           AND hbs_processing_status_code = :status
+           AND recd_directory LIKE :prefix""",
+        new MapSqlParameterSource("id", transmissionId)
+            .addValue("step", TransmissionUnpacker.STEP_RECEIVING)
+            .addValue("status", TransmissionUnpacker.STATUS_SUCCESS)
+            .addValue("prefix", "input/%"),
+        (rs, i) -> new Pending(rs.getLong(1), rs.getString(2), rs.getString(3)));
+    return rows.isEmpty() ? null : rows.get(0);
+  }
+
+  @Override
+  public boolean lockReceived(long transmissionId) {
+    // Waits for a concurrent unpack of the same row to commit, then re-reads its state.
+    List<Map<String, Object>> rows = jdbc.queryForList("""
+        SELECT hbs_xml_trans_step_code AS step, hbs_processing_status_code AS status
+          FROM dtl_scl_doc_transmission
+         WHERE transmission_id = :id
+           FOR UPDATE WAIT 60""", new MapSqlParameterSource("id", transmissionId));
+    if (rows.isEmpty()) {
+      return false;
+    }
+    Map<String, Object> row = rows.get(0);
+    return TransmissionUnpacker.STEP_RECEIVING.equals(row.get("STEP"))
+        && TransmissionUnpacker.STATUS_SUCCESS.equals(row.get("STATUS"));
+  }
+
+  @Override
   public Map<String, Object> transmission(long transmissionId) {
     return single("SELECT * FROM dtl_scl_doc_transmission WHERE transmission_id = :id",
         new MapSqlParameterSource("id", transmissionId));

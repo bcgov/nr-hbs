@@ -30,20 +30,32 @@ public class UnpackService {
     this.audit = audit;
   }
 
+  /**
+   * Unpacks the transmission, or returns null when it no longer waits at
+   * RCD/CSA (another pod or the in-request path unpacked it first). The row
+   * lock is held until this transaction commits.
+   */
   @Transactional
   public TransmissionUnpacker.Outcome unpack(UnpackRepository.Pending pending, SubmissionStorage.Key key) {
+    if (!repository.lockReceived(pending.transmissionId())) {
+      return null;
+    }
     byte[] xml;
     Boolean vendor;
+    SubmissionStorage.Channel channel;
     try (InputStream in = storage.open(SubmissionStorage.Area.INPUT, key.clientNumber(), key.transmissionId())) {
       xml = in.readAllBytes();
       vendor = storage.submitterIsSoftwareVendor(key.clientNumber(), key.transmissionId());
+      channel = storage.submitterChannel(key.clientNumber(), key.transmissionId());
     } catch (IOException ex) {
       throw new UncheckedIOException("Cannot read " + pending.recdDirectory(), ex);
     }
     // No sidecar: an upload from before the sidecar existed. Legacy skipped FXA04 when the user
     // could not be found ("user was deleted some time between p505 and b1012").
-    TransmissionUnpacker.Submitter submitter =
-        new TransmissionUnpacker.Submitter(true, Boolean.TRUE.equals(vendor));
+    // FXA04 (no production files from software vendors) is a web-page rule: files from the scale
+    // data API, like FTP files, are not subject to it (docs/scale-data-api.md open question 4).
+    TransmissionUnpacker.Submitter submitter = new TransmissionUnpacker.Submitter(
+        channel == SubmissionStorage.Channel.WEB, Boolean.TRUE.equals(vendor));
     UnpackContext ctx = new UnpackContext(tableApi, repository, audit.batchUser(), audit.now());
     return new TransmissionUnpacker(ctx).process(pending.transmissionId(), xml, submitter);
   }

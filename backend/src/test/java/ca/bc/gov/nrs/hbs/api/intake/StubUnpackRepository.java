@@ -64,6 +64,20 @@ class StubUnpackRepository implements UnpackRepository {
   }
 
   @Override
+  public Pending pendingTransmission(long transmissionId) {
+    return lockReceived(transmissionId) ? pendingTransmissions().stream()
+        .filter(p -> p.transmissionId() == transmissionId).findFirst().orElse(null) : null;
+  }
+
+  /** No real lock in memory: still at RCD/CSA? */
+  @Override
+  public boolean lockReceived(long transmissionId) {
+    Map<String, Object> row = transmissions.get(transmissionId);
+    return row != null && "RCD".equals(row.get("HBS_XML_TRANS_STEP_CODE"))
+        && "CSA".equals(row.get("HBS_PROCESSING_STATUS_CODE"));
+  }
+
+  @Override
   public Map<String, Object> transmission(long transmissionId) {
     return transmissions.get(transmissionId);
   }

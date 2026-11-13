@@ -76,7 +76,8 @@ public class StatementTransmissionControllerTest {
         + " 'x.xml', 'x.pdf', TIMESTAMP '2026-10-01 16:20:00')");
     sql.update("INSERT INTO document_delivery_batch_item VALUES (5, 103, 1002)");
 
-    controller = new StatementTransmissionController(jdbc, new StatementPdfRenderer(), new StatementXslVersion(jdbc));
+    controller = new StatementTransmissionController(
+        new StatementTransmissionFiles(jdbc, new StatementPdfRenderer(), new StatementXslVersion(jdbc)));
   }
 
   private static void file(org.springframework.jdbc.core.JdbcTemplate sql, long id, String type, String xml) {
