@@ -22,8 +22,9 @@ import org.springframework.util.StringUtils;
  *       with the OAuth 2.0 client-credentials scheme and its three scopes. This
  *       is the document the gateway publishes; the gateway reaches the backend
  *       Service in-cluster (backend/openshift.scale-data-gateway.yml) and its
- *       configuration exposes only this path and the API. Swagger UI:
- *       {@code /swagger-ui/index.html?urls.primaryName=scale-data} (internal).</li>
+ *       configuration exposes only this path, the API and Swagger UI
+ *       ({@code /swagger-ui/**}), answering {@code /v3/api-docs/swagger-config}
+ *       itself so the UI lists only this group (.gwa/README.md).</li>
  *   <li>{@code /v3/api-docs/hbs}: everything else (staff and public endpoints),
  *       internal only: neither the frontend route nor the gateway exposes it.</li>
  * </ul>

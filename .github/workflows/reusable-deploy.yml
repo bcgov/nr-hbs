@@ -143,6 +143,18 @@ jobs:
       # before it, so check out here to make ./.github/scripts available.
       - uses: actions/checkout@v7
 
+      # Idempotently create the scale data API's OAuth scopes
+      # (hbs.scale-data.submit, hbs.scale-data.read, hbs.statements.read) in this
+      # environment's custom realm, so a client's account can be given them.
+      # Same admin service account, realm and gating as the step below; skipped
+      # when those aren't configured (PR previews).
+      - name: Ensure Keycloak client scopes
+        if: ${{ env.KC_SA_CLIENT_ID != '' && vars.KEYCLOAK_SA_ISSUER_URI != '' }}
+        env:
+          KEYCLOAK_ISSUER_URI: ${{ vars.KEYCLOAK_SA_ISSUER_URI }}
+          KC_SA_CLIENT_SECRET: ${{ secrets.keycloak_sa_client_secret }}
+        run: ./.github/scripts/ensure-keycloak-scopes.sh
+
       # Idempotently create the HBS backend's user-lookup service-account client
       # in this environment's realm and assign the nr-user-lookup-api scopes.
       # Skipped when the admin service-account credentials aren't configured
@@ -205,6 +217,7 @@ jobs:
             -p KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID="${{ vars.KEYCLOAK_LEGACY_BRIDGE_CLIENT_ID }}"
             -p HBS_SCALE_DATA_API_ENABLED="${{ vars.HBS_SCALE_DATA_API_ENABLED || 'true' }}"
             -p SCALE_DATA_API_PUBLIC_BASE_URL="${{ vars.SCALE_DATA_API_PUBLIC_BASE_URL }}"
+            -p SCALE_DATA_API_ISSUER_URI="${{ vars.SCALE_DATA_API_ISSUER_URI || vars.KEYCLOAK_SA_ISSUER_URI || vars.KEYCLOAK_ISSUER_URI }}"
             -p SCALE_DATA_API_ACCEPT_ROLE_SCOPES="${{ vars.SCALE_DATA_API_ACCEPT_ROLE_SCOPES || 'false' }}"
             -p USER_LOOKUP_BASE_URL="$USER_LOOKUP_BASE_URL"
             -p USER_LOOKUP_TOKEN_URL="$USER_LOOKUP_TOKEN_URL"

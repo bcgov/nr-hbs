@@ -6,8 +6,8 @@ Background: [docs/scale-data-api-hosting.md](../docs/scale-data-api-hosting.md).
 
 | File | HBS environment | Public host | Upstream (in-cluster) | Token issuer |
 |---|---|---|---|---|
-| `test/gw-config.yaml` | TEST | `nr-hbs-scale-data-test.api.gov.bc.ca` | `nr-hbs-backend-test.<licence>-test.svc:8080` | `https://test.loginproxy.gov.bc.ca/auth/realms/standard` |
-| `prod/gw-config.yaml` | PROD | `nr-hbs-scale-data.api.gov.bc.ca` | `nr-hbs-backend-prod.<licence>-prod.svc:8080` | `https://loginproxy.gov.bc.ca/auth/realms/standard` |
+| `test/gw-config.yaml` | TEST | `nr-hbs-scale-data-test.api.gov.bc.ca` | `nr-hbs-backend-test.<licence>-test.svc:8080` | `https://test.loginproxy.gov.bc.ca/auth/realms/forests` |
+| `prod/gw-config.yaml` | PROD | `nr-hbs-scale-data.api.gov.bc.ca` | `nr-hbs-backend-prod.<licence>-prod.svc:8080` | `https://loginproxy.gov.bc.ca/auth/realms/forests` |
 
 Both are published to the production APS (`api.gov.bc.ca`), one Gateway, split
 by the qualifier tags `ns.<gatewayId>.test` and `ns.<gatewayId>.prod` (APS
@@ -20,16 +20,29 @@ replaces only the services carrying its tag.
 |---|---|---|---|
 | `…-api` | GET, POST | `/api/v1/hbs/integrations/scale-data/` (prefix) | `jwt-keycloak`: signature, issuer, expiry. Body up to 11 MB. |
 | `…-openapi` | GET | `/v3/api-docs/scale-data` (exact) | none (the document is public) |
+| `…-swagger-ui` | GET | `/swagger-ui/` (prefix: the UI's files) | none |
+| `…-swagger-config` | GET | `/v3/api-docs/swagger-config` (exact) | Answered by the gateway itself (`pre-function`) with only the client document. The backend's list also names the internal staff document, first. |
+| `…-swagger-redirect` | GET | `/`, `/swagger-ui`, `/swagger-ui.html` | Redirect (302) to `/swagger-ui/index.html` |
 
 On the whole service: per-IP rate limit, `X-Request-ID` correlation id, and the
 APS global error rewrite turned off so the API's own error bodies pass through.
-Nothing else on the backend (staff API, actuator, Swagger UI, the staff OpenAPI
-group) has a route, so the gateway answers 404 for it.
+Nothing else on the backend (staff API, actuator, the staff OpenAPI group) has
+a route, so the gateway answers 404 for it.
+
+Swagger UI: `https://nr-hbs-scale-data-test.api.gov.bc.ca/` (TEST) and
+`https://nr-hbs-scale-data.api.gov.bc.ca/` (PROD). Its "Try it out" calls go to
+the server named in the document, so `SCALE_DATA_API_PUBLIC_BASE_URL` (step 4)
+must be set; without it the document names the backend's in-cluster address.
 
 The backend does not rely on the gateway: it validates the token again and
 checks the mapped client id, the `HBS_SUBMISSION_API` role and each endpoint's
-scope. Roles and scopes are not checked here because the SSO standard realm
-puts client roles in a `client_roles` claim, which `jwt-keycloak` does not read.
+scope. Roles and scopes are checked there only, so the rules live in one place.
+
+The issuer is the custom **forests** realm, not the staff standard realm: the
+API's scopes are custom client scopes, which only a realm we administer can
+hold (the deploy creates them, `.github/scripts/ensure-keycloak-scopes.sh`).
+`allowed_iss` here must match the backend's `SCALE_DATA_API_ISSUER_URI`
+(GitHub environment variable; falls back to `KEYCLOAK_SA_ISSUER_URI`).
 
 ## Placeholders
 
@@ -70,7 +83,10 @@ puts client roles in a `client_roles` claim, which `jwt-keycloak` does not read.
 H=https://nr-hbs-scale-data-test.api.gov.bc.ca
 curl -s $H/v3/api-docs/scale-data | jq .info.title          # "HBS Scale Data API"
 curl -si $H/api/v1/hbs/integrations/scale-data/submissions   # 401 from the gateway
+curl -s $H/v3/api-docs/swagger-config | jq '.urls[].url'      # only "/v3/api-docs/scale-data"
+curl -si $H/ | grep -i ^location                             # /swagger-ui/index.html
 curl -si $H/api/v1/hbs/queries/x                             # 404: no route
+curl -si $H/v3/api-docs/hbs                                  # 404: no route
 curl -si $H/actuator/health                                  # 404: no route
 # With a client-credentials token from a mapped account:
 curl -si -H "Authorization: Bearer $TOKEN" $H/api/v1/hbs/integrations/scale-data/submissions
@@ -82,8 +98,9 @@ also confirms that `jwt-keycloak` passed `Authorization` through.
 ## Client accounts
 
 Accounts are not issued through the APS portal. Each client gets a
-client-credentials integration in the SSO standard realm (CSS) with the
-`HBS_SUBMISSION_API` role, plus a line in `SCALE_DATA_API_ACCOUNTS`
+confidential service-account client in the forests realm with the
+`HBS_SUBMISSION_API` client role and the scopes it needs as default client
+scopes, plus a line in `SCALE_DATA_API_ACCOUNTS`
 (see [docs/roles-and-security.md](../docs/roles-and-security.md), "Service
 accounts: scale data API"). Listing the API in the APS API Directory (a
 DraftDataset and a Product) is optional and not set up here.
