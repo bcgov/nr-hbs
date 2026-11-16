@@ -203,7 +203,8 @@ the `202` path.
 ## Authentication and onboarding
 
 Each submitting organization gets its own OAuth 2.0 client-credentials account
-in BC Gov SSO (Keycloak, standard realm), carrying one new service role,
+in BC Gov SSO (Keycloak, the custom forests realm, where custom scopes can
+be defined), carrying one new service role,
 `HBS_SUBMISSION_API`, and the OAuth scopes of the endpoints it may call:
 `hbs.scale-data.submit`, `hbs.scale-data.read`, `hbs.statements.read`
 (details in [roles-and-security.md](roles-and-security.md#service-accounts-scale-data-api)). This is the same pattern the legacy share bridge uses
