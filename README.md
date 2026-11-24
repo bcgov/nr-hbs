@@ -82,7 +82,7 @@ frontend/   React SPA (Vite + TypeScript), Caddy image
 docs/       Architecture, security, database, pinch points, per-area screen maps
 monitoring/ Sysdig alert templates (applied after PROD deploys)
 compose.yml Local dev (backend + frontend; shared Oracle, no local DB)
-.github/    CI/CD workflows (PR deploy, merge → TEST → PROD, analysis, route-tls)
+.github/    CI/CD workflows (PR deploy, merge → TEST → PROD, analysis, cert-keeper)
 ```
 
 ## License

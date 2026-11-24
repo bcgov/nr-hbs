@@ -134,6 +134,6 @@ Sysdig alerts after PROD. Differences:
 - The backend template adds a **ReadWriteMany PVC** for submitted XML
   (`${NAME}-backend-xml-${ZONE}`) and the `HBS_BATCH_ENABLED` switch.
 - The **PROD vanity hostname + TLS** is applied by the standalone
-  `.github/workflows/route-tls.yml` (workflow_dispatch), never by merge, per
+  `.github/workflows/cert-keeper.yml` (workflow_dispatch), never by merge, per
   AGENTS.md. nr-fsp-new embeds it in its deploy instead.
 - No FOM integration and no SchemaSpy job (no Postgres).
