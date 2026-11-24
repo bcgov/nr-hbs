@@ -274,7 +274,7 @@ jobs:
       # Default cluster-domain Route (nr-hbs-<slot>.apps.gold...). Applied in
       # every environment, PROD included. The PROD vanity hostname + TLS is NOT
       # managed here: per AGENTS.md it is applied on demand by the standalone
-      # .github/workflows/route-tls.yml (workflow_dispatch), never by merge.
+      # .github/workflows/cert-keeper.yml (workflow_dispatch), never by merge.
       - name: Default Route
         uses: bcgov/action-deployer-openshift@e2d60eb9cacceb89c3b97d8dcf0a2c460eea5eab # v4.2.3
         with:
