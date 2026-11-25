@@ -246,4 +246,26 @@ class ScaleDataApiSecurityTest {
         .andExpect(jsonPath("$.paths['" + BASE + "/submissions'].post.security[0]."
             + ScaleDataApi.SECURITY_SCHEME + "[0]").value("hbs.scale-data.submit"));
   }
+
+  /**
+   * The paths the gateway's Swagger UI routes rely on (.gwa/*\/gw-config.yaml):
+   * the UI's files under /swagger-ui/, which load their group list from
+   * /v3/api-docs/swagger-config. The gateway answers that one itself with only
+   * the scale-data group, so if springdoc moves it, the gateway must follow.
+   */
+  @Test
+  void swaggerUiLoadsWhereTheGatewayRoutesIt() throws Exception {
+    mvc.perform(get("/swagger-ui/index.html"))
+        .andExpect(status().isOk())
+        .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+            .string(containsString("./swagger-initializer.js")));
+    mvc.perform(get("/swagger-ui/swagger-initializer.js"))
+        .andExpect(status().isOk())
+        .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+            .string(containsString("\"configUrl\" : \"/v3/api-docs/swagger-config\"")));
+    mvc.perform(get("/v3/api-docs/swagger-config"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.urls[?(@.url == '/v3/api-docs/" + ScaleDataApi.OPENAPI_GROUP + "')].name")
+            .value(org.hamcrest.Matchers.contains("HBS Scale Data API (clients and software vendors)")));
+  }
 }

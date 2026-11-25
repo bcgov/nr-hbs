@@ -83,6 +83,13 @@ parameters:
   - name: SCALE_DATA_API_PUBLIC_BASE_URL
     required: false
     value: ""
+  # Issuer of the scale data accounts' tokens: the custom (forests) realm, where
+  # the deploy creates the API's scopes (.github/scripts/ensure-keycloak-scopes.sh),
+  # e.g. https://test.loginproxy.gov.bc.ca/auth/realms/forests. Not the staff
+  # standard realm, which can't hold custom scopes. Must match the gateway's
+  # allowed_iss (.gwa/). Required: a blank value would break the decoder.
+  - name: SCALE_DATA_API_ISSUER_URI
+    required: true
   # true = also accept the API's scopes as CSS client roles (HBS_SCALE_DATA_SUBMIT,
   # HBS_SCALE_DATA_READ, HBS_STATEMENTS_READ) when the issuer can't add custom scopes.
   - name: SCALE_DATA_API_ACCEPT_ROLE_SCOPES
@@ -267,6 +274,8 @@ objects:
                   value: ${HBS_SCALE_DATA_API_ENABLED}
                 - name: SCALE_DATA_API_PUBLIC_BASE_URL
                   value: ${SCALE_DATA_API_PUBLIC_BASE_URL}
+                - name: SCALE_DATA_API_ISSUER_URI
+                  value: ${SCALE_DATA_API_ISSUER_URI}
                 - name: SCALE_DATA_API_ACCEPT_ROLE_SCOPES
                   value: ${SCALE_DATA_API_ACCEPT_ROLE_SCOPES}
                 - name: USER_LOOKUP_BASE_URL

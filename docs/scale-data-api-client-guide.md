@@ -89,7 +89,8 @@ $Token = (Invoke-RestMethod -Method Post -Uri $TokenUrl -Body @{
 
 Send the token on every API call as `Authorization: Bearer <token>`.
 
-The API is described in OpenAPI at `{API base URL}/v3/api-docs/scale-data`;
+The API is described in OpenAPI at `{API base URL}/v3/api-docs/scale-data`, and
+you can browse and try it in Swagger UI at `{API base URL}/swagger-ui/index.html`;
 most HTTP client generators can build a client from it.
 
 ## 3. Send a file

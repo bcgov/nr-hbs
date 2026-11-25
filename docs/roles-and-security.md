@@ -240,12 +240,20 @@ holds even if the one before it is misconfigured or bypassed
 | `hbs.statements.read` | `GET /statements`, `GET /statements/{id}.pdf` and `.xml` |
 
 - **Scopes** come from the token's `scope` claim (Keycloak client scopes
-  assigned to the account's client). If the issuer can't add custom client
+  assigned to the account's client). The deploy creates the three scopes in
+  the custom (forests) realm of each environment
+  (`.github/scripts/ensure-keycloak-scopes.sh`, against
+  `KEYCLOAK_SA_ISSUER_URI` with the `keycloak_sa_client_*` admin account;
+  existing scopes are left alone). The accounts therefore live in that realm:
+  the API accepts tokens from `SCALE_DATA_API_ISSUER_URI` (GitHub environment
+  variable, falling back to `KEYCLOAK_SA_ISSUER_URI`), and the gateway's
+  `allowed_iss` (`.gwa/`) names the same issuer. Staff still sign in through
+  the standard realm. If the issuer can't add custom client
   scopes, set `SCALE_DATA_API_ACCEPT_ROLE_SCOPES=true` and grant the client
   roles `HBS_SCALE_DATA_SUBMIT`, `HBS_SCALE_DATA_READ`, `HBS_STATEMENTS_READ`
   instead; they count as the matching scopes and as nothing else.
 - **Accounts** are the `SCALE_DATA_API_ACCOUNTS` key of the backend settings
-  ConfigMap, one line per account: `<CSS client id> = <client number>, ...`.
+  ConfigMap, one line per account: `<client id> = <client number>, ...`.
   The file is re-read when it changes; removing a line shuts the account out
   within about a minute.
 - **Isolation both ways.** The staff chain's decoder never accepts a
@@ -254,8 +262,9 @@ holds even if the one before it is misconfigured or bypassed
   decoder refuses staff, BCeID and bridge tokens.
 - **Audit user** on the transmission rows is `API\<client id>` (30
   characters), so P032 shows the channel and the account.
-- Setup per account: create the CSS service-account client, grant it the
-  `HBS_SUBMISSION_API` role and the scopes it needs (usually all three), add
+- Setup per account: create the service-account client in the forests realm, grant it the
+  `HBS_SUBMISSION_API` role and the scopes it needs (usually all three, as
+  default client scopes so a `client_credentials` token carries them), add
   its line to the ConfigMap, and send the secret through a one-time link.
 
 ## Data domains
